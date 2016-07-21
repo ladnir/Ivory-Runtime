@@ -8,6 +8,10 @@
 #include <x86intrin.h>
 #endif 
 
+#include "Common/BitVector.h"
+
+using std::array;
+
 namespace osuCrypto {
 
 	void mul128(block x, block y, block& xy1, block& xy2)
@@ -29,7 +33,7 @@ namespace osuCrypto {
 
 
 
-	void eklundh_transpose128(std::array<block, 128>& inOut)
+	void eklundh_transpose128(array<block, 128>& inOut)
 	{
 		const static u64 TRANSPOSE_MASKS128[7][2] = {
 			{ 0x0000000000000000, 0xFFFFFFFFFFFFFFFF },
@@ -149,7 +153,102 @@ namespace osuCrypto {
 				exit(1);
 			}
 		}
-		cout << "\ttranspose with offset " << offset << " ok\n";
+		Log::out << "\ttranspose with offset " << offset << " ok\n";
 #endif
 	}
+
+
+
+
+
+
+	//  load          column  y,y+1          (byte index)
+	//                   __________________
+	//                  |                  |
+	//                  |                  |
+	//                  |                  |
+	//                  |                  |
+	//  row  16*x, ..., |     # #          |
+	//  row  16*(x+1)   |     # #          |     into  out  column wise
+	//                  |                  |
+	//                  |                  |
+	//                  |                  |
+	//                   ------------------
+	//				    
+	// note: out is a 16x16 bit matrix = 16 rows of 2 bytes each.
+	//       out[0] stores the first column of 16 bytes,
+	//       out[1] stores the second column of 16 bytes.
+	void sse_loadSubSquare(array<block, 128>& in, array<block, 2>& out, u64 x, u64 y)
+	{
+		static_assert(sizeof(array<array<u8, 16>, 2>) == sizeof(array<block, 2>), "");
+		static_assert(sizeof(array<array<u8, 16>, 128>) == sizeof(array<block, 128>), "");
+
+		array<array<u8, 16>, 2>& outByteView = *(array<array<u8, 16>, 2>*)&out;
+		array<array<u8, 16>, 128>& inByteView = *(array<array<u8, 16>, 128>*)&in;
+
+		for (int l = 0; l < 16; l++)
+		{
+			outByteView[0][l] = inByteView[16 * x + l][2 * y];
+			outByteView[1][l] = inByteView[16 * x + l][2 * y + 1];
+		}
+	}
+
+
+
+	// given a 16x16 sub square, place its transpose into out at 
+	// rows  16*x, ..., 16 *(x+1)  in byte  columns y, y+1. 
+	void sse_transposeSubSquare(array<block, 128>& out, array<block, 2>& in, u64 x, u64 y)
+	{
+		static_assert(sizeof(array<array<u16, 8>, 128>) == sizeof(array<block, 128>), "");
+
+		array<array<u16, 8>, 128>& outU16View = *(array<array<u16, 8>, 128>*)&out;
+		
+
+		for (int j = 0; j < 8; j++)
+		{
+			outU16View[16 * x + 7 - j][y] = _mm_movemask_epi8(in[0]);
+			outU16View[16 * x + 15 - j][y] = _mm_movemask_epi8(in[1]);
+
+			in[0] = _mm_slli_epi64(in[0], 1);
+			in[1] = _mm_slli_epi64(in[1], 1);
+		}
+	}
+
+	void print(array<block, 128>& inOut)
+	{
+		BitVector temp(128);
+
+		for (u64 i = 0; i < 128; ++i)
+		{
+
+			temp.assign(inOut[i]);
+			Log::out << temp << Log::endl;
+		}
+		Log::out << Log::endl;
+	}
+	
+	
+	void sse_transpose128(array<block, 128>& inOut)
+	{
+		array<block, 2> a, b;
+
+		for (int j = 0; j < 8; j++)
+		{
+			sse_loadSubSquare(inOut, a, j, j);
+			sse_transposeSubSquare(inOut, a, j, j);
+
+			for (int k = 0; k < j; k++)
+			{
+				sse_loadSubSquare(inOut, a, k, j);
+				sse_loadSubSquare(inOut, b, j, k);
+				sse_transposeSubSquare(inOut, a, j, k);
+				sse_transposeSubSquare(inOut, b, k, j);
+			}
+		}
+	}
+
+
 }
+
+
+

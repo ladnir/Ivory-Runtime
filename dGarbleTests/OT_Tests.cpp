@@ -189,7 +189,9 @@ void Transpose_Test_Impl()
 	data[7] = _mm_set_epi64x(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF);
 
 	//printMtx(data);
-	eklundh_transpose128(data);
+
+	for (u64 i = 0; i < 1001; ++i)
+		eklundh_transpose128(data);
 
 
 	for (auto& d : data)
@@ -205,6 +207,45 @@ void Transpose_Test_Impl()
 		}
 	}
 }
+
+
+void Sse_Transpose_Test_Impl()
+{
+
+	std::array<block, 128> data;
+	memset((u8*)data.data(), 0, sizeof(data));
+
+	data[0] = _mm_set_epi64x(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF);
+	data[1] = _mm_set_epi64x(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF);
+	data[2] = _mm_set_epi64x(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF);
+	data[3] = _mm_set_epi64x(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF);
+	data[4] = _mm_set_epi64x(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF);
+	data[5] = _mm_set_epi64x(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF);
+	data[6] = _mm_set_epi64x(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF);
+	data[7] = _mm_set_epi64x(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF);
+
+	//printMtx(data);
+
+
+
+	for (u64 i = 0; i < 1001; ++i)
+		sse_transpose128(data);
+
+
+	for (auto& d : data)
+	{
+		if (neq(d, _mm_set_epi64x(0, 0xFF)))
+		{
+			Log::out << "expected" << Log::endl;
+			Log::out << _mm_set_epi64x(0xF, 0) << Log::endl << Log::endl;
+
+			printMtx(data);
+
+			throw UnitTestFail();
+		}
+	}
+}
+
 
 
 void KosOtExt_100Receive_Test_Impl()

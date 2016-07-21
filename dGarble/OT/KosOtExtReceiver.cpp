@@ -116,7 +116,7 @@ namespace osuCrypto
 			chl.asyncSend(std::move(uBuff));
 
 			// transpose t0 in place
-			eklundh_transpose128(t0);
+			sse_transpose128(t0);
 
 #ifdef OTEXT_DEBUG 
 			chl.recv(debugBuff); assert(debugBuff.size() == sizeof(t0));

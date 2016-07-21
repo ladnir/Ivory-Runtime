@@ -4,6 +4,7 @@
 #include "miracl_gmt/include/miracl.h"
 #include "Common/Defines.h"
 #include "Crypto/PRNG.h"
+#include <memory>
 
 namespace osuCrypto
 {
@@ -81,6 +82,7 @@ namespace osuCrypto
 		EllipticCurveNumber(const EllipticCurveNumber& num);
 		EllipticCurveNumber(EllipticCurveNumber&& num);
 		EllipticCurveNumber(EllipticCurve& curve);
+		EllipticCurveNumber(EllipticCurve& curve, const EllipticCurveNumber& copy);
 		EllipticCurveNumber(EllipticCurve& curve, PRNG& prng);
 		EllipticCurveNumber(EllipticCurve& curve, const i32& val);
 
@@ -125,6 +127,7 @@ namespace osuCrypto
 
 
 		EllipticCurvePoint(EllipticCurve& curve);
+		EllipticCurvePoint(EllipticCurve& curve, const EllipticCurvePoint& copy);
 		EllipticCurvePoint(const EllipticCurvePoint& copy);
 		EllipticCurvePoint(EllipticCurvePoint&& move);
 

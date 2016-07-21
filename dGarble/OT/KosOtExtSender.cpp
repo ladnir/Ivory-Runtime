@@ -101,7 +101,7 @@ namespace osuCrypto
 				}
 			}
 
-			eklundh_transpose128(q);
+			sse_transpose128(q);
 
 #ifdef OTEXT_DEBUG
 			buff.setp(0);

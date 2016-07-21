@@ -44,6 +44,12 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 			Transpose_Test_Impl();
 		}
 
+		TEST_METHOD(Sse_Transpose_TestVS)
+		{
+			InitDebugPrinting();
+			Sse_Transpose_Test_Impl();
+		}
+
 		TEST_METHOD(Iknp_200Receive_TestVS)
 		{
 			InitDebugPrinting();

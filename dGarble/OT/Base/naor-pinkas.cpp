@@ -7,6 +7,7 @@
 #define PARALLEL
 
 #include "Common/ByteStream.h"
+#include "Crypto/sha1.h"
 
 namespace osuCrypto
 {
@@ -82,18 +83,8 @@ namespace osuCrypto
 				auto& g = curve.getGenerator();
 				u64 fieldElementSize = g.sizeBytes();
 
-				//std::unique_ptr<pk_crypto> thrdPkGen(new ecc_field(eccSecLevel, (u8*)&seed));
-				//std::unique_ptr<pk_crypto>& thrdPkGen = mainPkGen;
-				//uint32_t fieldElementSize = thrdPkGen->fe_byte_size();
-
 				EllipticCurvePoint PK0(curve);
-				//std::unique_ptr<fe>
-				//	PK0(thrdPkGen->get_fe()),
-				//	g(thrdPkGen->get_generator());
-
 				EllipticCurveBrick bg(g);
-				//std::unique_ptr<brickexp>
-				//	bg(thrdPkGen->get_brick(g.get()));
 
 				std::vector<EllipticCurveNumber> pK; 
 				std::vector<EllipticCurvePoint> 
@@ -107,24 +98,16 @@ namespace osuCrypto
 				for (u64 i = mStart, j = 0; i < mEnd; ++i, ++j)
 				{
 					// get a random value from Z_p
-					//pK[j] = thrdPkGen->get_rnd_num();
-
 					pK.emplace_back(curve);
 					pK[j].randomize(prng);
 
-					//Log::out << "rand? " << pK[j] << Log::endl;
-
-					//PK_sigma[j] = thrdPkGen->get_fe();
+					Log::out << "rand? " << pK[j] << Log::endl;
 
 					// using brickexp which has the base of g, compute
 					//
 					//      PK_sigma[i] = g ^ pK[i]
 					//
 					// where pK[i] is just a random number in Z_p
-					//bg.pow(PK_sigma[j], pK[j]);
-					
-					bg * pK[j];
-
 					PK_sigma.emplace_back(curve);
 					PK_sigma[j] = bg * pK[j];
 				}
@@ -136,7 +119,7 @@ namespace osuCrypto
 				for (auto u = 0; u < nSndVals; u++) 
 				{
 					pC.emplace_back(curve);
-					//pC[u] = thrdPkGen->get_fe();
+
 					pC[u].fromBytes(&*pBufIdx);
 					pBufIdx += fieldElementSize;
 				}
@@ -332,6 +315,17 @@ namespace osuCrypto
 					PK0a(curve),//(thrdPK->get_fe()),
 					fetmp(curve);//(thrdPK->get_fe());
 
+				EllipticCurveNumber alpha(curve, alpha);
+
+
+				std::vector<EllipticCurvePoint> c;
+				c.reserve(nSndVals);
+
+				for (u64 i = 0; i < nSndVals; ++i)
+				{
+					c.emplace_back(curve, pC[i]);
+				}
+
 				std::vector<u8> hashInBuff(fieldElementSize);
 				u8 shaBuff[SHA1::HashSize];
 				SHA1 sha;
@@ -348,9 +342,11 @@ namespace osuCrypto
 					pPK0.fromBytes(buff.data() + i * fieldElementSize);
 					//pPK0->import_from_bytes(buff.data() + i * fieldElementSize);
 
-					//Log::out
-					//	<< "for msg " << i << "  (sender)" << Log::endl
-					//	<< "  pPK0[i]:    " << pPK0->toString() << Log::endl;
+					Log::out
+						<< "for msg " << i << "  (sender)" << Log::endl
+						<< "  pPK0[i]:    " << pPK0 << Log::endl;
+
+
 
 					PK0a = pPK0 * alpha;
 					//PK0a->set_pow(pPK0.get(), alpha.get());
@@ -363,19 +359,18 @@ namespace osuCrypto
 
 					messages[i][0] = *(block*)shaBuff;
 
-					//Log::out
-					//	<< "for msg " << i << ", " << u << "  (sender)" << Log::endl
-					//	<< "  PK0^a:    " << PK0a->toString() << Log::endl;
+					Log::out
+						<< "for msg " << i << ", 0  (sender)" << Log::endl
+						<< "  PK0^a:    " << PK0a << Log::endl;
 
 					for (u64 u = 1; u < nSndVals; u++)
 					{
-
-						fetmp = pC[u] - PK0a;// ->set_div(pC[u], PK0a.get());
+						fetmp = c[u] - PK0a;// ->set_div(pC[u], PK0a.get());
 						fetmp.toBytes(hashInBuff.data());
 
-						//Log::out
-						//	<< "for msg " << i << ", " << u << "  (sender)" << Log::endl
-						//	<< "  c^a/PK0^a:    " << fetmp->toString() << Log::endl;
+						Log::out
+							<< "for msg " << i << ", " << u << "  (sender)" << Log::endl
+							<< "  c^a/PK0^a:    " << fetmp<< Log::endl;
 
 						sha.Reset();
 						sha.Update((u8*)&i, sizeof(i));

@@ -1,7 +1,7 @@
 #pragma once
 #include "Common/Defines.h"
 #include "Crypto/AES.h"
-#include "Crypto/sha1.h"
+//#include "Crypto/sha1.h"
 #include <vector>
 
 #define SEED_SIZE   AES_BLK_SIZE

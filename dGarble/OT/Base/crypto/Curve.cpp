@@ -87,6 +87,19 @@ namespace osuCrypto
 	}
 
 	EllipticCurvePoint::EllipticCurvePoint(
+		EllipticCurve & curve, 
+		const EllipticCurvePoint & copy)
+		:
+		mMem(nullptr),
+		mVal(nullptr),
+		mCurve(curve)
+	{
+		init();
+
+		*this = copy;
+	}
+
+	EllipticCurvePoint::EllipticCurvePoint(
 		const EllipticCurvePoint & copy)
 		:
 		mMem(nullptr),
@@ -126,6 +139,10 @@ namespace osuCrypto
 	EllipticCurvePoint & EllipticCurvePoint::operator+=(
 		const EllipticCurvePoint & addIn)
 	{
+#ifndef NDEBUG
+		if (&mCurve != &addIn.mCurve) throw std::runtime_error("curves instances must match.");
+#endif
+
 		ecurve2_add(mCurve.mMiracl, (epoint*)addIn.mVal, mVal);
 
 		return *this;
@@ -134,6 +151,9 @@ namespace osuCrypto
 	EllipticCurvePoint & EllipticCurvePoint::operator-=(
 		const EllipticCurvePoint & subtractIn)
 	{
+#ifndef NDEBUG
+		if (&mCurve != &subtractIn.mCurve) throw std::runtime_error("curves instances must match.");
+#endif
 
 		ecurve2_sub(mCurve.mMiracl, (epoint*)subtractIn.mVal, mVal);
 
@@ -143,6 +163,9 @@ namespace osuCrypto
 	EllipticCurvePoint & EllipticCurvePoint::operator*=(
 		const EllipticCurveNumber & multIn)
 	{
+#ifndef NDEBUG
+		if (&mCurve != &multIn.mCurve) throw std::runtime_error("curves instances must match.");
+#endif
 
 		ecurve2_mult(mCurve.mMiracl, multIn.mVal, mVal, mVal);
 
@@ -152,6 +175,10 @@ namespace osuCrypto
 	EllipticCurvePoint EllipticCurvePoint::operator+(
 		const EllipticCurvePoint & addIn) const
 	{
+#ifndef NDEBUG
+		if (&mCurve != &addIn.mCurve) throw std::runtime_error("curves instances must match.");
+#endif
+
 		EllipticCurvePoint temp(*this);
 
 		temp += addIn;
@@ -162,6 +189,9 @@ namespace osuCrypto
 	EllipticCurvePoint EllipticCurvePoint::operator-(
 		const EllipticCurvePoint & subtractIn) const
 	{
+#ifndef NDEBUG
+		if (&mCurve != &subtractIn.mCurve) throw std::runtime_error("curves instances must match.");
+#endif
 		EllipticCurvePoint temp(*this);
 
 		temp -= subtractIn;
@@ -172,6 +202,10 @@ namespace osuCrypto
 	EllipticCurvePoint EllipticCurvePoint::operator*(
 		const EllipticCurveNumber & multIn) const
 	{
+#ifndef NDEBUG
+		if (&mCurve != &multIn.mCurve) throw std::runtime_error("curves instances must match.");
+#endif
+
 		EllipticCurvePoint temp(*this);
 
 		temp *= multIn;
@@ -270,6 +304,18 @@ namespace osuCrypto
 		init();
 	}
 
+	EllipticCurveNumber::EllipticCurveNumber(
+		EllipticCurve & curve, 
+		const EllipticCurveNumber& copy)
+		:
+		mVal(nullptr),
+		mCurve(curve)
+	{
+		init();
+
+		*this = copy;
+	}
+
 	EllipticCurveNumber::EllipticCurveNumber(EllipticCurve & curve, PRNG & prng)
 		:
 		mVal(nullptr),
@@ -314,6 +360,9 @@ namespace osuCrypto
 	EllipticCurveNumber & EllipticCurveNumber::operator+=(
 		const EllipticCurveNumber & addIn)
 	{
+#ifndef NDEBUG
+		if (&mCurve != &addIn.mCurve) throw std::runtime_error("curves instances must match.");
+#endif
 		add(mCurve.mMiracl, mVal, addIn.mVal, mVal);
 		return *this;
 	}
@@ -321,6 +370,10 @@ namespace osuCrypto
 	EllipticCurveNumber & EllipticCurveNumber::operator-=(
 		const EllipticCurveNumber & subtractIn)
 	{
+#ifndef NDEBUG
+		if (&mCurve != &subtractIn.mCurve) throw std::runtime_error("curves instances must match.");
+#endif
+
 		subtract(mCurve.mMiracl, mVal, subtractIn.mVal, mVal);
 		return *this;
 	}
@@ -328,6 +381,10 @@ namespace osuCrypto
 	EllipticCurveNumber & EllipticCurveNumber::operator*=(
 		const EllipticCurveNumber & multIn)
 	{
+#ifndef NDEBUG
+		if (&mCurve != &multIn.mCurve) throw std::runtime_error("curves instances must match.");
+#endif
+
 		multiply(mCurve.mMiracl, mVal, multIn.mVal, mVal);
 		return *this;
 	}
@@ -335,6 +392,10 @@ namespace osuCrypto
 	EllipticCurveNumber EllipticCurveNumber::operator+(
 		const EllipticCurveNumber & addIn)
 	{
+#ifndef NDEBUG
+		if (&mCurve != &addIn.mCurve) throw std::runtime_error("curves instances must match.");
+#endif
+
 		EllipticCurveNumber temp(mCurve);
 
 		add(mCurve.mMiracl, mVal, addIn.mVal, temp.mVal);
@@ -345,6 +406,10 @@ namespace osuCrypto
 	EllipticCurveNumber EllipticCurveNumber::operator-(
 		const EllipticCurveNumber & subtractIn)
 	{
+#ifndef NDEBUG
+		if (&mCurve != &subtractIn.mCurve) throw std::runtime_error("curves instances must match.");
+#endif
+
 		EllipticCurveNumber temp(mCurve);
 
 		subtract(mCurve.mMiracl, mVal, subtractIn.mVal, temp.mVal);
@@ -355,6 +420,10 @@ namespace osuCrypto
 	EllipticCurveNumber EllipticCurveNumber::operator*(
 		const EllipticCurveNumber & multIn)
 	{
+#ifndef NDEBUG
+		if (&mCurve != &multIn.mCurve) throw std::runtime_error("curves instances must match.");
+#endif
+
 		EllipticCurveNumber temp(mCurve);
 
 		subtract(mCurve.mMiracl, mVal, multIn.mVal, temp.mVal);
@@ -416,6 +485,9 @@ namespace osuCrypto
 
 	EllipticCurvePoint EllipticCurveBrick::operator*(const EllipticCurveNumber & multIn) const
 	{
+#ifndef NDEBUG
+		if (&mCurve != &multIn.mCurve) throw std::runtime_error("curves instances must match.");
+#endif
 		EllipticCurvePoint ret(mCurve);
 
 		multiply(multIn, ret);
@@ -425,6 +497,11 @@ namespace osuCrypto
 
 	void EllipticCurveBrick::multiply(const EllipticCurveNumber & multIn, EllipticCurvePoint & result) const
 	{
+#ifndef NDEBUG
+		if (&mCurve != &multIn.mCurve) throw std::runtime_error("curves instances must match.");
+		if (&mCurve != &result.mCurve) throw std::runtime_error("curves instances must match.");
+#endif
+
 		big x, y;
 
 		x = mirvar(mCurve.mMiracl, 0);
