@@ -27,5 +27,11 @@ namespace libBDXTests
 	  {
 		  HalfGtGC_BitAdder_Validate_Test_Impl();
 	  }
+
+	  TEST_METHOD(HalfGtGC_Stream_BitAdder_Test)
+	  {
+		  InitDebugPrinting("../test.out");
+		  HalfGtGC_Stream_BitAdder_Test_Impl();
+	  }
    };
 }

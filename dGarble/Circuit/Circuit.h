@@ -5,12 +5,13 @@
 #include "Gate.h"
 #include "Common/Defines.h"
 #include "Common/BitVector.h"
+#include "Circuit/CircuitStream.h"
 
 namespace osuCrypto {
 
 	class DagCircuit;
 
-	class Circuit
+	class Circuit : public CircuitStream
 	{
 	public:
 		friend class DagCircuit;
@@ -71,8 +72,21 @@ namespace osuCrypto {
 		}
 		
 		void xorShareInputs();
+		
+		// CircuitStream interface
+		u8 mHasMore;
+		bool hasMoreGates() override;
+		ArrayView<Gate> getMoreGates() override;
+		ArrayView<u64> getOutputIndices() override;
+		ArrayView<u64> getInputIndices() override;
+
+		u64 getInternalWireBuffSize() const override;
+		u64 getInputWireBuffSize() const override;
+		u64 getNonXorGateCount() const override;
+
 
 	private:
+
 		u64 mWireCount, mNonXorGateCount, mOutputCount;
 		std::array<u64, 2> mInputs;
 		std::vector<Gate> mGates;

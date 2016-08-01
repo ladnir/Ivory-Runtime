@@ -11,11 +11,12 @@ namespace osuCrypto {
 
 
 	Circuit::Circuit()
+		:mHasMore(1)
 	{
 		mWireCount = mNonXorGateCount = mOutputCount = 0;
 	}
 	Circuit::Circuit(std::array<u64, 2> inputs)
-		: mInputs(inputs)
+		: mHasMore(1),mInputs(inputs)
 	{
 		mWireCount = mInputs[0] + mInputs[1];
 		mNonXorGateCount = mOutputCount = 0;
@@ -187,5 +188,40 @@ namespace osuCrypto {
 
 		for (auto& output : mOutputs)
 			output += offset;
+	}
+	
+	bool Circuit::hasMoreGates()
+	{
+		return mHasMore++ & 1;
+	}
+
+	ArrayView<Gate> Circuit::getMoreGates()
+	{
+		return ArrayView<Gate>(mGates.begin(), mGates.end());
+	}
+	ArrayView<u64> Circuit::getOutputIndices()
+	{
+		return ArrayView<u64>(mOutputs.begin(), mOutputs.end());
+	}
+	ArrayView<u64> Circuit::getInputIndices()
+	{
+		auto begin = new u64[mInputs[0] + mInputs[1]];
+		for (u64 i = 0; i < mInputs[0] + mInputs[1]; ++i)
+			begin[i] = i;
+
+		return ArrayView<u64>(begin, begin + mInputs[0] + mInputs[1], true);
+		//return ArrayView<u64>(mInputs.begin(), mInputs.end());
+	}
+	u64 Circuit::getInternalWireBuffSize() const
+	{
+		return mWireCount;
+	}
+	u64 Circuit::getInputWireBuffSize() const
+	{
+		return Inputs().size();
+	}
+	u64 Circuit::getNonXorGateCount() const
+	{
+		return NonXorGateCount();
 	}
 }

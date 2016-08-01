@@ -4,13 +4,13 @@
 #include "Common/Defines.h"
 #include "Crypto/AES.h"
 #include "Common/BitVector.h"
+#include "Circuit/CircuitStream.h"
 
-#define ADAPTIVE_SECURE
+//#define ADAPTIVE_SECURE
 //#define STRONGEVAL
 
 namespace osuCrypto {
-	class HalfGtGarbledCircuit //:
-	   //public GarbledCircuit
+	class HalfGtGarbledCircuit
 	{
 	public:
 		HalfGtGarbledCircuit(HalfGtGarbledCircuit&&);
@@ -39,18 +39,34 @@ namespace osuCrypto {
 			mTranslationTable.reset();
 		}
 
+		void garbleStream(
+			CircuitStream& cd, 
+			const block& seed, 
+			Channel& chl, 
+			std::vector<block>& wiresBuff,
+			std::function<void(std::vector<std::array<block, 2>>)> sendInputsCallback);
+
+		void evaluateStream(
+			CircuitStream& cd,
+			Channel& chl,
+			std::vector<block>& wiresBuff,
+			std::function<ArrayView<block>(u64)> receiveInputCallback);
+
+		void translate(const Circuit& cd, BitVector& output);
+
+
 #ifdef ADAPTIVE_SECURE 
-		void GarbleSend(const Circuit& cd, const block& seed, Channel& chl, std::vector<block>& wiresBuff, const std::vector<block>& indexArray, std::vector<block> tableMasks);
-		void Garble(const Circuit& cd, const block& seed, const std::vector<block>& indexArray, std::vector<block> tableMasks);
+		void GarbleSend(const Circuit& cd, const block& seed, Channel& chl, std::vector<block>& wiresBuff, std::vector<block> tableMasks);
+		void Garble(const Circuit& cd, const block& seed, std::vector<block> tableMasks);
 		void evaluate(const Circuit& cd, std::vector<block>& labels, std::vector<block> tableMasks);
-		bool Validate(const Circuit& cd, const block&, const std::vector<block>& indexArray, std::vector<block> tableMasks);
+		bool Validate(const Circuit& cd, const block&, std::vector<block> tableMasks);
 #else
-		void GarbleSend(const Circuit& cd, const block& seed, Channel& chl, std::vector<block>& wiresBuff, const std::vector<block>& indexArray);
-		void Garble(const Circuit& cd, const block& seed, const std::vector<block>& indexArray);
+		void GarbleSend(const Circuit& cd, const block& seed, Channel& chl, std::vector<block>& wiresBuff);
+		void Garble(const Circuit& cd, const block& seed);
 		void evaluate(const Circuit& cd, std::vector<block>& labels);
-		bool Validate(const Circuit& cd, const block&, const std::vector<block>& indexArray);
+		bool Validate(const Circuit& cd, const block&);
 #endif
-		void translate(const Circuit& cd, std::vector<block>&  labels, BitVector& output);// override; 
+		void translate(const Circuit& cd, std::vector<block>&  labels, BitVector& output);
 
 		void SendToEvaluator(Channel& channel);
 		void ReceiveFromGarbler(const Circuit& cd, Channel& channel);

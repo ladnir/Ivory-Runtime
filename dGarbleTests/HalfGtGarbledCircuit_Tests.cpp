@@ -1,5 +1,8 @@
 #include "HalfGtGarbledCircuit_Tests.h"
 
+#include "Network/BtChannel.h"
+#include "Network/BtEndpoint.h"
+
 #include "GarbledCircuit/GarbledCircuit.h"
 #include "GarbledCircuit/HalfGtGarbledCircuit.h"
 #include "Circuit/Circuit.h"
@@ -10,6 +13,7 @@
 #include "DebugCircuits.h"
 #include "Crypto/PRNG.h"
 #include "Common/Log.h"
+
 
 using namespace osuCrypto;
 
@@ -89,6 +93,16 @@ void ToBitVector(std::vector<bool>& vec, u64 input, u64 bits)
 	}
 }
 
+void ToBitVector(BitVector& vec, u64 input, u64 bits)
+{
+	vec.reset(bits);
+
+	for (u64 i = 0, mask = 1; i < bits; ++i, mask <<= 1)
+	{
+		vec[i] = ((input & mask) != 0);
+	}
+}
+
 void HalfGtGC_BitAdder_Test_Impl()
 {
 	u32 bits{ 4 };
@@ -146,7 +160,7 @@ void HalfGtGC_BitAdder_Test_Impl()
 
 			for (u64 i = 0; i < outputVec.size(); ++i)
 			{
-				if ((outputVec[i]>0) != (expectedOut[i]))
+				if ((outputVec[i] > 0) != (expectedOut[i]))
 					throw UnitTestFail();
 
 				//Assert::AreEqual(true, true, L"Output bits dont match");
@@ -154,6 +168,91 @@ void HalfGtGC_BitAdder_Test_Impl()
 		}
 	}
 }
+
+
+void HalfGtGC_Stream_BitAdder_Test_Impl()
+{
+	u32 bits{ 4 };
+	block seed = _mm_set_epi32(4253465, 3434565, 234435, 23987045);
+	Circuit cd = AdderCircuit(bits);
+
+	BtIOService ios(0);
+	BtEndpoint ep0(ios, "127.0.0.1", 1212, true, "ep");
+	BtEndpoint ep1(ios, "127.0.0.1", 1212, false, "ep");
+	Channel& senderChannel = ep1.addChannel("chl", "chl");
+	Channel& recvChannel = ep0.addChannel("chl", "chl");
+
+	std::vector<block> wireBuff(cd.WireCount());
+
+
+	std::vector<std::array<block, 2>> inputLabels;
+
+	for (u64 input0 = 0; input0 < (u64(1) << bits); ++input0)
+	{
+		for (u64 input1 = 0; input1 < (u64(1) << bits); ++input1)
+		{
+			std::vector<bool>inputVec;
+			ToBitVector(inputVec, input0, bits);
+			ToBitVector(inputVec, input1, bits);
+
+			HalfGtGarbledCircuit gcSend;
+
+			gcSend.garbleStream(cd, seed, senderChannel, wireBuff, [&](std::vector<std::array<block, 2>> inputs) {
+				inputLabels = std::move(inputs);
+			});
+
+
+			std::vector<block>labels(cd.WireCount());
+			for (u64 i = 0; i < inputVec.size(); ++i)
+			{
+				labels[i] = inputLabels[i][inputVec[i]];
+			}
+
+			HalfGtGarbledCircuit gcRecv;
+
+
+			gcRecv.evaluateStream(cd, recvChannel, wireBuff, [&](u64 numInputs) {
+				//if (numInputs != labels.size()) 
+					//throw std::runtime_error("");
+				return ArrayView<block>(labels);
+			});
+
+			BitVector outputVec;
+			gcRecv.translate(cd, outputVec);
+
+			BitVector expectedOut;
+			ToBitVector(expectedOut, input0 + input1, bits + 1);
+
+			//cd.Evaluate(inputVec);
+			//std::vector<bool> outputVec2;
+			//cd.Translate(inputVec, outputVec2);
+
+			if (outputVec.size() != expectedOut.size())
+				throw UnitTestFail();
+
+			for (u64 i = 0; i < outputVec.size(); ++i)
+			{
+				if ((outputVec[i] > 0) != (expectedOut[i]))
+				{
+
+					Log::out
+						<< "expected  " << expectedOut << Log::endl
+						<< "actual    " << outputVec << Log::endl;
+
+					throw UnitTestFail();
+				}
+				//Assert::AreEqual(true, true, L"Output bits dont match");
+			}
+		}
+	}
+
+	recvChannel.close();
+	senderChannel.close();
+	ep0.stop();
+	ep1.stop();
+	ios.stop();
+}
+
 
 void HalfGtGC_BitAdder_Validate_Test_Impl()
 {
@@ -179,7 +278,7 @@ void HalfGtGC_BitAdder_Validate_Test_Impl()
 	gc.mInputWires.clear();
 	gc.mOutputWires.clear();
 
-	gc.Validate(cd, seed, indexArray
+	gc.Validate(cd, seed
 #ifdef ADAPTIVE_SECURE
 		, masks
 #endif

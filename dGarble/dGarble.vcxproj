@@ -70,6 +70,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Circuit\Circuit.cpp" />
+    <ClCompile Include="Circuit\CircuitStream.cpp" />
     <ClCompile Include="Circuit\DagCircuit.cpp" />
     <ClCompile Include="Common\BitIterator.cpp" />
     <ClCompile Include="Common\BitVector.cpp" />
@@ -96,6 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Circuit\Circuit.h" />
+    <ClInclude Include="Circuit\CircuitStream.h" />
     <ClInclude Include="Circuit\DagCircuit.h" />
     <ClInclude Include="Circuit\Gate.h" />
     <ClInclude Include="Common\ArrayView.h" />

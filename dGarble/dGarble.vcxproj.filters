@@ -87,6 +87,9 @@
     <ClCompile Include="OT\Base\Tools.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Circuit\CircuitStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Circuit\Circuit.h">
@@ -192,6 +195,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OT\Base\Tools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Circuit\CircuitStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
