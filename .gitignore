@@ -190,7 +190,9 @@ _Pvt_Extensions/
 ModelManifest.xml
 /WeGarbleTests__
 /thirdparty
-kProbe_*
+kProbe_data_*
+
+*.VC.db
 
 CodeDB
 LinuxFrontEnd/VisualGDBCache
