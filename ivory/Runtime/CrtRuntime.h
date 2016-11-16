@@ -91,7 +91,7 @@ namespace osuCrypto
             BetaCircuit* mCircuit;
             std::vector<ArrayView<block>> mLabels;
             //BitVector mInputVal;
-            //u64 mInputBundleCount;
+            u64 mInputBundleCount;
         };
 
         struct InputItem

@@ -202,7 +202,7 @@ namespace osuCrypto
         // receive the next OT correction values. This will be several rows of the form u = T0 + T1 + C(w)
         // there c(w) is a pseudo-random code.
         auto dest = mCorrectionVals.begin() + (mCorrectionIdx * mCorrectionVals.size()[1]);
-        chl.recv(dest,
+        chl.recv((block*)dest,
             recvCount * sizeof(block) * mCorrectionVals.size()[1]);
 
         // update the index of there we should store the next set of correction values.

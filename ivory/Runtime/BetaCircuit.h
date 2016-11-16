@@ -4,6 +4,8 @@
 #include "Circuit/Gate.h"
 #include "Common/Defines.h"
 #include <array>
+#include  "Common/ArrayView.h"
+
 namespace osuCrypto
 {
 
@@ -58,7 +60,9 @@ namespace osuCrypto
 		void addOutputBundle(BetaBundle& in);
 		void addGate(BetaWire in0, BetaWire in2, GateType gt, BetaWire out);
 
-
+        std::vector<BetaBundle> mInputs, mOutputs;
+        
+        void evaluate(ArrayView<BitVector> input, ArrayView<BitVector> output);
 
 		void levelize();
 	};

@@ -13,11 +13,29 @@ namespace osuCrypto
 
     }
 
+    CrtInt32::CrtInt32(const CrtInt32 & v)
+        : mRuntime(v.mRuntime)
+        , mLabels(v.mLabels)
+    {
+    }
+
+    CrtInt32::CrtInt32(CrtInt32 &&v)
+        : mRuntime(v.mRuntime)
+        , mLabels(std::move(v.mLabels))
+    {
+    }
+
 
     CrtInt32::~CrtInt32()
     {
     }
 
+
+    CrtInt32& CrtInt32::operator=(const CrtInt32 & copy)
+    {
+        mLabels = copy.mLabels;
+        return *this;
+    }
 
     CrtInt32 CrtInt32::operator+(const CrtInt32& in2)
     {
@@ -85,7 +103,7 @@ namespace osuCrypto
 
         cd.addInputBundle(a1);
         cd.addInputBundle(a2);
-        cd.addInputBundle(sum);
+        cd.addOutputBundle(sum);
         cd.addTempWireBundle(temps);
 
         staticBuildAddBetaCir(cd, a1, a2, sum, temps);

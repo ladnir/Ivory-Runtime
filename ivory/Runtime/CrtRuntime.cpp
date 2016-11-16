@@ -37,8 +37,8 @@ namespace osuCrypto
         }
         else
         {
-            NaorPinkas base; 
-            std::vector<std::array<block,2>> msg(128);
+            NaorPinkas base;
+            std::vector<std::array<block, 2>> msg(128);
             base.send(msg, mPrng, chl, 4);
             mOtExtRecver.setBaseOts(msg);
         }
@@ -63,7 +63,7 @@ namespace osuCrypto
         item.mLabels[0] = in1;
         item.mLabels[1] = in2;
         item.mLabels[2] = out;
-
+        item.mInputBundleCount = 2;
 
         process();
 
@@ -166,13 +166,11 @@ namespace osuCrypto
         std::vector<std::array<block, 2>> messages(mOtCount);
         if (mOtCount)
         {
-            Log::out << "garb input (OT)" << Log::endl;
 
             mOtCount = 0;
 
             mOtExtSender.send(messages, mPrng, *mChannel);
 
-            Log::out << "garb input (OT) done" << Log::endl;
 
         }
 
@@ -181,7 +179,6 @@ namespace osuCrypto
         while (mInputQueue.size())
         {
 
-            Log::out << "garb input" << Log::endl;
 
             auto& item = mInputQueue.front();
 
@@ -221,7 +218,6 @@ namespace osuCrypto
 
         if (mOtChoices.size())
         {
-            Log::out << "eval input (OT)" << Log::endl;
 
             if (sharedMem.size() < mOtCount)
                 sharedMem.resize(mOtCount);
@@ -233,7 +229,6 @@ namespace osuCrypto
 
             mOtChoices.resize(0);
             mOtCount = 0;
-            Log::out << "eval input (OT) Done" << Log::endl;
 
         }
 
@@ -241,7 +236,6 @@ namespace osuCrypto
 
         while (mInputQueue.size())
         {
-            Log::out << "eval input" << Log::endl;
 
             auto& item = mInputQueue.front();
 
@@ -259,10 +253,8 @@ namespace osuCrypto
             {
                 mChannel->recv(item.mLabels.data(), item.mLabels.size() * sizeof(block));
             }
-
             mInputQueue.pop();
         }
-
     }
 
     void CrtRuntime::garblerCircuit()
@@ -281,7 +273,7 @@ namespace osuCrypto
             auto iter = sharedMem.begin();
 
 
-            for (u64 i = 0; i < item.mLabels.size(); ++i)
+            for (u64 i = 0; i < item.mInputBundleCount; ++i)
             {
                 std::copy(item.mLabels[i].begin(), item.mLabels[i].end(), iter);
                 iter += item.mLabels[i].size();
@@ -290,10 +282,16 @@ namespace osuCrypto
             std::unique_ptr<ByteStream> sendBuff(new ByteStream(item.mCircuit->mNonXorGateCount * sizeof(GarbledGate<2>)));
 
             auto gates = sendBuff->getArrayView<GarbledGate<2>>();
-            //if(item.)
+
             garble(*item.mCircuit, sharedMem, mTweaks, gates);
 
             mChannel->asyncSend(std::move(sendBuff));
+
+            for (u64 i = item.mInputBundleCount; i < item.mLabels.size(); ++i)
+            {
+                std::copy(iter, iter + item.mLabels[i].size(), item.mLabels[i].begin());
+                iter += item.mLabels[i].size();
+            }
 
             mCrtQueue.pop();
         }
@@ -316,16 +314,27 @@ namespace osuCrypto
 
             auto iter = sharedMem.begin();
 
-            for (u64 i = 0; i < item.mLabels.size(); ++i)
+            for (u64 i = 0; i < item.mInputBundleCount; ++i)
             {
                 std::copy(item.mLabels[i].begin(), item.mLabels[i].end(), iter);
                 iter += item.mLabels[i].size();
             }
-             
-            mChannel->recv(sharedBuff);
-            auto gates = sharedBuff.getArrayView<GarbledGate<2>>();
 
-            evaluate(*item.mCircuit, sharedMem, mTweaks, gates);
+
+            sharedGates.resize(item.mCircuit->mNonXorGateCount);
+
+            mChannel->recv(sharedGates.data(), sharedGates.size() * sizeof(GarbledGate<2>));
+
+
+            evaluate(*item.mCircuit, sharedMem, mTweaks, sharedGates);
+
+
+            for (u64 i = item.mInputBundleCount; i < item.mLabels.size(); ++i)
+            {
+                std::copy(iter, iter + item.mLabels[i].size(), item.mLabels[i].begin());
+                iter += item.mLabels[i].size();
+            }
+
 
             mCrtQueue.pop();
         }
@@ -355,6 +364,9 @@ namespace osuCrypto
                 {
                     if (neq(sharedMem[i], item.mLabels[i]) && neq(sharedMem[i], item.mLabels[i] ^ mGlobalOffset))
                     {
+                        Log::out << "output reveal error at " << i << ":\n   " << sharedMem[i] << "  != " << item.mLabels[i]
+                            << " (0) AND \n   " << sharedMem[i] << "  != " << (item.mLabels[i] ^ mGlobalOffset) << Log::endl;
+
                         throw std::runtime_error(LOCATION);
                     }
 
@@ -389,12 +401,7 @@ namespace osuCrypto
 
                 for (u64 i = 0; i < item.mLabels.size(); ++i)
                 {
-                    if (neq(sharedMem[i], item.mLabels[i]) && neq(sharedMem[i], item.mLabels[i] ^ mGlobalOffset))
-                    {
-                        throw std::runtime_error(LOCATION);
-                    }
-
-                    (*item.mOutputVal)[i] = (*item.mOutputVal)[i] ^  PermuteBit(sharedMem[i] ^ item.mLabels[i]);
+                    (*item.mOutputVal)[i] = (*item.mOutputVal)[i] ^ PermuteBit(item.mLabels[i]);
                 }
             }
             else
@@ -425,54 +432,53 @@ namespace osuCrypto
     {
         auto garbledGateIter = garbledGates.begin();
 
+
         if (cir.mLevelGates.size())
         {
             block hashs[2], temp[2],
                 zeroAndGarbledTable[2][2]
             { { ZeroBlock,ZeroBlock },{ ZeroBlock,ZeroBlock } };
-
+        
             for (const auto& level : cir.mLevelGates)
             {
-
+        
                 for (const auto& gate : level.mXorGates)
                 {
                     auto& aIdx1 = gate.mInput[0];
                     auto& bIdx1 = gate.mInput[1];
                     auto& cIdx1 = gate.mOutput;
-
+        
                     auto& a = wires[aIdx1];
                     auto& b = wires[bIdx1];
                     auto& c = wires[cIdx1];
                     auto& gt = gate.mType;
-
+        
                     c = a ^ b;
                 }
-
-
                 for (const auto& gate : level.mAndGates)
                 {
                     auto& a = wires[gate.mInput[0]];
                     auto& b = wires[gate.mInput[1]];
                     auto& c = wires[gate.mOutput];
                     auto& gt = gate.mType;
-
+        
                     // compute the hashs
                     hashs[0] = _mm_slli_epi64(a, 1) ^ tweaks[0];
                     hashs[1] = _mm_slli_epi64(b, 1) ^ tweaks[1];
                     mAesFixedKey.ecbEncTwoBlocks(hashs, temp);
                     hashs[0] = temp[0] ^ hashs[0]; // a
                     hashs[1] = temp[1] ^ hashs[1]; // b
-
+        
                                                    // increment the tweaks
                     tweaks[0] = tweaks[0] + OneBlock;
                     tweaks[1] = tweaks[1] + OneBlock;
-
-
+        
+        
                     auto& garbledTable = garbledGateIter++->mGarbledTable;
-
+        
                     zeroAndGarbledTable[1][0] = garbledTable[0];
                     zeroAndGarbledTable[1][1] = garbledTable[1] ^ a;
-
+        
                     // compute the output wire label
                     c = hashs[0] ^
                         hashs[1] ^
@@ -480,7 +486,6 @@ namespace osuCrypto
                         zeroAndGarbledTable[PermuteBit(b)][1];
                 }
             }
-
         }
         else
         {
@@ -513,19 +518,25 @@ namespace osuCrypto
                     tweaks[1] = tweaks[1] + OneBlock;
 
 
+
                     auto& garbledTable = garbledGateIter++->mGarbledTable;
 
                     zeroAndGarbledTable[1][0] = garbledTable[0];
                     zeroAndGarbledTable[1][1] = garbledTable[1] ^ a;
+
+
 
                     // compute the output wire label
                     c = hashs[0] ^
                         hashs[1] ^
                         zeroAndGarbledTable[PermuteBit(a)][0] ^
                         zeroAndGarbledTable[PermuteBit(b)][1];
+
                 }
+                    
             }
         }
+
 
     }
 
@@ -535,54 +546,54 @@ namespace osuCrypto
         std::array<block, 2>& tweaks,
         ArrayView<GarbledGate<2>> gates)
     {
-        auto gateIter = gates.begin();
+        auto gateIter = gates.data();
 
         if (cir.mLevelGates.size())
         {
             u8 aPermuteBit, bPermuteBit, bAlphaBPermute, cPermuteBit;
             block hash[16], temp[16];
-
+        
             for (const auto& level : cir.mLevelGates)
             {
-
+        
                 for (const auto& gate : level.mXorGates)
                 {
-
+        
                     auto& a = wires[gate.mInput[0]];
                     auto& b = wires[gate.mInput[1]];
                     auto& c = wires[gate.mOutput];
                     auto& gt = gate.mType;
-
+        
                     c = a ^ b ^ mZeroAndGlobalOffset[(u8)gt & 1];
                 }
-
-
+        
+        
                 for (u64 i = 0; i < level.mAndGates.size();)
                 {
                     switch (level.mAndGates.size() - i)
                     {
                     case 1:
                     {
-
+        
                         auto& gate = level.mAndGates[i];
                         i += 1;
-
+        
                         auto& a = wires[gate.mInput[0]];
                         auto& b = wires[gate.mInput[1]];
                         auto& c = wires[gate.mOutput];
                         auto& gt = gate.mType;
-
+        
                         // compute the gate modifier variables
                         auto& aAlpha = gate.mAAlpha;
                         auto& bAlpha = gate.mBAlpha;
                         auto& cAlpha = gate.mCAlpha;
-
+        
                         //signal bits of wire 0 of input0 and wire 0 of input1
                         aPermuteBit = PermuteBit(a);
                         bPermuteBit = PermuteBit(b);
                         bAlphaBPermute = bAlpha ^ bPermuteBit;
                         cPermuteBit = ((aPermuteBit ^ aAlpha) && (bAlphaBPermute)) ^ cAlpha;
-
+        
                         // compute the hashs of the wires as H(x) = AES_f( x * 2 ^ tweak) ^ (x * 2 ^ tweak)    
                         hash[0] = _mm_slli_epi64(a, 1) ^ tweaks[0];
                         hash[1] = _mm_slli_epi64((a ^ mGlobalOffset), 1) ^ tweaks[0];
@@ -593,18 +604,18 @@ namespace osuCrypto
                         hash[1] = hash[1] ^ temp[1]; // H( a1 )
                         hash[2] = hash[2] ^ temp[2]; // H( b0 )
                         hash[3] = hash[3] ^ temp[3]; // H( b1 )
-
+        
                                                      // increment the tweaks
                         tweaks[0] = tweaks[0] + OneBlock;
                         tweaks[1] = tweaks[1] + OneBlock;
-
+        
                         // generate the garbled table
                         auto& garbledTable = gateIter++->mGarbledTable;
-
+        
                         // compute the table entries
                         garbledTable[0] = hash[0] ^ hash[1] ^ mZeroAndGlobalOffset[bAlphaBPermute];
                         garbledTable[1] = hash[2] ^ hash[3] ^ a ^ mZeroAndGlobalOffset[aAlpha];
-
+        
                         // compute the out wire
                         c = hash[aPermuteBit] ^
                             hash[2 ^ bPermuteBit] ^
@@ -615,27 +626,27 @@ namespace osuCrypto
                     //case 3:
                     default:
                     {
-
+        
                         auto& gate0 = level.mAndGates[i];
                         auto& gate1 = level.mAndGates[i + 1];
                         i += 2;
-
-
+        
+        
                         auto& a0 = wires[gate0.mInput[0]];
                         auto& b0 = wires[gate0.mInput[1]];
                         auto& c0 = wires[gate0.mOutput];
                         auto& gt0 = gate0.mType;
-
+        
                         auto&  a1 = wires[gate1.mInput[0]];
                         auto&  b1 = wires[gate1.mInput[1]];
                         auto&  c1 = wires[gate1.mOutput];
                         auto& gt1 = gate1.mType;
-
+        
                         // compute the gate modifier variables
                         auto& aAlpha0 = gate0.mAAlpha;
                         auto& bAlpha0 = gate0.mBAlpha;
                         auto& cAlpha0 = gate0.mCAlpha;
-
+        
 
                         // compute the gate modifier variables
                         auto& aAlpha1 = gate1.mAAlpha;
@@ -702,11 +713,8 @@ namespace osuCrypto
                         break;
                     }
                     }
-
                 }
-
             }
-
         }
         else
         {
@@ -761,13 +769,17 @@ namespace osuCrypto
                     garbledTable[0] = hash[0] ^ hash[1] ^ mZeroAndGlobalOffset[bAlphaBPermute];
                     garbledTable[1] = hash[2] ^ hash[3] ^ a ^ mZeroAndGlobalOffset[aAlpha];
 
+
                     // compute the out wire
                     c = hash[aPermuteBit] ^
                         hash[2 ^ bPermuteBit] ^
                         mZeroAndGlobalOffset[cPermuteBit];
                 }
+
             }
         }
+        //Log::out << Log::unlock;
+
     }
 
 

@@ -49,6 +49,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)/ivory;$(ProjectDir);C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Miracl.lib;NTL.lib;cryptlib.lib;ivoryTests.lib;ivory.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -64,6 +65,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)/ivory;$(ProjectDir);C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

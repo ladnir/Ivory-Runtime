@@ -43,7 +43,7 @@ namespace osuCrypto
 
 
     void IknpOtExtReceiver::receive(
-        const BitVector& choices,
+        const BitVector& cc,
         ArrayView<block> messages,
         PRNG& prng,
         Channel& chl)
@@ -56,9 +56,12 @@ namespace osuCrypto
         static const u64 superBlkSize(8);
 
         // we are going to process OTs in blocks of 128 * superBlkSize messages.
-        u64 numOtExt = roundUpTo(choices.size(), 128);
+        u64 numOtExt = roundUpTo(cc.size(), 128);
         u64 numSuperBlocks = (numOtExt / 128 + superBlkSize - 1) / superBlkSize;
         u64 numBlocks = numSuperBlocks * superBlkSize;
+        BitVector choices(numBlocks * 128);
+        choices = cc;
+        choices.resize(numBlocks * 128);
 
         auto choiceBlocks = choices.getArrayView<block>();
         // this will be used as temporary buffers of 128 columns, 

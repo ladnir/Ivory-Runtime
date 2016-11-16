@@ -3,14 +3,16 @@
 #include "Common/Defines.h"
 #include <vector>
 #include <array>
+#include <algorithm>  
 namespace osuCrypto {
 
 
 #ifndef NDEBUG
-    //template<typename T, typename _Distance = ptrdiff_t,
-    //    typename _Pointer = T*, typename _Reference = T&>
+
+
+
     template<typename T>
-    struct ArrayIterator
+    struct ArrayIterator// : public stdext::checked_array_iterator<T*>
     {
         /// One of the @link iterator_tags tag types@endlink.
         typedef std::random_access_iterator_tag  iterator_category;
@@ -23,10 +25,15 @@ namespace osuCrypto {
         /// This type represents a reference-to-value_type.
         typedef T& reference;
 
+        typedef ArrayIterator<T> _Unchecked_type;
+
 
         ArrayIterator(T*begin, T* cur, T* end)
-            :mBegin(begin), mCur(cur), mEnd(end)
+            :// stdext::checked_array_iterator<T*>(begin, end - cur, begin - cur)
+            //, 
+            mBegin(begin), mCur(cur), mEnd(end)
         {
+            
             if (mCur > mEnd) throw std::runtime_error("iter went past end. " LOCATION);
             if (mCur < mBegin - 1) throw std::runtime_error("iter went past begin. " LOCATION);
         }
@@ -39,7 +46,8 @@ namespace osuCrypto {
         }
 
         ArrayIterator<T> operator++(int) {
-            return ArrayIterator<T>(mBegin, mCur + 1, mEnd);
+            ++mCur;
+            return ArrayIterator<T>(mBegin, mCur - 1, mEnd);
         }
 
         ArrayIterator<T> operator+(int i) {
@@ -59,12 +67,19 @@ namespace osuCrypto {
         }
 
         ArrayIterator<T> operator--(int) {
-            return ArrayIterator<T>(mBegin, mCur - 1, mEnd);
+            --mCur;
+            return ArrayIterator<T>(mBegin, mCur + 1, mEnd);
         }
 
         ArrayIterator<T> operator-(int i) {
             return ArrayIterator<T>(mBegin, mCur - i, mEnd);
         }
+
+
+        difference_type operator-(const  ArrayIterator<T>& other) {
+            return mCur - other.mCur;
+        }
+
 
         ArrayIterator<T>& operator-=(int i) {
             mCur -= i;
@@ -96,12 +111,16 @@ namespace osuCrypto {
         bool operator==(const ArrayIterator<T>& cmp) { return mCur == cmp.mCur; }
         bool operator!=(const ArrayIterator<T>& cmp) { return mCur != cmp.mCur; }
 
-        ArrayIterator<T>* operator=(const ArrayIterator<T>& cmp)
+        ArrayIterator<T>& operator=(const ArrayIterator<T>& cmp)
         {
-            mBegin = cmp.mBegin; mCur = cmp.mCur; mEnd = cmp.mEnd; return *this;
+            mBegin = cmp.mBegin; 
+            mCur = cmp.mCur;
+            mEnd = cmp.mEnd;
+            return *this;
         }
 
-        operator T*() { return mCur; }
+        explicit operator T*() { return mCur; }
+       // operator stdext::checked_array_iterator<T*>() { return stdext::checked_array_iterator<T*>(mCur, mEnd - mCur); }
     };
 #endif
 
@@ -235,4 +254,6 @@ namespace osuCrypto {
     {
         return ArrayView<T>(data, size);
     }
+
 }
+

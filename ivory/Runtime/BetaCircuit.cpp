@@ -1,114 +1,166 @@
 #include "BetaCircuit.h"
 #include <vector>
 #include <unordered_map>
-
+#include "Common/BitVector.h"
 namespace osuCrypto
 {
 
-	BetaCircuit::BetaCircuit()
-	{
-	}
+    BetaCircuit::BetaCircuit()
+    {
+    }
 
 
 
-	BetaCircuit::~BetaCircuit()
-	{
-	}
+    BetaCircuit::~BetaCircuit()
+    {
+    }
 
-	void BetaCircuit::addTempWireBundle(BetaBundle & in)
-	{
-		for (auto i = 0; i < in.mWires.size(); ++i)
-		{
-			in.mWires[i] = mWireCount++;
-		}
-	}
+    void BetaCircuit::addTempWireBundle(BetaBundle & in)
+    {
+        for (auto i = 0; i < in.mWires.size(); ++i)
+        {
+            in.mWires[i] = mWireCount++;
+        }
+    }
 
-	void BetaCircuit::addInputBundle(BetaBundle & in)
-	{
-		for (auto i = 0; i < in.mWires.size(); ++i)
-		{
-			in.mWires[i] = mWireCount++;
-		}
+    void BetaCircuit::addInputBundle(BetaBundle & in)
+    {
+        for (auto i = 0; i < in.mWires.size(); ++i)
+        {
+            in.mWires[i] = mWireCount++;
+        }
 
-	}
-	
+        mInputs.push_back(in);
+    }
+    
 
-	void BetaCircuit::addOutputBundle(BetaBundle & in)
-	{
-		for (auto i = 0; i < in.mWires.size(); ++i)
-		{
-			in.mWires[i] = mWireCount;
-		}
-	}
+    void BetaCircuit::addOutputBundle(BetaBundle & out)
+    {
+        for (auto i = 0; i < out.mWires.size(); ++i)
+        {
+            out.mWires[i] = mWireCount++;
+        }
 
-
-	void BetaCircuit::addGate(
-		BetaWire in0, 
-		BetaWire in1, 
-		GateType gt, 
-		BetaWire out)
-	{
-		if (gt == GateType::a ||
-			gt == GateType::b ||
-			gt == GateType::na ||
-			gt == GateType::nb ||
-			gt == GateType::One ||
-			gt == GateType::Zero)
-			throw std::runtime_error("");
-
-		if (gt != GateType::Xor && gt != GateType::Nxor) ++mNonXorGateCount;
-		mGates.emplace_back(in0, in1, gt, out);
-
-	}
+        mOutputs.push_back(out);
+    }
 
 
-	void BetaCircuit::levelize()
-	{
-		mLevelGates.clear();
-		mLevelGates.emplace_back();
+    void BetaCircuit::addGate(
+        BetaWire in0, 
+        BetaWire in1, 
+        GateType gt, 
+        BetaWire out)
+    {
+        if (gt == GateType::a ||
+            gt == GateType::b ||
+            gt == GateType::na ||
+            gt == GateType::nb ||
+            gt == GateType::One ||
+            gt == GateType::Zero)
+            throw std::runtime_error("");
+
+        if (gt != GateType::Xor && gt != GateType::Nxor) ++mNonXorGateCount;
+        mGates.emplace_back(in0, in1, gt, out);
+
+    }
 
 
-		std::unordered_map<u64, u64> levelMap;
+    void BetaCircuit::evaluate(ArrayView<BitVector> input, ArrayView<BitVector> output)
+    {
+        BitVector mem(mWireCount);
+
+        if (input.size() != mInputs.size())
+        {
+            throw std::runtime_error(LOCATION);
+        }
+
+        for (u64 i = 0; i < input.size(); ++i)
+        {
+            if (input[i].size() != mInputs[i].mWires.size())
+                throw std::runtime_error(LOCATION);
+
+            for (u64 j = 0; j < input[i].size(); ++j)
+            {
+                mem[mInputs[i].mWires[j]] = input[i][j];
+            }
+        }
+
+        for (u64 i = 0; i < mGates.size(); ++i)
+        {
+            u64 idx0 = mGates[i].mInput[0];
+            u64 idx1 = mGates[i].mInput[1];
+            u64 idx2 = mGates[i].mOutput;
+
+            u8 a = mem[idx0];
+            u8 b = mem[idx1];
+
+            mem[idx2] = GateEval(mGates[i].mType, a, b);
+
+        }
+        if (output.size() != mOutputs.size())
+        {
+            throw std::runtime_error(LOCATION);
+        }
+
+        for (u64 i = 0; i < output.size(); ++i)
+        {
+            if (output[i].size() != mOutputs[i].mWires.size())
+                throw std::runtime_error(LOCATION);
+
+            for (u64 j = 0; j < output[i].size(); ++j)
+            {
+                output[i][j] = mem[mOutputs[i].mWires[j]];
+            }
+        }
+    }
+
+    void BetaCircuit::levelize()
+    {
+        mLevelGates.clear();
+        mLevelGates.emplace_back();
 
 
-		for (u64 i = 0; i < mGates.size(); ++i)
-		{
-			u64 level = 0;
+        std::unordered_map<u64, u64> levelMap;
 
 
-			static_assert(sizeof(BetaWire) == sizeof(u32), "");
-
-			auto idx = mGates[i].mInput[0];
-			auto iter = levelMap.find(idx);
-
-			if (iter != levelMap.end())
-			{
-				level = iter->second + 1;
-			}
-
-			idx = mGates[i].mInput[1];
-			iter = levelMap.find(idx);
-
-			if (iter != levelMap.end())
-			{
-				level = std::max(iter->second + 1, level);
-			}
-
-			idx = mGates[i].mOutput;
-			levelMap[idx] = level;
+        for (u64 i = 0; i < mGates.size(); ++i)
+        {
+            u64 level = 0;
 
 
-			if (level == mLevelGates.size())
-				mLevelGates.emplace_back();
+            static_assert(sizeof(BetaWire) == sizeof(u32), "");
 
-			if (mGates[i].mType == GateType::Xor || mGates[i].mType == GateType::Nxor)
-			{
-				mLevelGates[level].mXorGates.push_back(mGates[i]);
-			}
-			else
-			{
-				mLevelGates[level].mAndGates.push_back(mGates[i]);
-			}
-		}
-	}
+            auto idx = mGates[i].mInput[0];
+            auto iter = levelMap.find(idx);
+
+            if (iter != levelMap.end())
+            {
+                level = iter->second + 1;
+            }
+
+            idx = mGates[i].mInput[1];
+            iter = levelMap.find(idx);
+
+            if (iter != levelMap.end())
+            {
+                level = std::max(iter->second + 1, level);
+            }
+
+            idx = mGates[i].mOutput;
+            levelMap[idx] = level;
+
+
+            if (level == mLevelGates.size())
+                mLevelGates.emplace_back();
+
+            if (mGates[i].mType == GateType::Xor || mGates[i].mType == GateType::Nxor)
+            {
+                mLevelGates[level].mXorGates.push_back(mGates[i]);
+            }
+            else
+            {
+                mLevelGates[level].mAndGates.push_back(mGates[i]);
+            }
+        }
+    }
 }

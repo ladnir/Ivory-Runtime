@@ -13,7 +13,8 @@ The Ivory runtime is a C++ library that aims to make secure computation easier t
 Instead of requiring the user provide the circuit to be computed, the runtime pre-compiles many of the most useful opertions into mini-circuits, e.g. addition, subtraction, multiplication, etc.
 
 The runtime then provides easy to use abstrations for declaring input variables, and computing on them. Consider the following code snippet. 
-
+<br>
+<br>
 ```c++
 u32 program(CrtRemoteParty& them, CrtLocalParty& me, u32 myInput)
 {
