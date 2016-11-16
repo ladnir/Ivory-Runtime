@@ -1,14 +1,19 @@
 # The Ivory Secure Computation Runtime
 
-<div style="float:right;width:50%;" align="right">
-    <img style="width:300px" align="right" src="icon.jpg" alt="Ivory Logo">
+<div style="float:right;width:50%;" align="left">
+    <img style="width:300px" align="left" src="icon.jpg" alt="Ivory Logo">
+    <div align="center" ><font  color="#C8C8C8"> &copy;  2012-2016 WiorkaEG</font></div>
 </div>
 </br>
 The Ivory runtime is a C++ library that aims to make secure computation easier to use. At a high level, Ivory acheives this by bringing together the protocol and the circuit compiler into a single integrated system. 
 
-Instead of requiring the user provide the circuit to be computed, the runtime pre-compiles many of the most useful opertions into mini-circuits, e.g. addition, subtraction, multiplication, etc.
 
-The runtime then provides easy to use abstrations for declaring input variables, and computing on them. Consider the following code snippet. 
+</br>
+</br>
+</br>
+</br>
+</br>
+Consider the following code snippet. 
 
 ```c++
 u32 program(CrtRemoteParty& them, CrtLocalParty& me, u32 myInput)
@@ -20,8 +25,8 @@ u32 program(CrtRemoteParty& them, CrtLocalParty& me, u32 myInput)
     auto input0 = me.getIdx() == 0 ? me.input<CrtInt32>(myInput) : them.input<CrtInt32>();
     auto input1 = me.getIdx() == 1 ? me.input<CrtInt32>(myInput) : them.input<CrtInt32>();
 
-    // perform the computation. Simply adding Party 0's input 
-    // to Party 1's input n times.
+    // perform the computation. Simply adding Party 0's input to Party 1's input
+    // input to Party 2's input n times.
     for (u64 i = 0; i < n; ++i)
         input1 += input0;
 
