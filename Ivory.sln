@@ -21,6 +21,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "frontend", "frontend\fronte
 		{8C3AF3C3-2ABF-43A7-8B72-C674E64BD0D6} = {8C3AF3C3-2ABF-43A7-8B72-C674E64BD0D6}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6194E977-4CDD-4280-A7C5-903448CF2B35}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
