@@ -1,4 +1,4 @@
-#include "CrtRuntime.h"
+#include "ShGcRuntime.h"
 #include "Common/ByteStream.h"
 #include "OT/Base/naor-pinkas.h"
 #include "Common/Log.h"
@@ -6,17 +6,17 @@ namespace osuCrypto
 {
 
 
-    CrtRuntime::CrtRuntime()
+    ShGcRuntime::ShGcRuntime()
     {
         mBytesSent = 0;
     }
 
 
-    CrtRuntime::~CrtRuntime()
+    ShGcRuntime::~ShGcRuntime()
     {
     }
 
-    void CrtRuntime::init(Channel & chl, block seed, Role role, u64 partyIdx)
+    void ShGcRuntime::init(Channel & chl, block seed, Role role, u64 partyIdx)
     {
         mPrng.SetSeed(seed);
         mAes.setKey(mPrng.get<block>());
@@ -45,34 +45,71 @@ namespace osuCrypto
 
     }
 
-    void CrtRuntime::scheduleCrt(
-        BetaCircuit & cir,
-        ArrayView<block> in1,
-        ArrayView<block> in2,
-        ArrayView<block> out)
+    void ShGcRuntime::scheduleOp(
+        Op op,
+        ArrayView<ArrayView<block>> io)
+        //BetaCircuit & cir,
+        //ArrayView<block> in1,
+        //ArrayView<block> in2,
+        //ArrayView<block> out)
     {
-        //sharedMem.resize(cir.mWireCount);
-        //sharedGates.resize(cir.mNonXorGateCount);
-        //std::array<block, 2> tweak;
-        //garble(cir, sharedMem, tweak, sharedGates.data());
         mCrtQueue.emplace();
         CircuitItem& item = mCrtQueue.back();
 
-        item.mCircuit = &cir;
-        item.mLabels.resize(3);// = ArrayView<ArrayView<block>>(3);
-        item.mLabels[0] = in1;
-        item.mLabels[1] = in2;
-        item.mLabels[2] = out;
-        item.mInputBundleCount = 2;
+        item.mLabels.resize(io.size());
+        for (u64 i = 0; i < io.size(); ++i)
+            item.mLabels[i] = io[i];
+
+
+        switch (op)
+        {
+        case osuCrypto::Op::Add:
+            item.mCircuit = mLibrary.int_int_add(io[0].size(), io[1].size(), io[2].size());
+            item.mInputBundleCount = 2;
+            break;
+        case osuCrypto::Op::Subtract:
+            throw std::runtime_error(LOCATION);
+            break;
+        case osuCrypto::Op::Multiply:
+            item.mCircuit = mLibrary.int_int_mult(io[0].size(), io[1].size(), io[2].size());
+            item.mInputBundleCount = 2;
+            break;
+        case osuCrypto::Op::Divide:
+            throw std::runtime_error(LOCATION);
+            break;
+        case osuCrypto::Op::Mod:
+            throw std::runtime_error(LOCATION);
+            break;
+        case osuCrypto::Op::And:
+            throw std::runtime_error(LOCATION);
+            break;
+        case osuCrypto::Op::Or:
+            throw std::runtime_error(LOCATION);
+            break;
+        case osuCrypto::Op::Not:
+            throw std::runtime_error(LOCATION);
+            break;
+        case osuCrypto::Op::BitWiseAnd:
+            throw std::runtime_error(LOCATION);
+            break;
+        case osuCrypto::Op::BitWiseOr:
+            throw std::runtime_error(LOCATION);
+            break;
+        default:
+            throw std::runtime_error(LOCATION);
+            break;
+        }
+
 
         process();
 
     }
 
-    void CrtRuntime::scheduleInput(
-        ArrayView<block> input,
-        BitVector& value,
-        u64 partyIdx)
+    void ShGcRuntime::scheduleInput(
+        ArrayView<block> enc, u64 pIdx, BitVector& value)
+        //ArrayView<block> input,
+        //BitVector& value,
+        //u64 partyIdx)
     {
         mInputQueue.emplace();
 
@@ -87,13 +124,13 @@ namespace osuCrypto
         auto& item = mInputQueue.back();
 
         item.mInputVal = value;
-        item.mLabels = input;
+        item.mLabels = enc;
 
         process();
 
     }
 
-    void CrtRuntime::scheduleInput(ArrayView<block> input, u64 partyIdx)
+    void ShGcRuntime::scheduleInput(ArrayView<block> input, u64 partyIdx)
     {
         if (mRole == Garbler)
         {
@@ -112,7 +149,7 @@ namespace osuCrypto
 
     }
 
-    void CrtRuntime::scheduleOutput(ArrayView<block> labels, u64 partyIdx)
+    void ShGcRuntime::scheduleOutput(ArrayView<block> labels, u64 partyIdx)
     {
         mOutputQueue.emplace();
 
@@ -125,7 +162,7 @@ namespace osuCrypto
 
     }
 
-    void CrtRuntime::scheduleOutput(ArrayView<block> labels,
+    void ShGcRuntime::scheduleOutput(ArrayView<block> labels,
         BitVector& future)
     {
 
@@ -140,7 +177,7 @@ namespace osuCrypto
         process();
     }
 
-    void CrtRuntime::process()
+    void ShGcRuntime::process()
     {
 
         if (true)
@@ -161,7 +198,7 @@ namespace osuCrypto
     }
 
 
-    void CrtRuntime::garblerInput()
+    void ShGcRuntime::garblerInput()
     {
         std::vector<std::array<block, 2>> messages(mOtCount);
         if (mOtCount)
@@ -212,7 +249,7 @@ namespace osuCrypto
         }
     }
 
-    void CrtRuntime::evaluatorInput()
+    void ShGcRuntime::evaluatorInput()
     {
         static const std::array<block, 2> zeroAndAllOnesBlk{ ZeroBlock, AllOneBlock };
 
@@ -257,7 +294,7 @@ namespace osuCrypto
         }
     }
 
-    void CrtRuntime::garblerCircuit()
+    void ShGcRuntime::garblerCircuit()
     {
 
         while (mCrtQueue.size())
@@ -300,7 +337,7 @@ namespace osuCrypto
     }
 
 
-    void CrtRuntime::evaluatorCircuit()
+    void ShGcRuntime::evaluatorCircuit()
     {
         while (mCrtQueue.size())
         {
@@ -342,7 +379,7 @@ namespace osuCrypto
     }
 
 
-    void CrtRuntime::garblerOutput()
+    void ShGcRuntime::garblerOutput()
     {
 
         while (mOutputQueue.size())
@@ -389,7 +426,7 @@ namespace osuCrypto
         }
     }
 
-    void CrtRuntime::evaluatorOutput()
+    void ShGcRuntime::evaluatorOutput()
     {
         while (mOutputQueue.size())
         {
@@ -424,7 +461,7 @@ namespace osuCrypto
 
 
 
-    void CrtRuntime::evaluate(
+    void ShGcRuntime::evaluate(
         BetaCircuit & cir,
         ArrayView<block> wires,
         std::array<block, 2>& tweaks,
@@ -540,7 +577,7 @@ namespace osuCrypto
 
     }
 
-    void CrtRuntime::garble(
+    void ShGcRuntime::garble(
         BetaCircuit& cir,
         ArrayView<block> wires,
         std::array<block, 2>& tweaks,

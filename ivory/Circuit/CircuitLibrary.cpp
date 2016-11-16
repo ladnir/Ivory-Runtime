@@ -1,124 +1,84 @@
-#include "CrtInt.h"
+#include "CircuitLibrary.h"
+
 
 namespace osuCrypto
 {
-
-    u64 CrtInt32::sBitCount = 32;
-
-    CrtInt32::CrtInt32(CrtRuntime& runtime)
-        : mRuntime(runtime),
-        mLabels(sBitCount)
-    {
-
-
-    }
-
-    CrtInt32::CrtInt32(const CrtInt32 & v)
-        : mRuntime(v.mRuntime)
-        , mLabels(v.mLabels)
-    {
-    }
-
-    CrtInt32::CrtInt32(CrtInt32 &&v)
-        : mRuntime(v.mRuntime)
-        , mLabels(std::move(v.mLabels))
+    CircuitLibrary::CircuitLibrary()
     {
     }
 
 
-    CrtInt32::~CrtInt32()
+    CircuitLibrary::~CircuitLibrary()
     {
     }
 
-
-    CrtInt32& CrtInt32::operator=(const CrtInt32 & copy)
+    BetaCircuit * osuCrypto::CircuitLibrary::int_int_add(u64 aSize, u64 bSize, u64 cSize)
     {
-        mLabels = copy.mLabels;
-        return *this;
+        auto key = "add" + ToString(aSize) + "x" + ToString(bSize) + "x" + ToString(cSize);
+
+        auto iter = mCirMap.find(key);
+
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle b(bSize);
+            BetaBundle c(cSize);
+            BetaBundle t(3);
+
+            cd->addInputBundle(a);
+            cd->addInputBundle(b);
+
+            cd->addOutputBundle(c);
+
+            cd->addTempWireBundle(t);
+
+            int_int_add_built(*cd, a, b, c, t);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
     }
 
-    CrtInt32 CrtInt32::operator+(const CrtInt32& in2)
+    BetaCircuit * CircuitLibrary::int_int_mult(u64 aSize, u64 bSize, u64 cSize)
     {
+        auto key = "mult" + ToString(aSize) + "x" + ToString(bSize) + "x" + ToString(cSize);
 
-        std::vector<block>& h2 = *(std::vector<block>*)&in2.mLabels;
-        CrtInt32 ret(mRuntime);
+        auto iter = mCirMap.find(key);
 
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
 
-        mRuntime.scheduleCrt(mAddBetaCir, mLabels, h2, ret.mLabels);
+            BetaBundle a(aSize);
+            BetaBundle b(bSize);
+            BetaBundle c(cSize);
 
-        return ret;
-    }
+            cd->addInputBundle(a);
+            cd->addInputBundle(b);
 
+            cd->addOutputBundle(c);
 
-    void CrtInt32::operator+=(const CrtInt32& in2)
-    {
-        std::vector<block>& h2 = *(std::vector<block>*)&in2.mLabels;
+            int_int_mult_build(*cd, a, b, c);
 
-        mRuntime.scheduleCrt(mAddBetaCir, mLabels, h2, mLabels);
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
 
-    }
+        return iter->second;
 
-    CrtInt32 CrtInt32::operator*(const CrtInt32& in2)
-    {
-
-        std::vector<block>& h2 = *(std::vector<block>*)&in2.mLabels;
-        CrtInt32 ret(mRuntime);
-
-
-        mRuntime.scheduleCrt(mMultBetaCir, mLabels, h2, ret.mLabels);
-
-        return ret;
-    }
-
-    BitVector CrtInt32::valueToBV(const ValueType & val)
-    {
-        return BitVector((u8*)&val, sizeof(ValueType) * 8);
-    }
-
-    CrtInt32::ValueType CrtInt32::valueFromBV(const BitVector & val)
-    {
-        if (val.size() != sizeof(ValueType) * 8)throw std::runtime_error("");
-        return *(ValueType*)val.data();
-    }
-
-
-    void CrtInt32::staticInit()
-    {
-        staticInitAddBetaCir();
-        staticInitMultBetaCir();
-    }
-
-    BetaCircuit CrtInt32::mAddBetaCir =  BetaCircuit();
-    BetaCircuit CrtInt32::mMultBetaCir = BetaCircuit();
-
-    void CrtInt32::staticInitAddBetaCir()
-    {
-
-        auto& cd = mAddBetaCir;
-
-        BetaBundle a1(sBitCount);
-        BetaBundle a2(sBitCount);
-        BetaBundle sum(sBitCount);
-        BetaBundle temps(3);
-
-        cd.addInputBundle(a1);
-        cd.addInputBundle(a2);
-        cd.addOutputBundle(sum);
-        cd.addTempWireBundle(temps);
-
-        staticBuildAddBetaCir(cd, a1, a2, sum, temps);
-
-        cd.levelize();
     }
 
 
-    void CrtInt32::staticBuildAddBetaCir(
+    void CircuitLibrary::int_int_add_built(
         BetaCircuit& cd,
         BetaBundle & a1,
         BetaBundle & a2,
         BetaBundle & sum,
         BetaBundle & temps)
     {
+
 
         if (a1.mWires.size() != a2.mWires.size() ||
             a1.mWires.size() != sum.mWires.size() ||
@@ -166,56 +126,66 @@ namespace osuCrypto
         }
     }
 
-
-    void CrtInt32::staticInitMultBetaCir()
+    void CircuitLibrary::int_int_mult_build(
+        BetaCircuit & cd,
+        BetaBundle & a,
+        BetaBundle & b,
+        BetaBundle & c)
     {
+        //cd.addInputBundle(a);
+        //cd.addInputBundle(b);
+        //cd.addOutputBundle(c);
 
-        BetaBundle multiplicand(sBitCount);
-        BetaBundle multiplier(sBitCount);
-        BetaBundle product(sBitCount);
-        //BetaBundle temp(sBitCount);
-
-        auto& cd = mMultBetaCir;
-
-
-        cd.addInputBundle(multiplicand);
-        cd.addInputBundle(multiplier);
-        cd.addInputBundle(product);
-        //cd.addWireBundle(temp);
+        u64 N = c.mWires.size();
 
         std::vector<BetaBundle> terms;
-        terms.reserve(sBitCount);
+        terms.reserve(N);
 
-        for (u64 i = 0; i < sBitCount; ++i)
+
+        // first, we compute the AND between the two inputs.
+        for (u64 i = 0; i < b.mWires.size(); ++i)
         {
-            const BetaWire& multBit = multiplier.mWires[i];
+            const BetaWire& multBit = b.mWires[i];
 
+            // this will hold the b[i] * a, a vector of N-i bits
+            terms.emplace_back(N - i);
 
-            terms.emplace_back(sBitCount - i);
-            cd.addTempWireBundle(terms.back());
 
             if (i == 0)
             {
-                terms[0].mWires[0] = product.mWires[0];
+                // later, we will sum together all the 
+                // terms, and this term at idx 0 will be 
+                // the running total, so we want it to be 
+                // the wires that represent the product c.
+                terms[0].mWires[0] = c.mWires[0];
+            }
+            else
+            {
+                // initialize some unused wires, these will
+                // hold intermediate sums.
+                cd.addTempWireBundle(terms.back());
             }
 
-            for (u64 j = 0; j + i< sBitCount; ++j)
+            // compute the AND between b[i] * a[j].
+            for (u64 j = 0; j + i < N; ++j)
             {
                 cd.addGate(
                     multBit,
-                    multiplicand.mWires[j],
+                    a.mWires[j],
                     GateType::And,
-                    terms.back().mWires[j]);
+                    terms[i].mWires[j]);
             }
         }
+
+
 #ifdef SERIAL
-        BetaBundle temp(3), temp2(sBitCount - 1);
+        BetaBundle temp(3), temp2(N - 1);
         cd.addTempWireBundle(temp);
         cd.addTempWireBundle(temp2);
 
         std::array<BetaBundle, 2> temps{ temp2, terms[0] };
 
-        for (u64 i = 1; i < sBitCount; i++)
+        for (u64 i = 1; i < N; i++)
         {
             auto& t0 = temps[(i & 1)];
             auto& t1 = temps[(i & 1) ^ 1];
@@ -223,11 +193,15 @@ namespace osuCrypto
             t0.mWires.erase(t0.mWires.begin());
             t1.mWires.resize(t0.mWires.size());
 
-            t1.mWires[0] = product.mWires[i];
+            t1.mWires[0] = c.mWires[i];
 
             staticBuildAddCir(cd, t0, terms[i], t1, temp);
         }
 #else
+
+        // while the serial code above should work, it is more sequential. 
+        // as such, then using the 'leveled' presentation, fewer operations
+        // can be pipelined. 
 
         u64 k = 1, p = 1;
         while (terms.size() > 1)
@@ -248,7 +222,7 @@ namespace osuCrypto
                 {
                     for (u64 j = 0; j < k; ++j)
                     {
-                        prod.mWires[j] = product.mWires[p++];
+                        prod.mWires[j] = c.mWires[p++];
                     }
 
                     k *= 2;
@@ -264,7 +238,7 @@ namespace osuCrypto
                     terms[i].mWires.begin(),
                     terms[i].mWires.begin() + sizeDiff);
 
-                staticBuildAddBetaCir(cd, terms[i], terms[i + 1], prod, temp);
+                int_int_add_built(cd, terms[i], terms[i + 1], prod, temp);
 
                 prod.mWires.insert(prod.mWires.begin(), bottomBits.begin(), bottomBits.end());
             }
@@ -275,5 +249,4 @@ namespace osuCrypto
 #endif
         cd.levelize();
     }
-
 }

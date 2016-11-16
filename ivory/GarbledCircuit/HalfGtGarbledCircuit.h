@@ -4,7 +4,7 @@
 #include "Common/Defines.h"
 #include "Crypto/AES.h"
 #include "Common/BitVector.h"
-#include "Circuit/CircuitStream.h"
+#include "Circuit/Circuit.h"
 //#include "Runtime/AlphaCircuit.h"
 
 
@@ -42,14 +42,14 @@ namespace osuCrypto {
 		}
 
 		void garbleStream(
-			CircuitStream& cd, 
+			Circuit& cd, 
 			const block& seed, 
 			Channel& chl, 
 			std::vector<block>& wiresBuff,
 			std::function<void(std::vector<std::array<block, 2>>)> sendInputsCallback);
 
 		void evaluateStream(
-			CircuitStream& cd,
+			Circuit& cd,
 			Channel& chl,
 			std::vector<block>& wiresBuff,
 			std::function<ArrayView<block>(u64)> receiveInputCallback);

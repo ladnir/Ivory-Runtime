@@ -16,14 +16,14 @@ The runtime then provides easy to use abstrations for declaring input variables,
 <br>
 <br>
 ```c++
-u32 program(CrtRemoteParty& them, CrtLocalParty& me, u32 myInput)
+u32 program(RemoteParty& them, LocalParty& me, u32 myInput)
 {
     // a public parameter determining the loop count
     u64 n = 100;
 
     // declaring private inputs, one for each party
-    auto input0 = me.getIdx() == 0 ? me.input<CrtInt32>(myInput) : them.input<CrtInt32>();
-    auto input1 = me.getIdx() == 1 ? me.input<CrtInt32>(myInput) : them.input<CrtInt32>();
+    auto input0 = me.getIdx() == 0 ? me.input<sInt<32>>(myInput) : them.input<sInt<32>>();
+    auto input1 = me.getIdx() == 1 ? me.input<sInt<32>>(myInput) : them.input<sInt<32>>();
 
     // perform the computation. Simply adding Party 0's input to Party 1's input
     // input to Party 2's input n times.

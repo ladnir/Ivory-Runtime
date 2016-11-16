@@ -29,7 +29,7 @@ namespace osuCrypto
 	}
 
 	void HalfGtGarbledCircuit::garbleStream(
-		CircuitStream & cd, 
+		Circuit& cd, 
 		const block & seed, 
 		Channel & chl, 
 		std::vector<block>& wires,
@@ -158,7 +158,7 @@ namespace osuCrypto
 
 
 	void HalfGtGarbledCircuit::evaluateStream(
-		CircuitStream& cd,
+		Circuit& cd,
 		Channel& chl,
 		std::vector<block>& wires,
 		std::function<ArrayView<block>(u64)> receiveInputCallback)

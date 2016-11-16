@@ -4,7 +4,7 @@
 #include <sstream>
 #include <unordered_map>
 #include <set>
-#include "Circuit/DagCircuit.h"
+//#include "Circuit/DagCircuit.h"
 
 namespace osuCrypto {
 
@@ -65,32 +65,32 @@ namespace osuCrypto {
 		return mWireCount++;
 	}
 
-	void Circuit::readBris(std::istream & in, bool reduce)
-	{
-		if (in.eof())
-			throw std::runtime_error("Circuit::readBris input istream is emprty");
+	//void Circuit::readBris(std::istream & in, bool reduce)
+	//{
+	//	if (in.eof())
+	//		throw std::runtime_error("Circuit::readBris input istream is emprty");
 
-		DagCircuit dag;
-		dag.readBris(in);
+	//	DagCircuit dag;
+	//	dag.readBris(in);
 
-		if (reduce)
-			dag.removeInvertGates();
+	//	if (reduce)
+	//		dag.removeInvertGates();
 
-		dag.toCircuit(*this);
+	//	dag.toCircuit(*this);
 
-		if (reduce)
-		{
-			if (mGates.size() != dag.mNonInvertGateCount)
-				throw std::runtime_error("");
-		}
-		else
-		{
-			if (mGates.size() != dag.mGates.size())
-				throw std::runtime_error("");
-		}
+	//	if (reduce)
+	//	{
+	//		if (mGates.size() != dag.mNonInvertGateCount)
+	//			throw std::runtime_error("");
+	//	}
+	//	else
+	//	{
+	//		if (mGates.size() != dag.mGates.size())
+	//			throw std::runtime_error("");
+	//	}
 
-		init();
-	}
+	//	init();
+	//}
 
 
 

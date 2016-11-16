@@ -71,11 +71,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\libOTe\libOTe\Crypto\sha.cpp" />
     <ClCompile Include="Circuit\Circuit.cpp" />
-    <ClCompile Include="Circuit\CircuitStream.cpp" />
-    <ClCompile Include="Circuit\DagCircuit.cpp" />
-    <ClCompile Include="Circuit\Parser\VerilogParser.cpp" />
-    <ClCompile Include="Circuit\Parser\VerilogTokenizer.cpp" />
-    <ClCompile Include="Circuit\SequentialCircuit.cpp" />
+    <ClCompile Include="Circuit\CircuitLibrary.cpp" />
     <ClCompile Include="Common\BitIterator.cpp" />
     <ClCompile Include="Common\BitVector.cpp" />
     <ClCompile Include="Common\ByteStream.cpp" />
@@ -108,20 +104,17 @@
     <ClCompile Include="OT\TwoChooseOne\KosOtExtSender.cpp" />
     <ClCompile Include="OT\TwoChooseOne\LzKosOtExtReceiver.cpp" />
     <ClCompile Include="OT\TwoChooseOne\LzKosOtExtSender.cpp" />
-    <ClCompile Include="Runtime\BetaCircuit.cpp" />
-    <ClCompile Include="Runtime\CrtRuntime.cpp" />
-    <ClCompile Include="Runtime\CrtInput.cpp" />
-    <ClCompile Include="Runtime\CrtInt.cpp" />
-    <ClCompile Include="Runtime\MpcRuntime.cpp" />
+    <ClCompile Include="Circuit\BetaCircuit.cpp" />
+    <ClCompile Include="Runtime\Party.cpp" />
+    <ClCompile Include="Runtime\sInt.cpp" />
+    <ClCompile Include="Runtime\ShGcRuntime.cpp" />
+    <ClCompile Include="Runtime\Runtime.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Circuit\BetaCircuit.h" />
     <ClInclude Include="Circuit\Circuit.h" />
-    <ClInclude Include="Circuit\CircuitStream.h" />
-    <ClInclude Include="Circuit\DagCircuit.h" />
+    <ClInclude Include="Circuit\CircuitLibrary.h" />
     <ClInclude Include="Circuit\Gate.h" />
-    <ClInclude Include="Circuit\Parser\VerilogParser.h" />
-    <ClInclude Include="Circuit\Parser\VerilogTokenizer.h" />
-    <ClInclude Include="Circuit\SequentialCircuit.h" />
     <ClInclude Include="Common\ArrayView.h" />
     <ClInclude Include="Common\BitIterator.h" />
     <ClInclude Include="Common\BitVector.h" />
@@ -164,11 +157,10 @@
     <ClInclude Include="OT\TwoChooseOne\LzKosOtExtReceiver.h" />
     <ClInclude Include="OT\TwoChooseOne\LzKosOtExtSender.h" />
     <ClInclude Include="OT\TwoChooseOne\OTExtInterface.h" />
-    <ClInclude Include="Runtime\BetaCircuit.h" />
-    <ClInclude Include="Runtime\CrtRuntime.h" />
-    <ClInclude Include="Runtime\CrtInput.h" />
-    <ClInclude Include="Runtime\CrtInt.h" />
-    <ClInclude Include="Runtime\MpcRuntime.h" />
+    <ClInclude Include="Runtime\Party.h" />
+    <ClInclude Include="Runtime\sInt.h" />
+    <ClInclude Include="Runtime\ShGcRuntime.h" />
+    <ClInclude Include="Runtime\Runtime.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\libOTe\libOTe\Crypto\asm\sha_win64.asm" />

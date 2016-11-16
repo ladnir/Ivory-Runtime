@@ -5,13 +5,13 @@
 #include "Gate.h"
 #include "Common/Defines.h"
 #include "Common/BitVector.h"
-#include "Circuit/CircuitStream.h"
+//#include "Circuit/CircuitStream.h"
 
 namespace osuCrypto {
 
 	class DagCircuit;
 
-	class Circuit : public CircuitStream
+	class Circuit// : public CircuitStream
 	{
 	public:
 		friend class DagCircuit;
@@ -20,13 +20,10 @@ namespace osuCrypto {
 		Circuit(std::array<u64, 2> inputs);
 		~Circuit();
 
-		void readBris(std::istream& in, bool reduce = true);
+		//void readBris(std::istream& in, bool reduce = true);
 
 		void evaluate(BitVector& input);
 		void translate(BitVector& labels, BitVector& output);
-
-		//void evaluate(std::vector<bool>& input);
-		//void translate(std::vector<bool>& labels, std::vector<bool>& output);
 
 		void init();
 		 
@@ -75,14 +72,14 @@ namespace osuCrypto {
 		
 		// CircuitStream interface
 		u8 mHasMore;
-		bool hasMoreGates() override;
-		ArrayView<Gate> getMoreGates() override;
-		ArrayView<u64> getOutputIndices() override;
-		ArrayView<u64> getInputIndices() override;
+		bool hasMoreGates() ;
+		ArrayView<Gate> getMoreGates() ;
+		ArrayView<u64> getOutputIndices() ;
+		ArrayView<u64> getInputIndices() ;
 
-		u64 getInternalWireBuffSize() const override;
-		u64 getInputWireBuffSize() const override;
-		u64 getNonXorGateCount() const override;
+		u64 getInternalWireBuffSize() const ;
+		u64 getInputWireBuffSize() const ;
+		u64 getNonXorGateCount() const ;
 
 
 	private:
