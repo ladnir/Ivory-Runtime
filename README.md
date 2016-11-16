@@ -1,9 +1,7 @@
 # The Ivory Secure Computation Runtime
 
 <div style="float:right;width:50%;" align="right">
- <figure>
     <img style="width:300px" align="right" src="icon.jpg" alt="Ivory Logo">
-</figure> 
 </div>
 </br>
 The Ivory runtime is a C++ library that aims to make secure computation easier to use. At a high level, Ivory acheives this by bringing together the protocol and the circuit compiler into a single integrated system. 
