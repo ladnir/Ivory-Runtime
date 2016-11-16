@@ -5,7 +5,6 @@
 
 <div style="float:right;width:50%;" align="left">
     <img  align="right" src="icon.jpg" alt="Ivory Logo" style="width:304px;height:228px;">
-    <div align="center"><font  color="#C8C8C8"> &copy;  2012-2016 WiorkaEG</font></div>
 </div>
 
 
