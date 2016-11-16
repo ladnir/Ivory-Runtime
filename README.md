@@ -1,12 +1,8 @@
 # The Ivory Secure Computation Runtime
 
+![Some Title](icon.jpg){:style="float: right;margin-right: 7px;margin-top: 7px;width:304px;"}
 
 
-
-<div style="float:right;width:50%;" align="left">
-    <img  align="right" src="icon.jpg" alt="Ivory Logo" style="width:304px;height:228px;">
-    <div align="center"><font  color="#C8C8C8"> &copy;  2012-2016 WiorkaEG</font></div>
-</div>
 
 
 The Ivory runtime is a C++ library that aims to make secure computation easier to use. At a high level, Ivory acheives this by bringing together the protocol and the circuit compiler into a single integrated system. 
@@ -45,3 +41,7 @@ u32 program(CrtRemoteParty& them, CrtLocalParty& me, u32 myInput)
     return ret;
 }
 ```
+<div style="float:right;width:50%;" align="left">
+    <img  align="right" src="icon.jpg" alt="Ivory Logo" style="width:304px;height:228px;">
+    <div align="center"><font  color="#C8C8C8"> &copy;  2012-2016 WiorkaEG</font></div>
+</div>
