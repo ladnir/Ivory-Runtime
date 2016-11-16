@@ -3,7 +3,6 @@
 <div style="float:right;width:50%;" align="right">
  <figure>
     <img style="width:300px" align="right" src="icon.jpg" alt="Ivory Logo">
-  <figcaption>   <font  color="#C8C8C8"> &copy;2012-2016 WiorkaEG</font></figcaption>
 </figure> 
 </div>
 </br>
@@ -23,8 +22,8 @@ u32 program(CrtRemoteParty& them, CrtLocalParty& me, u32 myInput)
     auto input0 = me.getIdx() == 0 ? me.input<CrtInt32>(myInput) : them.input<CrtInt32>();
     auto input1 = me.getIdx() == 1 ? me.input<CrtInt32>(myInput) : them.input<CrtInt32>();
 
-    // perform the computation. Simply adding Party 0's input to Party 1's input
-    // input to Party 2's input n times.
+    // perform the computation. Simply adding Party 0's input 
+    // to Party 1's input n times.
     for (u64 i = 0; i < n; ++i)
         input1 += input0;
 
