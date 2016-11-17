@@ -111,9 +111,6 @@
     <ClCompile Include="OT\NChooseK\AknOtSender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libOTe\libOTe\Crypto\sha.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Crypto\sha.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -133,6 +130,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Circuit\BetaCircuit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\ClearRuntime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -287,11 +287,9 @@
     <ClInclude Include="Circuit\BetaCircuit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\libOTe\libOTe\Crypto\asm\sha_win64.asm">
-      <Filter>Source Files</Filter>
-    </None>
+    <ClInclude Include="Runtime\ClearRuntime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Crypto\asm\sha_win64.asm">

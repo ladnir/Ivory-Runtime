@@ -16,6 +16,22 @@ namespace osuCrypto
     {
     }
 
+    void ShGcRuntime::initVar(std::unique_ptr<RuntimeData>& data, u64 bitCount)
+    {
+        if (data) throw std::runtime_error(LOCATION);
+
+        data.reset(new ShGcRuntimeData(bitCount));
+    }
+
+    void ShGcRuntime::copyVar(std::unique_ptr<RuntimeData>& data, RuntimeData * copy)
+    {
+        if (data) throw std::runtime_error(LOCATION);
+
+        data.reset(new ShGcRuntimeData(static_cast<ShGcRuntimeData*>(copy)->mLabels->size()));
+
+        static_cast<ShGcRuntimeData*>(data.get())->mLabels = static_cast<ShGcRuntimeData*>(copy)->mLabels;
+    }
+
     void ShGcRuntime::init(Channel & chl, block seed, Role role, u64 partyIdx)
     {
         mPrng.SetSeed(seed);
@@ -47,31 +63,34 @@ namespace osuCrypto
 
     void ShGcRuntime::scheduleOp(
         Op op,
-        ArrayView<ArrayView<block>> io)
-        //BetaCircuit & cir,
-        //ArrayView<block> in1,
-        //ArrayView<block> in2,
-        //ArrayView<block> out)
+        ArrayView<RuntimeData*> io) 
     {
         mCrtQueue.emplace();
         CircuitItem& item = mCrtQueue.back();
 
         item.mLabels.resize(io.size());
+        std::vector<u64> sizes(io.size());
+
         for (u64 i = 0; i < io.size(); ++i)
-            item.mLabels[i] = io[i];
+        {
+            item.mLabels[i] = static_cast<ShGcRuntimeData*>(io[i])->mLabels;
+            sizes[i] = item.mLabels[i]->size();
+        }
 
 
         switch (op)
         {
         case osuCrypto::Op::Add:
-            item.mCircuit = mLibrary.int_int_add(io[0].size(), io[1].size(), io[2].size());
+
+            item.mCircuit = mLibrary.int_int_add(sizes[0], sizes[1], sizes[2]);
             item.mInputBundleCount = 2;
+
             break;
         case osuCrypto::Op::Subtract:
             throw std::runtime_error(LOCATION);
             break;
         case osuCrypto::Op::Multiply:
-            item.mCircuit = mLibrary.int_int_mult(io[0].size(), io[1].size(), io[2].size());
+            item.mCircuit = mLibrary.int_int_mult(sizes[0], sizes[1], sizes[2]);
             item.mInputBundleCount = 2;
             break;
         case osuCrypto::Op::Divide:
@@ -106,14 +125,11 @@ namespace osuCrypto
     }
 
     void ShGcRuntime::scheduleInput(
-        ArrayView<block> enc, u64 pIdx, BitVector& value)
-        //ArrayView<block> input,
-        //BitVector& value,
-        //u64 partyIdx)
+        RuntimeData* data, u64 pIdx, BitVector& value)
     {
         mInputQueue.emplace();
 
-        /*mOtChoices*/
+        auto& enc = static_cast<ShGcRuntimeData*>(data)->mLabels;
 
         if (mRole == Evaluator)
         {
@@ -130,12 +146,13 @@ namespace osuCrypto
 
     }
 
-    void ShGcRuntime::scheduleInput(ArrayView<block> input, u64 partyIdx)
+    void ShGcRuntime::scheduleInput(RuntimeData* data, u64 partyIdx)
     {
+        auto& input = *static_cast<ShGcRuntimeData*>(data);
+
         if (mRole == Garbler)
         {
-            mOtCount += input.size();
-
+            mOtCount += input.mLabels->size();
         }
 
 
@@ -143,36 +160,40 @@ namespace osuCrypto
 
         auto& item = mInputQueue.back();
 
-        item.mLabels = input;
+        item.mLabels = input.mLabels;
 
         process();
 
     }
 
-    void ShGcRuntime::scheduleOutput(ArrayView<block> labels, u64 partyIdx)
+    void ShGcRuntime::scheduleOutput(RuntimeData* data, u64 partyIdx)
     {
+        auto& input = *static_cast<ShGcRuntimeData*>(data);
+
         mOutputQueue.emplace();
 
         auto& item = mOutputQueue.back();
 
-        item.mLabels = labels;
+        item.mLabels = input.mLabels;
         item.mOutputVal = nullptr;
 
         process();
 
     }
 
-    void ShGcRuntime::scheduleOutput(ArrayView<block> labels,
-        BitVector& future)
+    void ShGcRuntime::scheduleOutput(RuntimeData* data,
+        std::future<BitVector>& future)
     {
 
+        auto& input = *static_cast<ShGcRuntimeData*>(data);
         mOutputQueue.emplace();
 
         auto& item = mOutputQueue.back();
 
-        item.mLabels = labels;
-        item.mOutputVal = &future;
-        item.mOutputVal->resize(item.mLabels.size());
+        item.mLabels = input.mLabels;
+        item.mOutputVal = new std::promise<BitVector>();
+
+        future = item.mOutputVal->get_future();
 
         process();
     }
@@ -221,25 +242,25 @@ namespace osuCrypto
 
             if (item.mInputVal.size())
             {
-                mAes.ecbEncCounterMode(mInputIdx, item.mLabels.size(), item.mLabels.data());
-                mInputIdx += item.mLabels.size();
+                mAes.ecbEncCounterMode(mInputIdx, item.mLabels->size(), item.mLabels->data());
+                mInputIdx += item.mLabels->size();
 
-                std::unique_ptr<ByteStream> buff(new ByteStream(item.mLabels.size() * sizeof(block)));
+                std::unique_ptr<ByteStream> buff(new ByteStream(item.mLabels->size() * sizeof(block)));
                 auto view = buff->getArrayView<block>();
 
-                for (u64 i = 0; i < item.mLabels.size(); ++i)
+                for (u64 i = 0; i < item.mLabels->size(); ++i)
                 {
-                    view[i] = item.mLabels[i] ^ mZeroAndGlobalOffset[item.mInputVal[i]];
+                    view[i] = (*item.mLabels)[i] ^ mZeroAndGlobalOffset[item.mInputVal[i]];
                 }
                 mChannel->asyncSend(std::move(buff));
             }
             else
             {
-                std::unique_ptr<ByteStream> buff(new ByteStream(item.mLabels.size() * sizeof(block)));
+                std::unique_ptr<ByteStream> buff(new ByteStream(item.mLabels->size() * sizeof(block)));
                 auto view = buff->getArrayView<block>();
-                for (u64 i = 0; i < item.mLabels.size(); ++i, ++iter)
+                for (u64 i = 0; i < item.mLabels->size(); ++i, ++iter)
                 {
-                    item.mLabels[i] = (*iter)[0];
+                    (*item.mLabels)[i] = (*iter)[0];
                     view[i] = (*iter)[1] ^ (*iter)[0] ^ mGlobalOffset;
                 }
                 mChannel->asyncSend(std::move(buff));
@@ -281,14 +302,14 @@ namespace osuCrypto
                 mChannel->recv(sharedBuff);
                 auto view = sharedBuff.getArrayView<block>();
 
-                for (u64 i = 0; i < item.mLabels.size(); ++i)
+                for (u64 i = 0; i < item.mLabels->size(); ++i)
                 {
-                    item.mLabels[i] = *iter++ ^ (zeroAndAllOnesBlk[item.mInputVal[i]] & view[i]);
+                    (*item.mLabels)[i] = *iter++ ^ (zeroAndAllOnesBlk[item.mInputVal[i]] & view[i]);
                 }
             }
             else
             {
-                mChannel->recv(item.mLabels.data(), item.mLabels.size() * sizeof(block));
+                mChannel->recv(item.mLabels->data(), item.mLabels->size() * sizeof(block));
             }
             mInputQueue.pop();
         }
@@ -312,22 +333,24 @@ namespace osuCrypto
 
             for (u64 i = 0; i < item.mInputBundleCount; ++i)
             {
-                std::copy(item.mLabels[i].begin(), item.mLabels[i].end(), iter);
-                iter += item.mLabels[i].size();
+                std::copy(item.mLabels[i]->begin(), item.mLabels[i]->end(), iter);
+                iter += item.mLabels[i]->size();
             }
 
             std::unique_ptr<ByteStream> sendBuff(new ByteStream(item.mCircuit->mNonXorGateCount * sizeof(GarbledGate<2>)));
 
             auto gates = sendBuff->getArrayView<GarbledGate<2>>();
 
+
             garble(*item.mCircuit, sharedMem, mTweaks, gates);
 
             mChannel->asyncSend(std::move(sendBuff));
 
+
             for (u64 i = item.mInputBundleCount; i < item.mLabels.size(); ++i)
             {
-                std::copy(iter, iter + item.mLabels[i].size(), item.mLabels[i].begin());
-                iter += item.mLabels[i].size();
+                std::copy(iter, iter + item.mLabels[i]->size(), item.mLabels[i]->begin());
+                iter += item.mLabels[i]->size();
             }
 
             mCrtQueue.pop();
@@ -353,8 +376,8 @@ namespace osuCrypto
 
             for (u64 i = 0; i < item.mInputBundleCount; ++i)
             {
-                std::copy(item.mLabels[i].begin(), item.mLabels[i].end(), iter);
-                iter += item.mLabels[i].size();
+                std::copy(item.mLabels[i]->begin(), item.mLabels[i]->end(), iter);
+                iter += item.mLabels[i]->size();
             }
 
 
@@ -368,8 +391,8 @@ namespace osuCrypto
 
             for (u64 i = item.mInputBundleCount; i < item.mLabels.size(); ++i)
             {
-                std::copy(iter, iter + item.mLabels[i].size(), item.mLabels[i].begin());
-                iter += item.mLabels[i].size();
+                std::copy(iter, iter + item.mLabels[i]->size(), item.mLabels[i]->begin());
+                iter += item.mLabels[i]->size();
             }
 
 
@@ -389,34 +412,39 @@ namespace osuCrypto
 
             if (item.mOutputVal)
             {
-                if (sharedMem.size() < item.mLabels.size())
+                if (sharedMem.size() < item.mLabels->size())
                 {
-                    sharedMem.resize(item.mLabels.size());
+                    sharedMem.resize(item.mLabels->size());
                 }
 
-                mChannel->recv(sharedMem.data(), item.mLabels.size() * sizeof(block));
+                mChannel->recv(sharedMem.data(), item.mLabels->size() * sizeof(block));
 
 
-                for (u64 i = 0; i < item.mLabels.size(); ++i)
+                BitVector val(item.mLabels->size());
+
+
+                for (u64 i = 0; i < item.mLabels->size(); ++i)
                 {
-                    if (neq(sharedMem[i], item.mLabels[i]) && neq(sharedMem[i], item.mLabels[i] ^ mGlobalOffset))
+                    if (neq(sharedMem[i], (*item.mLabels)[i]) && neq(sharedMem[i], (*item.mLabels)[i] ^ mGlobalOffset))
                     {
-                        Log::out << "output reveal error at " << i << ":\n   " << sharedMem[i] << "  != " << item.mLabels[i]
-                            << " (0) AND \n   " << sharedMem[i] << "  != " << (item.mLabels[i] ^ mGlobalOffset) << Log::endl;
+                        Log::out << "output reveal error at " << i << ":\n   " << sharedMem[i] << "  != " << (*item.mLabels)[i]
+                            << " (0) AND \n   " << sharedMem[i] << "  != " << ((*item.mLabels)[i] ^ mGlobalOffset) << Log::endl;
 
                         throw std::runtime_error(LOCATION);
                     }
 
-                    (*item.mOutputVal)[i] = PermuteBit(sharedMem[i] ^ item.mLabels[i]);
+                    val[i] = PermuteBit(sharedMem[i] ^ (*item.mLabels)[i]);
                 }
+
+                item.mOutputVal->set_value(val);
             }
             else
             {
-                std::unique_ptr<BitVector> sendBuff(new BitVector(item.mLabels.size()));
+                std::unique_ptr<BitVector> sendBuff(new BitVector(item.mLabels->size()));
 
-                for (u64 i = 0; i < item.mLabels.size(); ++i)
+                for (u64 i = 0; i < item.mLabels->size(); ++i)
                 {
-                    (*sendBuff)[i] = PermuteBit(item.mLabels[i]);
+                    (*sendBuff)[i] = PermuteBit((*item.mLabels)[i]);
                 }
 
                 mChannel->asyncSend(std::move(sendBuff));
@@ -434,21 +462,33 @@ namespace osuCrypto
 
             if (item.mOutputVal)
             {
-                mChannel->recv((*item.mOutputVal));
+                BitVector val(item.mLabels->size());
 
-                for (u64 i = 0; i < item.mLabels.size(); ++i)
+                mChannel->recv(val);
+
+                for (u64 i = 0; i < item.mLabels->size(); ++i)
                 {
-                    (*item.mOutputVal)[i] = (*item.mOutputVal)[i] ^ PermuteBit(item.mLabels[i]);
+                    val[i] = val[i] ^ PermuteBit((*item.mLabels)[i]);
                 }
+
+                item.mOutputVal->set_value(val);
             }
             else
             {
-                mChannel->asyncSendCopy(item.mLabels.data(), item.mLabels.size() * sizeof(block));
+                mChannel->asyncSendCopy(item.mLabels->data(), item.mLabels->size() * sizeof(block));
             }
 
             mOutputQueue.pop();
         }
     }
+
+
+
+
+
+
+
+
 
 
 

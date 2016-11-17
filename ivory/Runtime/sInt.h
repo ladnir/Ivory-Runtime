@@ -14,7 +14,7 @@ namespace osuCrypto
     public:
         typedef i64 ValueType;
 
-        //u64 mBitCount;
+        u64 mBitCount;
         sInt(Runtime& runtime, u64 bitCount);
         sInt(const sInt&);
         sInt(sInt&&);
@@ -35,10 +35,24 @@ namespace osuCrypto
         //sInt operator*=(const sInt&);
         //sInt operator/=(const sInt&);
 
+
+        ValueType getValue();
+
+
+        void reveal(ArrayView<u64> partyIdxs);
+
         BitVector valueToBV(const ValueType& val);
         ValueType valueFromBV(const BitVector& val);
         
-        std::vector<block> mLabels;
+
+
+
+        std::unique_ptr<RuntimeData> mData;
+        std::unique_ptr<std::future<BitVector>> mValFut;
+
+        //std::vector<block> mLabels;
+        
+        //void* mData;
 
     //private:
 

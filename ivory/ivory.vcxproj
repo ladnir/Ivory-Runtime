@@ -69,7 +69,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\libOTe\libOTe\Crypto\sha.cpp" />
     <ClCompile Include="Circuit\Circuit.cpp" />
     <ClCompile Include="Circuit\CircuitLibrary.cpp" />
     <ClCompile Include="Common\BitIterator.cpp" />
@@ -105,6 +104,7 @@
     <ClCompile Include="OT\TwoChooseOne\LzKosOtExtReceiver.cpp" />
     <ClCompile Include="OT\TwoChooseOne\LzKosOtExtSender.cpp" />
     <ClCompile Include="Circuit\BetaCircuit.cpp" />
+    <ClCompile Include="Runtime\ClearRuntime.cpp" />
     <ClCompile Include="Runtime\Party.cpp" />
     <ClCompile Include="Runtime\sInt.cpp" />
     <ClCompile Include="Runtime\ShGcRuntime.cpp" />
@@ -157,13 +157,13 @@
     <ClInclude Include="OT\TwoChooseOne\LzKosOtExtReceiver.h" />
     <ClInclude Include="OT\TwoChooseOne\LzKosOtExtSender.h" />
     <ClInclude Include="OT\TwoChooseOne\OTExtInterface.h" />
+    <ClInclude Include="Runtime\ClearRuntime.h" />
     <ClInclude Include="Runtime\Party.h" />
     <ClInclude Include="Runtime\sInt.h" />
     <ClInclude Include="Runtime\ShGcRuntime.h" />
     <ClInclude Include="Runtime\Runtime.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\libOTe\libOTe\Crypto\asm\sha_win64.asm" />
     <CustomBuild Include="Crypto\asm\sha_win64.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\NASM\nasm.exe $(ProjectDir)\Crypto\asm\sha_win64.asm -f win64 -DWIN_ABI -o $(ProjectDir)\x64\$(Configuration)\sha_win64.obj</Command>

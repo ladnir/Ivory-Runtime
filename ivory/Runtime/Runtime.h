@@ -1,9 +1,16 @@
 #pragma once
 #include "Common/Defines.h"
 #include "Common/ArrayView.h"
+#include <future>
+#include <memory>
 
 namespace osuCrypto
 {
+
+    struct RuntimeData
+    {
+
+    };
 
     enum class Op
     {
@@ -25,15 +32,18 @@ namespace osuCrypto
         Runtime();
         ~Runtime();
 
-        virtual void scheduleInput(ArrayView<block> enc, u64 pIdx, BitVector& value) = 0;
-        virtual void scheduleInput(ArrayView<block> enc, u64 pIdx) = 0;
+        virtual void initVar(std::unique_ptr<RuntimeData>& data, u64 bitCount) = 0;
+        virtual void copyVar(std::unique_ptr<RuntimeData>& data, RuntimeData* copy) = 0;
+
+        virtual void scheduleInput(RuntimeData* data, u64 pIdx, BitVector& value) = 0;
+        virtual void scheduleInput(RuntimeData* data, u64 pIdx) = 0;
 
 
-        virtual void scheduleOp(Op op, ArrayView<ArrayView<block>> io) = 0;
+        virtual void scheduleOp(Op op, ArrayView<RuntimeData*> io) = 0;
 
 
-        virtual void scheduleOutput(ArrayView<block> labels, u64 partyIdx) = 0;
-        virtual void scheduleOutput(ArrayView<block> labels, BitVector& value) = 0;
+        virtual void scheduleOutput(RuntimeData* data, u64 partyIdx) = 0;
+        virtual void scheduleOutput(RuntimeData* data, std::future<BitVector>& future) = 0;
 
 
         //virtual LocalParty getLocalParty() = 0;

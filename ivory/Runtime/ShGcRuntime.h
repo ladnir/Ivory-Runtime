@@ -13,7 +13,16 @@
 
 namespace osuCrypto
 {
+    typedef std::vector<block> ShGcLabelVec;
 
+    struct ShGcRuntimeData :public RuntimeData
+    {
+        ShGcRuntimeData(u64 bitCount)
+            : mLabels(std::make_shared<ShGcLabelVec>(bitCount))
+        { }
+
+        std::shared_ptr<ShGcLabelVec> mLabels;
+    };
 
     class ShGcRuntime : public Runtime
     {
@@ -27,55 +36,24 @@ namespace osuCrypto
         ShGcRuntime();
         ~ShGcRuntime();
 
-
         void init(Channel& chl, block seed, Role role, u64 partyIdx);
 
-        void scheduleInput(ArrayView<block> enc, u64 pIdx, BitVector& value)override;
-        void scheduleInput(ArrayView<block> enc, u64 pIdx)override;
+        void initVar(std::unique_ptr<RuntimeData>& data, u64 bitCount) override;
+        void copyVar(std::unique_ptr<RuntimeData>& data, RuntimeData* copy) override;
+
+
+        void scheduleInput(RuntimeData* enc, u64 pIdx, BitVector& value)override;
+        void scheduleInput(RuntimeData* enc, u64 pIdx)override;
        
        
-        void scheduleOp(Op op, ArrayView<ArrayView<block>> io)override;
+        void scheduleOp(Op op, ArrayView<RuntimeData*> io)override;
        
        
-        void scheduleOutput(ArrayView<block> labels, u64 partyIdx)override;
-        void scheduleOutput(ArrayView<block> labels, BitVector& value)override;
+        void scheduleOutput(RuntimeData* labels, u64 partyIdx)override;
+        void scheduleOutput(RuntimeData* labels, std::future<BitVector>& value)override;
        
        
         CircuitLibrary mLibrary;
-        //LocalParty getLocalParty()override;
-        //RemoteParty getRemoteParty(u64 pIdx = 0)override;
-
-
-        //void scheduleCrt(
-        //    BetaCircuit & cir,
-        //    ArrayView<block> in1,
-        //    ArrayView<block> in2,
-        //    ArrayView<block> out);
-
-
-
-
-        //void scheduleInput(
-        //    ArrayView<block> labels,
-        //    BitVector& value, 
-        //    u64 partyIdx);
-
-        //void scheduleInput(
-        //    ArrayView<block> labels,
-        //    u64 partyIdx);
-
-
-        //void scheduleOutput(
-        //    ArrayView<block> labels,
-        //    BitVector& future);
-
-        //void scheduleOutput(
-        //    ArrayView<block> labels,
-        //    u64 partyIdx);
-
-
-
-
 
 
 
@@ -115,22 +93,20 @@ namespace osuCrypto
         struct CircuitItem
         {
             BetaCircuit* mCircuit;
-            std::vector<ArrayView<block>> mLabels;
-            //BitVector mInputVal;
+            std::vector<std::shared_ptr<ShGcLabelVec>> mLabels; 
             u64 mInputBundleCount;
         };
 
         struct InputItem
         {
             BitVector mInputVal;
-            ArrayView<block> mLabels;
+            std::shared_ptr<ShGcLabelVec> mLabels;
         };
 
         struct OutputItem
         {
-            BitVector* mOutputVal;
-            //std::promise<BitVector>* mProm;
-            ArrayView<block> mLabels;
+            std::promise<BitVector>* mOutputVal; 
+            std::shared_ptr<ShGcLabelVec> mLabels;
         };
 
         void process();

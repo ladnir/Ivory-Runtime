@@ -19,7 +19,7 @@ namespace osuCrypto
 
 
         template<typename T>
-        typename T::ValueType reveal(const T&);
+        typename void reveal(const T&);
 
         u64 getIdx() { return mPartyIdx; }
 
@@ -64,7 +64,7 @@ namespace osuCrypto
     inline T LocalParty::input(typename const T::ValueType& value, u64 bitCount)
     {
         T ret(mRuntime, bitCount);
-        mRuntime.scheduleInput(ret.mLabels, mPartyIdx, ret.valueToBV(value));
+        mRuntime.scheduleInput(ret.mData.get(), mPartyIdx, ret.valueToBV(value));
         return ret;
     }
 
@@ -72,17 +72,16 @@ namespace osuCrypto
     inline T LocalParty::input(typename const T::ValueType& value)
     {
         T ret(mRuntime, T::N);
-        mRuntime.scheduleInput(ret.mLabels, mPartyIdx, ret.valueToBV(value));
+        mRuntime.scheduleInput(ret.mData.get(), mPartyIdx, ret.valueToBV(value));
         return ret;
     }
 
     template<typename T>
-    inline typename  T::ValueType LocalParty::reveal(const T& var)
+    inline typename  void LocalParty::reveal(const T& var)
     {
         auto& v = *(T*)&var;
-        BitVector fut;
-        mRuntime.scheduleOutput(v.mLabels, fut);
-        return v.valueFromBV(fut);
+        v.mValFut.reset(new std::future<BitVector>());
+        mRuntime.scheduleOutput(v.mData.get(), *v.mValFut.get());
     }
 
 
@@ -90,7 +89,7 @@ namespace osuCrypto
     inline T RemoteParty::input(u64 bitCount)
     {
         T ret(mRuntime, bitCount);
-        mRuntime.scheduleInput(ret.mLabels, mPartyIdx);
+        mRuntime.scheduleInput(ret.mData.get(), mPartyIdx);
         return ret;
     }
 
@@ -98,7 +97,7 @@ namespace osuCrypto
     inline T RemoteParty::input()
     {
         T ret(mRuntime, T::N);
-        mRuntime.scheduleInput(ret.mLabels, mPartyIdx);
+        mRuntime.scheduleInput(ret.mData.get(), mPartyIdx);
         return ret;
     }
 
@@ -106,7 +105,7 @@ namespace osuCrypto
     inline void RemoteParty::reveal(const T& var)
     {
         auto& v = *(T*)&var;
-        mRuntime.scheduleOutput(v.mLabels, mPartyIdx);
+        mRuntime.scheduleOutput(v.mData.get(), mPartyIdx);
     }
 
 }

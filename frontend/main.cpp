@@ -6,6 +6,7 @@
 #include "Common/Log.h"
 #include "Common/Timer.h"
 #include "Runtime/ShGcRuntime.h"
+#include "Runtime/ClearRuntime.h"
 #include "Runtime/sInt.h"
 #include "Runtime/Party.h"
 
@@ -23,22 +24,21 @@ u32 program(RemoteParty& them, LocalParty& me, u64 val)
     auto input1 = me.getIdx() == 1 ? me.input<sInt>(val, bitCount) : them.input<sInt>(bitCount);
 
 
-    input1 = input1 * input0;
+    auto out = input1 * input0;
 
 
-    u32 ret = 0;
     if (me.getIdx() == 0)
     {
-        ret = me.reveal(input1);
-        them.reveal(input1);
+        me.reveal(out);
+        them.reveal(out);
     }
     else
     {
-        them.reveal(input1);
-        ret = me.reveal(input1);
+        them.reveal(out);
+        me.reveal(out);
     }
 
-    return ret;
+    return out.getValue();
 }
 
 int main(char* argv, int argc)
@@ -55,13 +55,20 @@ int main(char* argv, int argc)
 
         Log::setThreadName("party1");
 
-        ShGcRuntime rt1;
+
+
         BtEndpoint ep1(ios, "127.0.0.1:1212", false, "n");
         Channel& chl1 = ep1.addChannel("n");
 
         PRNG prng(ZeroBlock);
 
+        ShGcRuntime rt1;
         rt1.init(chl1, prng.get<block>(), ShGcRuntime::Evaluator, 1);
+
+        //ClearRuntime rt1;
+        //rt1.init(chl1, prng.get<block>(), 1);
+
+
 
         RemoteParty them(rt1, 0);
         LocalParty me(rt1, 1);
@@ -75,12 +82,17 @@ int main(char* argv, int argc)
 
     Log::setThreadName("party0");
 
-    ShGcRuntime rt0;
+
     BtEndpoint ep0(ios, "127.0.0.1:1212", true, "n");
     Channel& chl0 = ep0.addChannel("n");
 
 
+    ShGcRuntime rt0;
     rt0.init(chl0, prng.get<block>(), ShGcRuntime::Garbler, 0);
+
+    //ClearRuntime rt0;
+    //rt0.init(chl0, prng.get<block>(), 0);
+
 
     LocalParty me(rt0, 0);
     RemoteParty them(rt0, 1);
