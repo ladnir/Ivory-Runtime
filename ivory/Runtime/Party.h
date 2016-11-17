@@ -12,14 +12,14 @@ namespace osuCrypto
         LocalParty(Runtime& runtime, u64 partyIdx);
 
         template<typename T>
-        T input(typename const T::ValueType&, u64 bitCount);
+        T input(typename T::ValueType&, u64 bitCount);
 
         template<typename T>
-        T input(typename const T::ValueType&);
+        T input(typename T::ValueType&);
 
 
         template<typename T>
-        typename void reveal(const T&);
+        void reveal(const T&);
 
         u64 getIdx() { return mPartyIdx; }
 
@@ -61,7 +61,7 @@ namespace osuCrypto
 
 
     template<typename T>
-    inline T LocalParty::input(typename const T::ValueType& value, u64 bitCount)
+    inline T LocalParty::input(typename T::ValueType& value, u64 bitCount)
     {
         T ret(mRuntime, bitCount);
         mRuntime.scheduleInput(ret.mData.get(), mPartyIdx, ret.valueToBV(value));
@@ -69,7 +69,7 @@ namespace osuCrypto
     }
 
     template<typename T>
-    inline T LocalParty::input(typename const T::ValueType& value)
+    inline T LocalParty::input(typename T::ValueType& value)
     {
         T ret(mRuntime, T::N);
         mRuntime.scheduleInput(ret.mData.get(), mPartyIdx, ret.valueToBV(value));
@@ -77,7 +77,7 @@ namespace osuCrypto
     }
 
     template<typename T>
-    inline typename  void LocalParty::reveal(const T& var)
+    inline void LocalParty::reveal(const T& var)
     {
         auto& v = *(T*)&var;
         v.mValFut.reset(new std::future<BitVector>());
