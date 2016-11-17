@@ -4,7 +4,6 @@
 #ifdef _MSC_VER
 #include <windows.h>
 #endif
-#include <boost/thread/tss.hpp>
 
 //
 //void CleanupThreadInfo(void*)
@@ -21,7 +20,7 @@
 //    return precision.get();
 //}
 //
-//
+// 
 
 namespace osuCrypto
 {

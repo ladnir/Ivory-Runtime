@@ -75,18 +75,6 @@
     <ClCompile Include="OT\Tools\BchCode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OT\NChooseOne\KkrtNcoOtReceiver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OT\NChooseOne\KkrtNcoOtSender.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OT\NChooseOne\Oos\OosNcoOtReceiver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OT\NChooseOne\Oos\OosNcoOtSender.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="OT\TwoChooseOne\IknpOtExtReceiver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -97,18 +85,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OT\TwoChooseOne\KosOtExtSender.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OT\TwoChooseOne\LzKosOtExtReceiver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OT\TwoChooseOne\LzKosOtExtSender.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OT\NChooseK\AknOtReceiver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OT\NChooseK\AknOtSender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Crypto\sha.cpp">
@@ -221,27 +197,6 @@
     <ClInclude Include="OT\Tools\BchCode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OT\NChooseOne\KkrtDefines.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\NChooseOne\KkrtNcoOtReceiver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\NChooseOne\KkrtNcoOtSender.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\NChooseOne\NcoOtExt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\NChooseOne\Oos\OosDefines.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\NChooseOne\Oos\OosNcoOtReceiver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\NChooseOne\Oos\OosNcoOtSender.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OT\TwoChooseOne\IknpOtExtReceiver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -254,19 +209,7 @@
     <ClInclude Include="OT\TwoChooseOne\KosOtExtSender.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OT\TwoChooseOne\LzKosOtExtReceiver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\TwoChooseOne\LzKosOtExtSender.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OT\TwoChooseOne\OTExtInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\NChooseK\AknOtReceiver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\NChooseK\AknOtSender.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\ShGcRuntime.h">

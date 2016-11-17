@@ -23,8 +23,6 @@ namespace osuCrypto
 
         u64 getIdx() { return mPartyIdx; }
 
-        //template<typename T>
-        //std::future<T::ValueType> asyncReveal(const T&);
 
     private:
         Runtime& mRuntime;

@@ -177,7 +177,7 @@ namespace osuCrypto
             }
         }
 
-
+//#define SERIAL
 #ifdef SERIAL
         BetaBundle temp(3), temp2(N - 1);
         cd.addTempWireBundle(temp);
@@ -195,7 +195,7 @@ namespace osuCrypto
 
             t1.mWires[0] = c.mWires[i];
 
-            staticBuildAddCir(cd, t0, terms[i], t1, temp);
+            int_int_add_built(cd, t0, terms[i], t1, temp);
         }
 #else
 

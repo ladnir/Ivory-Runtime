@@ -14,8 +14,8 @@ namespace osuCrypto
 	{
 		BetaGate(const BetaWire& in0, const BetaWire& in1, const GateType& gt, const BetaWire& out)
 			: mInput({in0, in1})
-			, mType(gt)
 			, mOutput(out)
+			, mType(gt)
 			, mAAlpha(gt == GateType::Nor || gt == GateType::na_And || gt == GateType::nb_Or || gt == GateType::Or)
 			, mBAlpha(gt == GateType::Nor || gt == GateType::nb_And || gt == GateType::na_Or || gt == GateType::Or)
 			, mCAlpha(gt == GateType::Nand || gt == GateType::nb_Or || gt == GateType::na_Or || gt == GateType::Or)
@@ -51,7 +51,8 @@ namespace osuCrypto
 
 
 
-		u64 mNonXorGateCount, mWireCount;
+		u64 mNonXorGateCount;
+        BetaWire mWireCount;
 		std::vector<BetaGate> mGates;
 		std::vector<BetaLevel> mLevelGates;
 

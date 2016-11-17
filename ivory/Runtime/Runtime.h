@@ -35,7 +35,7 @@ namespace osuCrypto
         virtual void initVar(std::unique_ptr<RuntimeData>& data, u64 bitCount) = 0;
         virtual void copyVar(std::unique_ptr<RuntimeData>& data, RuntimeData* copy) = 0;
 
-        virtual void scheduleInput(RuntimeData* data, u64 pIdx, BitVector& value) = 0;
+        virtual void scheduleInput(RuntimeData* data, u64 pIdx, const BitVector& value) = 0;
         virtual void scheduleInput(RuntimeData* data, u64 pIdx) = 0;
 
 

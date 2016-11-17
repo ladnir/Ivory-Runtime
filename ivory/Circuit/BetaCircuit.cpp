@@ -6,6 +6,8 @@ namespace osuCrypto
 {
 
     BetaCircuit::BetaCircuit()
+        :mNonXorGateCount(0),
+        mWireCount(0)
     {
     }
 
@@ -17,7 +19,7 @@ namespace osuCrypto
 
     void BetaCircuit::addTempWireBundle(BetaBundle & in)
     {
-        for (auto i = 0; i < in.mWires.size(); ++i)
+        for (u64 i = 0; i < in.mWires.size(); ++i)
         {
             in.mWires[i] = mWireCount++;
         }
@@ -25,7 +27,7 @@ namespace osuCrypto
 
     void BetaCircuit::addInputBundle(BetaBundle & in)
     {
-        for (auto i = 0; i < in.mWires.size(); ++i)
+        for (u64 i = 0; i < in.mWires.size(); ++i)
         {
             in.mWires[i] = mWireCount++;
         }
@@ -36,7 +38,7 @@ namespace osuCrypto
 
     void BetaCircuit::addOutputBundle(BetaBundle & out)
     {
-        for (auto i = 0; i < out.mWires.size(); ++i)
+        for (u64 i = 0; i < out.mWires.size(); ++i)
         {
             out.mWires[i] = mWireCount++;
         }
@@ -94,7 +96,7 @@ namespace osuCrypto
             u8 a = mem[idx0];
             u8 b = mem[idx1];
 
-            mem[idx2] = GateEval(mGates[i].mType, a, b);
+            mem[idx2] = GateEval(mGates[i].mType, (bool)a, (bool)b);
 
         }
         if (output.size() != mOutputs.size())

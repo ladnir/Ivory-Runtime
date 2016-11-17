@@ -35,7 +35,7 @@ namespace osuCrypto
         mPartyIdx = partyIdx;
     }
 
-    void ClearRuntime::scheduleInput(RuntimeData* data, u64 pIdx, BitVector & value)
+    void ClearRuntime::scheduleInput(RuntimeData* data, u64 pIdx, const BitVector & value)
     {
         auto& input = *static_cast<ClearIntRuntimeData*>(data);
 

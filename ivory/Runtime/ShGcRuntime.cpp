@@ -8,6 +8,7 @@ namespace osuCrypto
 
     ShGcRuntime::ShGcRuntime()
     {
+        mOtCount = 0;
         mBytesSent = 0;
     }
 
@@ -84,7 +85,7 @@ namespace osuCrypto
 
             item.mCircuit = mLibrary.int_int_add(sizes[0], sizes[1], sizes[2]);
             item.mInputBundleCount = 2;
-
+            Log::out << "got adder " << mPartyIdx << Log::endl;
             break;
         case osuCrypto::Op::Subtract:
             throw std::runtime_error(LOCATION);
@@ -125,7 +126,7 @@ namespace osuCrypto
     }
 
     void ShGcRuntime::scheduleInput(
-        RuntimeData* data, u64 pIdx, BitVector& value)
+        RuntimeData* data, u64 pIdx, const BitVector& value)
     {
         mInputQueue.emplace();
 
@@ -321,10 +322,12 @@ namespace osuCrypto
         while (mCrtQueue.size())
         {
             auto& item = mCrtQueue.front();
-
+            Log::out << "garble" << Log::endl;
 
             if (sharedMem.size() < item.mCircuit->mWireCount)
             {
+                Log::out << "garble input resize " << item.mCircuit->mWireCount << Log::endl;
+
                 sharedMem.resize(item.mCircuit->mWireCount);
             }
 
@@ -333,6 +336,8 @@ namespace osuCrypto
 
             for (u64 i = 0; i < item.mInputBundleCount; ++i)
             {
+                Log::out << "garble input copy" << i << Log::endl;
+
                 std::copy(item.mLabels[i]->begin(), item.mLabels[i]->end(), iter);
                 iter += item.mLabels[i]->size();
             }
@@ -341,6 +346,7 @@ namespace osuCrypto
 
             auto gates = sendBuff->getArrayView<GarbledGate<2>>();
 
+            Log::out << "garbling" << Log::endl;
 
             garble(*item.mCircuit, sharedMem, mTweaks, gates);
 
@@ -349,6 +355,8 @@ namespace osuCrypto
 
             for (u64 i = item.mInputBundleCount; i < item.mLabels.size(); ++i)
             {
+                Log::out << "garble out copy" << i << Log::endl;
+
                 std::copy(iter, iter + item.mLabels[i]->size(), item.mLabels[i]->begin());
                 iter += item.mLabels[i]->size();
             }
@@ -431,6 +439,13 @@ namespace osuCrypto
                             << " (0) AND \n   " << sharedMem[i] << "  != " << ((*item.mLabels)[i] ^ mGlobalOffset) << Log::endl;
 
                         throw std::runtime_error(LOCATION);
+                    }
+
+                    if (i == 1)
+                    {
+                        Log::out << "output reveal at " << i << ":\n   " << sharedMem[i] << "  ?= " << (*item.mLabels)[i]
+                            << " (0) AND \n   " << sharedMem[i] << "  ?= " << ((*item.mLabels)[i] ^ mGlobalOffset) << Log::endl;
+
                     }
 
                     val[i] = PermuteBit(sharedMem[i] ^ (*item.mLabels)[i]);
@@ -528,7 +543,6 @@ namespace osuCrypto
                     auto& a = wires[aIdx1];
                     auto& b = wires[bIdx1];
                     auto& c = wires[cIdx1];
-                    auto& gt = gate.mType;
         
                     c = a ^ b;
                 }
@@ -537,7 +551,6 @@ namespace osuCrypto
                     auto& a = wires[gate.mInput[0]];
                     auto& b = wires[gate.mInput[1]];
                     auto& c = wires[gate.mOutput];
-                    auto& gt = gate.mType;
         
                     // compute the hashs
                     hashs[0] = _mm_slli_epi64(a, 1) ^ tweaks[0];
@@ -658,7 +671,6 @@ namespace osuCrypto
                         auto& a = wires[gate.mInput[0]];
                         auto& b = wires[gate.mInput[1]];
                         auto& c = wires[gate.mOutput];
-                        auto& gt = gate.mType;
         
                         // compute the gate modifier variables
                         auto& aAlpha = gate.mAAlpha;
@@ -712,12 +724,10 @@ namespace osuCrypto
                         auto& a0 = wires[gate0.mInput[0]];
                         auto& b0 = wires[gate0.mInput[1]];
                         auto& c0 = wires[gate0.mOutput];
-                        auto& gt0 = gate0.mType;
         
                         auto&  a1 = wires[gate1.mInput[0]];
                         auto&  b1 = wires[gate1.mInput[1]];
                         auto&  c1 = wires[gate1.mOutput];
-                        auto& gt1 = gate1.mType;
         
                         // compute the gate modifier variables
                         auto& aAlpha0 = gate0.mAAlpha;

@@ -116,7 +116,7 @@ namespace osuCrypto
 						)));
 
 
-			u64 T = (1 << (t - 1));
+			u64 T = (u64(1) << (t - 1));
 			double h = secParam + (std::log2(inputSize) + inputSize + secParam);
 			// find the minimum t such that	2 ^ t >= k + (lg(n) + n + k	) = t
 			while (T > h / (t - 1))

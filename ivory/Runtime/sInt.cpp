@@ -14,17 +14,17 @@ namespace osuCrypto
     }
 
     sInt::sInt(const sInt & v)
-        : mRuntime(v.mRuntime) 
+        : mRuntime(v.mRuntime)
+        , mBitCount(v.mBitCount)
     {
-        mBitCount = v.mBitCount;
         mRuntime.copyVar(mData, v.mData.get());
     }
 
     sInt::sInt(sInt &&v)
         : mRuntime(v.mRuntime)
+        , mBitCount(v.mBitCount)
         , mData(std::move(v.mData))
     {
-        mBitCount = v.mBitCount;
     }
 
     sInt::~sInt()
@@ -67,11 +67,17 @@ namespace osuCrypto
         return std::move(ret);
     }
 
+
+
     sInt::ValueType sInt::getValue()
     {
-        return valueFromBV(mValFut->get());
+        if (mValFut)
+        {
+            mVal = std::move(mValFut->get());
+            mValFut.reset();
+        }
+        return valueFromBV(mVal);
     }
-
 
     void sInt::reveal(ArrayView<u64> partyIdxs)
     {

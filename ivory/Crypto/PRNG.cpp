@@ -5,10 +5,20 @@
 
 namespace osuCrypto {
 
+
+    //block mSeed;
+    //std::vector<block> mBuffer, mIndexArray;
+    //AES mAes;
+    //u64 mBytesIdx, mBlockIdx, mBufferByteCapacity;
+
 #define DEFAULT_BUFF_SIZE 64
-    PRNG::PRNG() : mBytesIdx(0), mBlockIdx(0),
+    PRNG::PRNG() :
+        mSeed(ZeroBlock),
         mBuffer(DEFAULT_BUFF_SIZE),
         mIndexArray(DEFAULT_BUFF_SIZE, ZeroBlock),
+        mAes(mSeed),
+        mBytesIdx(0), 
+        mBlockIdx(0),
         mBufferByteCapacity(sizeof(block) * DEFAULT_BUFF_SIZE)
     {
     }
@@ -16,15 +26,14 @@ namespace osuCrypto {
 
     PRNG::PRNG(const block& seed)
         : 
-        mBytesIdx(0), 
-        mBlockIdx(0),
+        mSeed(seed),
         mBuffer(DEFAULT_BUFF_SIZE),
         mIndexArray(DEFAULT_BUFF_SIZE, ZeroBlock),
+        mAes(mSeed),
+        mBytesIdx(0),
+        mBlockIdx(0),
         mBufferByteCapacity(sizeof(block) * DEFAULT_BUFF_SIZE)
     {
-        mSeed = seed;
-        mAes.setKey(seed);
-
         refillBuffer();
     }
 
@@ -34,7 +43,7 @@ namespace osuCrypto {
         mIndexArray(std::move(s.mIndexArray)),
         mAes(std::move(s.mAes)),
         mBytesIdx(s.mBytesIdx),
-        mBlockIdx(s.mBlockIdx),
+        mBlockIdx(s.mBlockIdx), 
         mBufferByteCapacity(s.mBufferByteCapacity)
     {
         s.mSeed = ZeroBlock;

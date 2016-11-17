@@ -165,7 +165,7 @@ namespace osuCrypto
 
             for (u64 gRow = 0; gRow < 8; ++gRow)
             {
-                u64 g8Row = (1 << gRow);
+                u64 g8Row = (u64(1) << gRow);
                 u64 stride = g8Row;
 
                 while (g8Row < 256)

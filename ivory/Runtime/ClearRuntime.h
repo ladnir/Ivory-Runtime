@@ -29,7 +29,7 @@ namespace osuCrypto
 
         void init(Channel& chl, block seed, u64 partyIdx);
 
-        void scheduleInput(RuntimeData* data, u64 pIdx, BitVector& value)override;
+        void scheduleInput(RuntimeData* data, u64 pIdx, const BitVector& value)override;
         void scheduleInput(RuntimeData* data, u64 pIdx)override;
 
 

@@ -42,7 +42,7 @@ namespace osuCrypto
         void copyVar(std::unique_ptr<RuntimeData>& data, RuntimeData* copy) override;
 
 
-        void scheduleInput(RuntimeData* enc, u64 pIdx, BitVector& value)override;
+        void scheduleInput(RuntimeData* enc, u64 pIdx, const BitVector& value)override;
         void scheduleInput(RuntimeData* enc, u64 pIdx)override;
        
        

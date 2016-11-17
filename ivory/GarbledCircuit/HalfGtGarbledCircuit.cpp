@@ -1,9 +1,7 @@
 #include "HalfGtGarbledCircuit.h"
-#include "cryptopp/randpool.h"
 #include "Network/Channel.h"
 #include "Common/ByteStream.h"
 #include "Common/Log.h"
-#include "cryptopp/sha.h"
 #include <cassert>
 
 namespace osuCrypto 
@@ -187,7 +185,7 @@ namespace osuCrypto
 
 			auto inputs = receiveInputCallback(inputIdxs.size());
 
-			for (auto i = 0; i < inputIdxs.size(); ++i)
+			for (u64 i = 0; i < inputIdxs.size(); ++i)
 				wires[inputIdxs[i]] = inputs[i];
 
 

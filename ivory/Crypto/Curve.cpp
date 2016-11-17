@@ -10,9 +10,9 @@ namespace osuCrypto
     EllipticCurve::EllipticCurve(const Ecc2mParams & params, const block& seed)
         :
         mMiracl(nullptr),
-        mOrder(nullptr),
+        BA(nullptr),
         BB(nullptr),
-        BA(nullptr)
+        mOrder(nullptr)
     {
         setParameters(params);
         setPrng(seed);
@@ -21,16 +21,16 @@ namespace osuCrypto
     EllipticCurve::EllipticCurve(const EccpParams & params, const block & seed)
         :
         mMiracl(nullptr),
-        mOrder(nullptr),
+        BA(nullptr),
         BB(nullptr),
-        BA(nullptr)
+        mOrder(nullptr)
     {
         setParameters(params);
         setPrng(seed);
     }
 
     EllipticCurve::~EllipticCurve()
-    {
+    { 
         mG = std::vector<Point>();
 
         if (mMiracl)
@@ -143,7 +143,7 @@ namespace osuCrypto
         convert(mMiracl, params.BB, BB);
 
         mOrder.reset(new EccNumber(*this));
-        mOrder->fromHex(params.order);
+        mOrder->fromHex((char*)(params.order));
 
 
         ecurve2_init(
@@ -209,8 +209,8 @@ namespace osuCrypto
     EccPoint::EccPoint(
         EllipticCurve & curve)
         :
-        mMem(nullptr),
         mVal(nullptr),
+        mMem(nullptr),
         mCurve(&curve)
 
     {
@@ -221,8 +221,8 @@ namespace osuCrypto
         EllipticCurve & curve,
         const EccPoint & copy)
         :
-        mMem(nullptr),
         mVal(nullptr),
+        mMem(nullptr),
         mCurve(&curve)
     {
         init();
@@ -233,8 +233,8 @@ namespace osuCrypto
     EccPoint::EccPoint(
         const EccPoint & copy)
         :
-        mMem(nullptr),
         mVal(nullptr),
+        mMem(nullptr),
         mCurve(copy.mCurve)
     {
 
@@ -245,8 +245,8 @@ namespace osuCrypto
 
     EccPoint::EccPoint(EccPoint && move)
         :
-        mMem(move.mMem),
         mVal(move.mVal),
+        mMem(move.mMem),
         mCurve(move.mCurve)
     {
         move.mVal = nullptr;
@@ -374,11 +374,11 @@ namespace osuCrypto
 #endif
         if (mCurve->mIsPrimeField)
         {
-            return epoint_comp(mCurve->mMiracl, mVal, cmp.mVal);
+            return static_cast<bool>( epoint_comp(mCurve->mMiracl, mVal, cmp.mVal));
         }
         else
         {
-            return epoint2_comp(mCurve->mMiracl, mVal, cmp.mVal);
+            return static_cast<bool>(epoint2_comp(mCurve->mMiracl, mVal, cmp.mVal));
         }
     }
     bool EccPoint::operator!=(
@@ -502,7 +502,7 @@ namespace osuCrypto
             prng.get(buff, byteSize);
             buff[byteSize - 1] &= mask;
 
-            bytes_to_big(mCurve->mMiracl, byteSize, (char*)buff, var);
+            bytes_to_big(mCurve->mMiracl, static_cast<int>(byteSize), (char*)buff, var);
             if (mCurve->mIsPrimeField)
             {
                 epoint_set(mCurve->mMiracl, var, var, 0, mVal);
@@ -1109,11 +1109,13 @@ namespace osuCrypto
 
 
 
-            result = ebrick_init(mCurve->mMiracl, &mBrick, 
+            result = static_cast<bool>(ebrick_init(
+                mCurve->mMiracl, 
+                &mBrick,
                 x,y, 
                 mCurve->BA, mCurve->BB,
                 mCurve->getFieldPrime().mVal,
-                8, mCurve->mEccpParams.bitCount);
+                8, mCurve->mEccpParams.bitCount));
 
             mirkill(x);
             mirkill(y);
@@ -1122,8 +1124,19 @@ namespace osuCrypto
         {
 
             //fe2ec2(point)->getxy(x, y);
-            result = ebrick2_init(mCurve->mMiracl, &mBrick2, copy.mVal->X, copy.mVal->Y, mCurve->BA, mCurve->BB,
-                mCurve->mEcc2mParams.m, mCurve->mEcc2mParams.a, mCurve->mEcc2mParams.b, mCurve->mEcc2mParams.c, 8, mCurve->mEcc2mParams.bitCount);
+            result = static_cast<bool>(ebrick2_init(
+                mCurve->mMiracl, 
+                &mBrick2, 
+                copy.mVal->X, 
+                copy.mVal->Y, 
+                mCurve->BA, 
+                mCurve->BB,
+                mCurve->mEcc2mParams.m, 
+                mCurve->mEcc2mParams.a, 
+                mCurve->mEcc2mParams.b, 
+                mCurve->mEcc2mParams.c, 
+                8, 
+                mCurve->mEcc2mParams.bitCount));
         }
 
         if (result == 0)

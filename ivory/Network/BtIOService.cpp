@@ -237,7 +237,7 @@ namespace osuCrypto {
 
 
 				// lets delete the other pointer as its either nullptr or a buffer that was allocated
-				delete op.mOther;
+				delete (ChannelBuffer*)op.mOther;
 
 				// make sure all the data sent. If this fails, look up whether WSASend guarantees that all the data in the buffers will be send.
 				if (bytesTransferred !=
@@ -292,10 +292,10 @@ namespace osuCrypto {
 
 	void BtIOService::dispatch(BtSocket* socket, BoostIOOperation& op)
 	{
-		if(&op == nullptr)
-		{
-			Log::out << "bad op ref";
-		}
+		//if(&op == nullptr)
+		//{
+		//	Log::out << "bad op ref";
+		//}
 
 		switch (op.mType)
 		{

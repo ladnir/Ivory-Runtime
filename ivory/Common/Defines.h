@@ -22,6 +22,9 @@
 //#include <vld.h>
 //#endif
 
+#ifndef _MSC_VER
+#pragma GCC diagnostic ignored "-Wignored-attributes"
+#endif
 
 #ifdef _MSC_VER 
 #define __STR2__(x) #x

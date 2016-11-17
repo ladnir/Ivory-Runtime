@@ -56,7 +56,7 @@ namespace osuCrypto {
 
     inline u8 GateEval(GateType type, bool a, bool b)
     {
-        u8 v = ((u8)a & 1 | ((u8)b <<1));
+        u8 v = ((u8(a) & 1) | (u8(b) <<1));
         return ((u8)type & (1 << v)) ? 1 : 0;
     }
 

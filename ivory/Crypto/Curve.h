@@ -106,13 +106,13 @@ namespace osuCrypto
         u32 bitCount;
         u32 BA;
         u32 BB;
-        char* X;
-        char* Y;
+        const char* X;
+        const char* Y;
         u32 m;
         u32 a;
         u32 b;
         u32 c;
-        char* order;
+        const char* order;
     };
 
 
@@ -379,7 +379,7 @@ namespace osuCrypto
         //csprng mMrPrng;
         Ecc2mParams mEcc2mParams;
         EccpParams mEccpParams;
-        big BB, BA;
+        big BA, BB;
         std::unique_ptr<EccNumber> mOrder, mFieldPrime;
         std::vector<Point> mG;
 

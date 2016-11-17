@@ -224,7 +224,7 @@ namespace osuCrypto
         u64 numThreads)
     {
         // one out of nSndVals OT.
-        auto nSndVals(2);
+        u64 nSndVals(2);
         auto& params = k233;
 
         //auto numThreads = (messages.size() + minMsgPerThread - 1) / minMsgPerThread;
@@ -266,7 +266,7 @@ namespace osuCrypto
 
         //Log::out << "send c[0] " << pC[0] << Log::endl;
 
-        for (auto u = 1; u < nSndVals; u++)
+        for (u64 u = 1; u < nSndVals; u++)
         {
             pC.emplace_back(curve);
             //pC[u] = mainPk->get_fe();
@@ -285,7 +285,7 @@ namespace osuCrypto
         socket.asyncSend(std::move(sendBuff));
 
 
-        for (auto u = 1; u < nSndVals; u++)
+        for (u64 u = 1; u < nSndVals; u++)
             pC[u] = pC[u] * alpha;
 
 
@@ -326,8 +326,8 @@ namespace osuCrypto
                 SHA1 sha;
 
 
-                auto mStart = t * messages.size() / numThreads;
-                auto mEnd = (t + 1) * messages.size() / numThreads;
+                //auto mStart = t * messages.size() / numThreads;
+                //auto mEnd = (t + 1) * messages.size() / numThreads;
 
                 recvFuture.get();
 
