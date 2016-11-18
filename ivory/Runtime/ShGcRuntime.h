@@ -42,17 +42,18 @@ namespace osuCrypto
         void copyVar(std::unique_ptr<RuntimeData>& data, RuntimeData* copy) override;
 
 
-        void scheduleInput(RuntimeData* enc, u64 pIdx, const BitVector& value)override;
+        void scheduleInput(RuntimeData* enc, const BitVector& value)override;
         void scheduleInput(RuntimeData* enc, u64 pIdx)override;
-       
-       
+
+
         void scheduleOp(Op op, ArrayView<RuntimeData*> io)override;
-       
-       
+
+
         void scheduleOutput(RuntimeData* labels, u64 partyIdx)override;
         void scheduleOutput(RuntimeData* labels, std::future<BitVector>& value)override;
-       
-       
+
+        void processesQueue() override {}
+
         CircuitLibrary mLibrary;
 
 
@@ -88,12 +89,12 @@ namespace osuCrypto
         std::vector<block> sharedMem;
         std::vector<GarbledGate<2>> sharedGates;
         ByteStream sharedBuff;
-        std::array<block,2>mTweaks;
+        std::array<block, 2>mTweaks;
 
         struct CircuitItem
         {
             BetaCircuit* mCircuit;
-            std::vector<std::shared_ptr<ShGcLabelVec>> mLabels; 
+            std::vector<std::shared_ptr<ShGcLabelVec>> mLabels;
             u64 mInputBundleCount;
         };
 
@@ -105,7 +106,7 @@ namespace osuCrypto
 
         struct OutputItem
         {
-            std::promise<BitVector>* mOutputVal; 
+            std::promise<BitVector>* mOutputVal;
             std::shared_ptr<ShGcLabelVec> mLabels;
         };
 

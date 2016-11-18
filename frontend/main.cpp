@@ -57,22 +57,21 @@ i32 program(RemoteParty& them, LocalParty& me, i64 val)
     auto input0 = me.getIdx() == 0 ? me.input<sInt>(val, bitCount) : them.input<sInt>(bitCount);
     auto input1 = me.getIdx() == 1 ? me.input<sInt>(val, bitCount) : them.input<sInt>(bitCount);
 
-    Log::out << "input " << me.getIdx() << Log::endl;
 
     //auto test =  
 
 
     auto out = input1 + input0;
 
-    Log::out << "comp " << me.getIdx() << Log::endl;
+    //Log::out << "comp " << me.getIdx() << Log::endl;
 
     if (me.getIdx() == 0)
     {
         me.reveal(input0);
         me.reveal(input1);
 
-        Log::out << "input0 " << input0.getValue() << Log::endl;
-        Log::out << "input1 " << input1.getValue() << Log::endl;
+        //Log::out << "input0 " << input0.getValue() << Log::endl;
+        //Log::out << "input1 " << input1.getValue() << Log::endl;
 
         me.reveal(out);
         them.reveal(out);
