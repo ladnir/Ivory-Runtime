@@ -97,6 +97,9 @@ namespace osuCrypto
         // Result: Upon return, all operations are either in process or completed.
         virtual void processesQueue() = 0;
 
+
+        // getPartyIdx() returns the index of the local party.
+        virtual u64 getPartyIdx() = 0;
     };
 
 }

@@ -6,51 +6,23 @@
 namespace osuCrypto
 {
 
-    class LocalParty
+    class Party
     {
     public:
-        LocalParty(Runtime& runtime, u64 partyIdx);
+        Party(Runtime& runtime, u64 partyIdx);
 
         template<typename T>
         T input(typename T::ValueType&, u64 bitCount);
 
         template<typename T>
-        T input(typename T::ValueType&);
-
-
-        template<typename T>
-        void reveal(const T&);
-
-        u64 getIdx() { return mPartyIdx; }
-
-
-    private:
-        Runtime& mRuntime;
-        u64 mPartyIdx;
-    };
-
-
-
-
-
-
-
-
-    class RemoteParty
-    {
-    public:
-        RemoteParty(Runtime& runtime, u64 partyIdx);
-
-        template<typename T>
         T input(u64 bitCount);
 
         template<typename T>
-        T input();
-
-        template<typename T>
         void reveal(const T&);
 
-        u64 getIdx() { return mPartyIdx; }
+        u64 getPartyIdx() { return mPartyIdx; }
+
+        bool isLocalParty() { return mPartyIdx == mRuntime.getPartyIdx(); }
 
     private:
         Runtime& mRuntime;
@@ -58,33 +30,18 @@ namespace osuCrypto
     };
 
 
+
     template<typename T>
-    inline T LocalParty::input(typename T::ValueType& value, u64 bitCount)
+    inline T Party::input(typename T::ValueType& value, u64 bitCount)
     {
         T ret(mRuntime, bitCount);
-        mRuntime.scheduleInput(ret.mData.get(), mPartyIdx, ret.valueToBV(value));
+        mRuntime.scheduleInput(ret.mData.get(), ret.valueToBV(value));
         return ret;
     }
 
-    template<typename T>
-    inline T LocalParty::input(typename T::ValueType& value)
-    {
-        T ret(mRuntime, T::N);
-        mRuntime.scheduleInput(ret.mData.get(), mPartyIdx, ret.valueToBV(value));
-        return ret;
-    }
 
     template<typename T>
-    inline void LocalParty::reveal(const T& var)
-    {
-        auto& v = *(T*)&var;
-        v.mValFut.reset(new std::future<BitVector>());
-        mRuntime.scheduleOutput(v.mData.get(), *v.mValFut.get());
-    }
-
-
-    template<typename T>
-    inline T RemoteParty::input(u64 bitCount)
+    inline T Party::input(u64 bitCount)
     {
         T ret(mRuntime, bitCount);
         mRuntime.scheduleInput(ret.mData.get(), mPartyIdx);
@@ -92,18 +49,22 @@ namespace osuCrypto
     }
 
     template<typename T>
-    inline T RemoteParty::input()
+    inline void Party::reveal(const T& var)
     {
-        T ret(mRuntime, T::N);
-        mRuntime.scheduleInput(ret.mData.get(), mPartyIdx);
-        return ret;
+        // cast the const away...
+        auto& v = *(T*)&var;
+
+        if (isLocalParty())
+        {
+            v.mValFut.reset(new std::future<BitVector>());
+            mRuntime.scheduleOutput(v.mData.get(), *v.mValFut.get());
+        }
+        else
+        {
+            mRuntime.scheduleOutput(v.mData.get(), mPartyIdx);
+        }
     }
 
-    template<typename T>
-    inline void RemoteParty::reveal(const T& var)
-    {
-        auto& v = *(T*)&var;
-        mRuntime.scheduleOutput(v.mData.get(), mPartyIdx);
-    }
+
 
 }

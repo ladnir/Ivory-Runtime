@@ -41,6 +41,7 @@ namespace osuCrypto
         
         void processesQueue() override {}
 
+        u64 getPartyIdx() override { return mPartyIdx; }
 
         Channel* mChannel;
         u64 mPartyIdx;

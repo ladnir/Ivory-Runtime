@@ -49,53 +49,41 @@ void multTest()
 }
 
 
-i32 program(RemoteParty& them, LocalParty& me, i64 val)
+i32 program(std::array<Party, 2> parties, i64 myInput)
 {
-    Log::out << "start " << me.getIdx() << Log::endl;
+    // choose how large the arithmetic should be.
     u64 bitCount = 32;
 
-    auto input0 = me.getIdx() == 0 ? me.input<sInt>(val, bitCount) : them.input<sInt>(bitCount);
-    auto input1 = me.getIdx() == 1 ? me.input<sInt>(val, bitCount) : them.input<sInt>(bitCount);
+    // get the two input variables. If this party is
+    // the local party, then lets use our input value.
+    // Otherwise the remote party will provide the value.
+    auto input0 = parties[0].isLocalParty() ?
+        parties[0].input<sInt>(myInput, bitCount) :
+        parties[0].input<sInt>(bitCount);
+
+    auto input1 = parties[1].isLocalParty() ?
+        parties[1].input<sInt>(myInput, bitCount) :
+        parties[1].input<sInt>(bitCount);
 
 
-    //auto test =  
-
-
+    // perform some computation
     auto out = input1 + input0;
 
-    //Log::out << "comp " << me.getIdx() << Log::endl;
 
-    if (me.getIdx() == 0)
-    {
-        me.reveal(input0);
-        me.reveal(input1);
+    // reveal this output to party 0 and then party 1.
+    parties[0].reveal(out);
+    parties[1].reveal(out);
 
-        //Log::out << "input0 " << input0.getValue() << Log::endl;
-        //Log::out << "input1 " << input1.getValue() << Log::endl;
+    i32 result = (i32)out.getValue();
 
-        me.reveal(out);
-        them.reveal(out);
-    }
-    else
-    {
-        them.reveal(input0);
-        them.reveal(input1);
+    Log::out << result << Log::endl;
 
-        them.reveal(out);
-        me.reveal(out);
-    }
-
-
-    Log::out << "reveal " << me.getIdx() << Log::endl;
-
-    return (i32) out.getValue();
+    // Get the value what was just revealed to us.
+    return result;
 }
 
 int main(int argc, char**argv)
 {
-
-    //multTest();
-    //return 0;
     PRNG prng(OneBlock);
 
 
@@ -118,15 +106,13 @@ int main(int argc, char**argv)
         ShGcRuntime rt1;
         rt1.init(chl1, prng.get<block>(), ShGcRuntime::Evaluator, 1);
 
-        //ClearRuntime rt1;
-        //rt1.init(chl1, prng.get<block>(), 1);
 
+        std::array<Party, 2> parties {
+            Party(rt1, 0),
+            Party(rt1, 1)
+        };
 
-
-        RemoteParty them(rt1, 0);
-        LocalParty me(rt1, 1);
-
-        program(them, me, 44);
+        program(parties, 44);
 
         chl1.close();
         ep1.stop();
@@ -144,15 +130,13 @@ int main(int argc, char**argv)
     ShGcRuntime rt0;
     rt0.init(chl0, prng.get<block>(), ShGcRuntime::Garbler, 0);
 
-    //ClearRuntime rt0;
-    //rt0.init(chl0, prng.get<block>(), 0);
 
+    std::array<Party, 2> parties{
+        Party(rt0, 0),
+        Party(rt0, 1)
+    };
 
-
-    LocalParty me(rt0, 0);
-    RemoteParty them(rt0, 1);
-
-    program(them, me, 23);
+    program(parties, 23);
 
 
 

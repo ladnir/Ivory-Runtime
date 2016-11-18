@@ -54,6 +54,8 @@ namespace osuCrypto
 
         void processesQueue() override {}
 
+        u64 getPartyIdx() override { return mPartyIdx; }
+
         CircuitLibrary mLibrary;
 
 
