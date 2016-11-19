@@ -15,58 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Circuit\Circuit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GarbledCircuit\HalfGtGarbledCircuit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GarbledCircuit\KProbeResistant.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Common\BitIterator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\BitVector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\ByteStream.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\Defines.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\Log.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\Timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Crypto\AES.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Crypto\PRNG.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Network\BtAcceptor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Network\BtChannel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Network\BtEndpoint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Network\BtIOService.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Network\Channel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="OT\Base\naor-pinkas.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Crypto\Curve.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OT\Tools\Tools.cpp">
@@ -87,9 +42,6 @@
     <ClCompile Include="OT\TwoChooseOne\KosOtExtSender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Crypto\sha.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Runtime\ShGcRuntime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -102,23 +54,20 @@
     <ClCompile Include="Runtime\Runtime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Circuit\CircuitLibrary.cpp">
+    <ClCompile Include="Runtime\ClearRuntime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Circuit\BetaCircuit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\ClearRuntime.cpp">
+    <ClCompile Include="Circuit\Circuit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Circuit\CircuitLibrary.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Circuit\Circuit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Circuit\Gate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GarbledCircuit\GarbledCircuit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -128,67 +77,7 @@
     <ClInclude Include="GarbledCircuit\KProbeResistant.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Common\ArrayView.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\BitIterator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\BitVector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\ByteStream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\Defines.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\Exceptions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\Log.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\Timer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Crypto\AES.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Crypto\Commit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Crypto\PRNG.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Crypto\sha1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Network\BtAcceptor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Network\BtChannel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Network\BtEndpoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Network\BtIOService.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Network\BtSocket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Network\Channel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Network\Endpoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OT\Base\naor-pinkas.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Crypto\Curve.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OT\Tools\Tools.h">
@@ -224,19 +113,20 @@
     <ClInclude Include="Runtime\Runtime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Circuit\CircuitLibrary.h">
+    <ClInclude Include="Runtime\ClearRuntime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Circuit\BetaCircuit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\ClearRuntime.h">
+    <ClInclude Include="Circuit\Circuit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="Crypto\asm\sha_win64.asm">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
+    <ClInclude Include="Circuit\CircuitLibrary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Circuit\Gate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
