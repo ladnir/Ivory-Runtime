@@ -123,7 +123,7 @@ namespace osuCrypto
         case osuCrypto::Op::Not:
             throw std::runtime_error(LOCATION);
             break;
-        case osuCrypto::Op::BitWiseAnd:
+        case osuCrypto::Op::BitwiseAnd:
             throw std::runtime_error(LOCATION);
             break;
         case osuCrypto::Op::BitWiseOr:

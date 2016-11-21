@@ -1,6 +1,6 @@
 #include "ShGcRuntime.h"
 #include "Common/ByteStream.h"
-#include "OT/Base/naor-pinkas.h"
+#include "Base/naor-pinkas.h"
 #include "Common/Log.h"
 namespace osuCrypto
 {
@@ -111,8 +111,9 @@ namespace osuCrypto
         case osuCrypto::Op::Not:
             throw std::runtime_error(LOCATION);
             break;
-        case osuCrypto::Op::BitWiseAnd:
-            throw std::runtime_error(LOCATION);
+        case osuCrypto::Op::BitwiseAnd:
+            item.mCircuit = mLibrary.int_int_bitwiseAnd(sizes[0], sizes[1], sizes[2]);
+            item.mInputBundleCount = 2;
             break;
         case osuCrypto::Op::BitWiseOr:
             throw std::runtime_error(LOCATION);
@@ -351,7 +352,9 @@ namespace osuCrypto
 
             garble(*item.mCircuit, sharedMem, mTweaks, gates);
 
-            mChannel->asyncSend(std::move(sendBuff));
+
+            if(item.mCircuit->mNonXorGateCount)
+                mChannel->asyncSend(std::move(sendBuff));
 
 
             for (u64 i = item.mInputBundleCount; i < item.mLabels.size(); ++i)

@@ -5,9 +5,9 @@
 #include "Common/ArrayView.h"
 //#include "boost/lockfree/spsc_queue.hpp"
 #include <queue>
-#include "OT/TwoChooseOne/IknpOtExtSender.h"
+#include "TwoChooseOne/IknpOtExtSender.h"
 #include "Common/ByteStream.h"
-#include "OT/TwoChooseOne/IknpOtExtReceiver.h"
+#include "TwoChooseOne/IknpOtExtReceiver.h"
 #include "Circuit/CircuitLibrary.h"
 
 

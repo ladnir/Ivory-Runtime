@@ -50,6 +50,17 @@ namespace osuCrypto
         return ret;
     }
 
+    sInt sInt::operator&(sInt &in2)
+    {
+        sInt ret(mRuntime, std::max(mBitCount, in2.mBitCount));
+
+        std::array<RuntimeData*, 3> io{ mData.get(), in2.mData.get(), ret.mData.get() };
+
+        mRuntime.scheduleOp(Op::BitwiseAnd, io);
+
+
+        return ret;
+    }
 
     void sInt::operator+=(const sInt& in2)
     {

@@ -78,6 +78,7 @@ i32 program(std::array<Party, 2> parties, i64 myInput)
 
     Log::out << result << Log::endl;
 
+
     // Get the value what was just revealed to us.
     return result;
 }

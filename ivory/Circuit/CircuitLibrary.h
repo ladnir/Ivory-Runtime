@@ -16,7 +16,7 @@ namespace osuCrypto
 
         BetaCircuit* int_int_add(u64 aSize, u64 bSize, u64 cSize);
         BetaCircuit* int_int_mult(u64 aSize, u64 bSize, u64 cSize);
-
+        BetaCircuit* int_int_bitwiseAnd(u64 aSize, u64 bSize, u64 cSize);
 
         void int_int_add_built(
             BetaCircuit& cd,
@@ -31,6 +31,13 @@ namespace osuCrypto
             BetaBundle & a2,
             BetaBundle & prod);
 
+
+        void int_int_bitwiseAnd_build(
+            BetaCircuit& cd,
+            BetaBundle & a1,
+            BetaBundle & a2,
+            BetaBundle & out);
+        
         //u64 aSize, u64 bSize, u64 cSize);
 
     };

@@ -5,7 +5,7 @@ $SolutionDir=$PWD
 $RemoteWorkingDir='/scratch/repo/ivory'
 
 # only files with these extensions will be copied
-$FileMasks='**.cpp;**.c;**.h;makefile,*.bin,*.S;**.mak;thirdparty/linux/**.get'
+$FileMasks='**.cpp;**.c;**.h;*.bin,*.S;*CMakeLists.txt;thirdparty/linux/**.get'
 
 # everything in these folders will be skipped
 $ExcludeDirs='.git/;thirdparty/;Debug/;Release/;x64/;ipch/;.vs/'

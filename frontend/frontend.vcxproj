@@ -36,9 +36,11 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\ExternalDependancies.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\ExternalDependancies.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -47,13 +49,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\cryptoTools;$(SolutionDir)/ivory;$(ProjectDir);C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(libOTeDir)/libOTe;$(SolutionDir)\cryptoTools;$(SolutionDir)/ivory;$(ProjectDir);C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Miracl.lib;NTL.lib;cryptlib.lib;ivoryTests.lib;ivory.lib;cryptoTools.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OutputPath);%(AdditionalLibraryDirectories);C:\libs;C:\libs\cryptopp\x64\Output\$(Configuration);C:\libs\boost\stage\lib\;C:\libs\NTL\x64\$(Configuration);C:\libs\miracl\x64\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libOTe.lib;Miracl.lib;NTL.lib;cryptlib.lib;ivoryTests.lib;ivory.lib;cryptoTools.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutputPath);%(AdditionalLibraryDirectories);$(libOTeDir)\x64\$(Configuration);C:\libs;C:\libs\cryptopp\x64\Output\$(Configuration);C:\libs\boost\stage\lib\;C:\libs\NTL\x64\$(Configuration);C:\libs\miracl\x64\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -63,15 +65,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\cryptoTools;$(SolutionDir)/ivory;$(ProjectDir);C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(libOTeDir)/libOTe;$(SolutionDir)\cryptoTools;$(SolutionDir)/ivory;$(ProjectDir);C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Miracl.lib;NTL.lib;cryptlib.lib;ivoryTests.lib;ivory.lib;cryptoTools.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OutputPath);%(AdditionalLibraryDirectories);C:\libs;C:\libs\cryptopp\x64\Output\$(Configuration);C:\libs\boost\stage\lib\;C:\libs\NTL\x64\$(Configuration);C:\libs\miracl\x64\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libOTe.lib;Miracl.lib;NTL.lib;cryptlib.lib;ivoryTests.lib;ivory.lib;cryptoTools.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutputPath);%(AdditionalLibraryDirectories);$(libOTeDir)\x64\$(Configuration);C:\libs;C:\libs\cryptopp\x64\Output\$(Configuration);C:\libs\boost\stage\lib\;C:\libs\NTL\x64\$(Configuration);C:\libs\miracl\x64\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

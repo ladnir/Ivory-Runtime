@@ -1,5 +1,5 @@
 #pragma once
-#include "OT/TwoChooseOne/OTExtInterface.h"
+#include "TwoChooseOne/OTExtInterface.h"
 #include "Common/Defines.h"
 #include <unordered_map> 
 #include "Crypto/PRNG.h"

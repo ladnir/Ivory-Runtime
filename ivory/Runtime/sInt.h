@@ -34,6 +34,8 @@ namespace osuCrypto
         //sInt operator/=(const sInt&);
 
 
+        sInt operator&(sInt&);
+
         ValueType getValue();
 
 

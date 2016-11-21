@@ -21,27 +21,6 @@
     <ClCompile Include="GarbledCircuit\KProbeResistant.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OT\Base\naor-pinkas.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OT\Tools\Tools.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OT\Tools\BchCode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OT\TwoChooseOne\IknpOtExtReceiver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OT\TwoChooseOne\IknpOtExtSender.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OT\TwoChooseOne\KosOtExtReceiver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OT\TwoChooseOne\KosOtExtSender.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Runtime\ShGcRuntime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -75,30 +54,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GarbledCircuit\KProbeResistant.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\Base\naor-pinkas.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\Tools\Tools.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\Tools\BchCode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\TwoChooseOne\IknpOtExtReceiver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\TwoChooseOne\IknpOtExtSender.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\TwoChooseOne\KosOtExtReceiver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\TwoChooseOne\KosOtExtSender.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OT\TwoChooseOne\OTExtInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\ShGcRuntime.h">

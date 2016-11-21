@@ -1,32 +1,30 @@
 #include "OT_Tests.h"
 
-#include "OT/TwoChooseOne/OTExtInterface.h"
+#include "TwoChooseOne/OTExtInterface.h"
 
-#include "OT/Tools/Tools.h"
+#include "Tools/Tools.h"
 #include "Network/BtChannel.h"
 #include "Network/BtEndpoint.h"
 #include "Common/Log.h"
 
-#include "OT/TwoChooseOne/IknpOtExtReceiver.h"
-#include "OT/TwoChooseOne/IknpOtExtSender.h"
+#include "TwoChooseOne/IknpOtExtReceiver.h"
+#include "TwoChooseOne/IknpOtExtSender.h"
 
-#include "OT/TwoChooseOne/KosOtExtReceiver.h"
-#include "OT/TwoChooseOne/KosOtExtSender.h"
+#include "TwoChooseOne/KosOtExtReceiver.h"
+#include "TwoChooseOne/KosOtExtSender.h"
 
-//#include "OT/TwoChooseOne/KosOtExtReceiver2.h"
-//#include "OT/TwoChooseOne/KosOtExtSender2.h"
+//#include "TwoChooseOne/KosOtExtReceiver2.h"
+//#include "TwoChooseOne/KosOtExtSender2.h"
 
 #include "Common.h"
 #include <thread>
 #include <vector>
-#include <boost/multiprecision/cpp_int.hpp>
 
 #ifdef GetMessage
 #undef GetMessage
 #endif
 
 using namespace osuCrypto;
-using namespace boost::multiprecision;
 
 void OT_100Receive_Test(BitVector& choiceBits, ArrayView<block> recv, ArrayView<std::array<block,2>>  sender)
 {

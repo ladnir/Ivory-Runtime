@@ -70,6 +70,33 @@ namespace osuCrypto
 
     }
 
+    BetaCircuit * CircuitLibrary::int_int_bitwiseAnd(u64 aSize, u64 bSize, u64 cSize)
+    {
+        auto key = "bitwiseAnd" + ToString(aSize) + "x" + ToString(bSize) + "x" + ToString(cSize);
+
+        auto iter = mCirMap.find(key);
+
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle b(bSize);
+            BetaBundle c(cSize);
+
+            cd->addInputBundle(a);
+            cd->addInputBundle(b);
+
+            cd->addOutputBundle(c);
+
+            int_int_bitwiseAnd_build(*cd, a, b, c);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
 
     void CircuitLibrary::int_int_add_built(
         BetaCircuit& cd,
@@ -248,5 +275,17 @@ namespace osuCrypto
 
 #endif
         cd.levelize();
+    }
+    void CircuitLibrary::int_int_bitwiseAnd_build(BetaCircuit & cd, BetaBundle & a1, BetaBundle & a2, BetaBundle & out)
+    {
+        for (u64 j = 0; j  < out.mWires.size(); ++j)
+        {
+            cd.addGate(
+                a1.mWires[j],
+                a2.mWires[j],
+                GateType::And,
+                out.mWires[j]);
+        }
+
     }
 }
