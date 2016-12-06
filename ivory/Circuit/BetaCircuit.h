@@ -53,13 +53,17 @@ namespace osuCrypto
 
 		u64 mNonXorGateCount;
         BetaWire mWireCount;
-		std::vector<BetaGate> mGates;
+        std::vector<BetaGate> mGates;
+        std::vector<std::tuple<u64, BetaWire, std::string>> mPrints;
 		std::vector<BetaLevel> mLevelGates;
 
 		void addTempWireBundle(BetaBundle& in);
 		void addInputBundle(BetaBundle& in);
 		void addOutputBundle(BetaBundle& in);
 		void addGate(BetaWire in0, BetaWire in2, GateType gt, BetaWire out);
+
+        void addPrint(BetaWire wire);
+        void addPrint(std::string);
 
         std::vector<BetaBundle> mInputs, mOutputs;
         

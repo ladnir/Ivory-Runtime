@@ -150,7 +150,9 @@ namespace osuCrypto
             a2.mWires[0] == sum.mWires[0])
             throw std::runtime_error("");
 
-        u64 minSize = std::min<u64>(sum.mWires.size(), std::min<u64>(a1.mWires.size(), a2.mWires.size()));
+        u64 a1Size = a1.mWires.size();
+        u64 a2Size = a2.mWires.size();
+        u64 minSize = std::min<u64>(sum.mWires.size(), std::max<u64>(a1.mWires.size(), a2.mWires.size()));
 
         // sum is computed as a1[i] ^ a2[i] ^ carry[i-1]
         // carry[i] is computed as
@@ -173,68 +175,67 @@ namespace osuCrypto
         // now do the full adder while we have inputs from both a1,a2
         u64 i = 1;
         if (minSize > 1)
-        {
-            if (a1.mWires[i] == sum.mWires[i] ||
-                a2.mWires[i] == sum.mWires[i])
-                throw std::runtime_error("");
+        { 
 
             // compute the carry from the 0 bits (special case)
             cd.addGate(a1.mWires[i - 1], a2.mWires[i - 1], GateType::And, carry);
 
+            u64 a1Idx = std::min<u64>(i, a1Size - 1);
+            u64 a2Idx = std::min<u64>(i, a2Size - 1);
+
             // compute the sum
-            cd.addGate(a1.mWires[i], carry, GateType::Xor, aXorC);
-            cd.addGate(a2.mWires[i], aXorC, GateType::Xor, sum.mWires[i]);
+            cd.addGate(a1.mWires[a1Idx], carry, GateType::Xor, aXorC);
+            cd.addGate(a2.mWires[a2Idx], aXorC, GateType::Xor, sum.mWires[i]);
 
             // general case.
             for (i = 2; i < minSize; ++i)
             {
-                if (a1.mWires[i] == sum.mWires[i] ||
-                    a2.mWires[i] == sum.mWires[i])
-                    throw std::runtime_error("");
-
                 // compute the previous carry
-                cd.addGate(a2.mWires[i - 1], carry, GateType::Xor, temp);
+                cd.addGate(a2.mWires[a2Idx], carry, GateType::Xor, temp);
                 cd.addGate(temp, aXorC, GateType::And, temp);
                 cd.addGate(temp, carry, GateType::Xor, carry);
 
-                cd.addGate(a1.mWires[i], carry, GateType::Xor, aXorC);
-                cd.addGate(a2.mWires[i], aXorC, GateType::Xor, sum.mWires[i]);
+                a1Idx = std::min<u64>(i, a1Size - 1);
+                a2Idx = std::min<u64>(i, a2Size - 1);
+
+                cd.addGate(a1.mWires[a1Idx], carry, GateType::Xor, aXorC);
+                cd.addGate(a2.mWires[a2Idx], aXorC, GateType::Xor, sum.mWires[i]);
             }
         }
 
 
         // now special case the situation that a1 and a2 are different sizes
-        auto& aa = a1.mWires.size() > a2.mWires.size() ? a1 : a2;
-        minSize = std::min<u64>(aa.mWires.size(), sum.mWires.size());
+        //auto& aa = a1.mWires.size() > a2.mWires.size() ? a1 : a2;
+        //minSize = std::min<u64>(aa.mWires.size(), sum.mWires.size());
 
-        if (i < minSize)
-        {
-            // compute the previous carry (special case)
-            if (i == 1)
-            {
-                cd.addGate(a1.mWires[i - 1], a2.mWires[i - 1], GateType::And, carry);
-            }
-            else
-            {
-                cd.addGate(a2.mWires[i - 1], carry, GateType::Xor, temp);
-                cd.addGate(temp, aXorC, GateType::And, temp);
-                cd.addGate(temp, carry, GateType::Xor, carry);
-            }
-
-
-            cd.addGate(carry, aa.mWires[i], GateType::Xor, sum.mWires[i]);
-            ++i;
+        //if (i < minSize)
+        //{
+        //    // compute the previous carry (special case)
+        //    if (i == 1)
+        //    {
+        //        cd.addGate(a1.mWires[i - 1], a2.mWires[i - 1], GateType::And, carry);
+        //    }
+        //    else
+        //    {
+        //        cd.addGate(a2.mWires[i - 1], carry, GateType::Xor, temp);
+        //        cd.addGate(temp, aXorC, GateType::And, temp);
+        //        cd.addGate(temp, carry, GateType::Xor, carry);
+        //    }
 
 
-            // compute the general case
-            for (; i < minSize; ++i)
-            {
-                // compute the previous carry
-                cd.addGate(carry, aa.mWires[i - 1], GateType::And, carry);
+        //    cd.addGate(carry, aa.mWires[i], GateType::Xor, sum.mWires[i]);
+        //    ++i;
 
-                cd.addGate(carry, aa.mWires[i], GateType::Xor, sum.mWires[i]);
-            }
-        }
+
+        //    // compute the general case
+        //    for (; i < minSize; ++i)
+        //    {
+        //        // compute the previous carry
+        //        cd.addGate(carry, aa.mWires[i - 1], GateType::And, carry);
+
+        //        cd.addGate(carry, aa.mWires[i], GateType::Xor, sum.mWires[i]);
+        //    }
+        //}
     }
 
     void CircuitLibrary::int_int_subtract_built(
@@ -244,8 +245,13 @@ namespace osuCrypto
         BetaBundle & diff,
         BetaBundle & temps)
     {
+        if (diff.mWires.size() > std::max<u64>(a1.mWires.size(), a2.mWires.size()))
+            throw std::runtime_error(LOCATION);
 
-        u64 minSize = std::min(std::min(diff.mWires.size(), a1.mWires.size()), a2.mWires.size());
+
+        u64 a1Size = a1.mWires.size();
+        u64 a2Size = a2.mWires.size();
+        u64 minSize = std::min(std::max(a1.mWires.size(), a2.mWires.size()), diff.mWires.size());
 
         BetaWire borrow = temps.mWires[0];
         BetaWire aXorBorrow = temps.mWires[1];
@@ -276,64 +282,82 @@ namespace osuCrypto
             {
                 cd.addGate(a1.mWires[0], a2.mWires[0], GateType::na_And, borrow);
 
+                u64 a1Idx = std::min<u64>(1, a1Size - 1);
+                u64 a2Idx = std::min<u64>(1, a2Size - 1);
+
                 // second bit is the xor of borrow and input;
-                cd.addGate(borrow, a1.mWires[1], GateType::Xor, aXorBorrow);
-                cd.addGate(aXorBorrow, a2.mWires[1], GateType::Xor, d[1]);
+                cd.addGate(borrow, a1.mWires[a1Idx], GateType::Xor, aXorBorrow);
+                cd.addGate(aXorBorrow, a2.mWires[a2Idx], GateType::Xor, d[1]);
                 ++i;
 
                 for (; i < minSize; ++i)
-                {
+                {                             
                     // compute the borrow of the previous bit which itself has a borrow in.
-                    cd.addGate(a1.mWires[i - 1], a2.mWires[i - 1], GateType::Xor, temp);
+                    cd.addGate(a1.mWires[a1Idx], a2.mWires[a2Idx], GateType::Xor, temp);
                     cd.addGate(aXorBorrow, temp, GateType::Or, temp);
-                    cd.addGate(temp, a1.mWires[i - 1], GateType::Xor, borrow);
+                    cd.addGate(temp, a1.mWires[a1Idx], GateType::Xor, borrow);
+
+                    a1Idx = std::min<u64>(i, a1Size - 1);
+                    a2Idx = std::min<u64>(i, a2Size - 1);
 
                     // compute the difference as the xor of the input and prev borrow.
-                    cd.addGate(borrow, a1.mWires[i], GateType::Xor, aXorBorrow);
-                    cd.addGate(aXorBorrow, a2.mWires[i], GateType::Xor, d[i]);
+                    cd.addGate(borrow, a1.mWires[a1Idx], GateType::Xor, aXorBorrow);
+                    cd.addGate(aXorBorrow, a2.mWires[a2Idx], GateType::Xor, d[i]);
                 }
             }
         }
 
-        u64 minSizeA1 = std::min(a1.mWires.size(), diff.mWires.size());
-        u64 minSizeA2 = std::min(a2.mWires.size(), diff.mWires.size());
-        if (minSizeA1 > i || minSizeA2 > i)
-        {
-            if (i == 1)
-            {
-                cd.addGate(a1.mWires[0], a2.mWires[0], GateType::na_And, borrow);
-            }
-            else
-            {
-                // compute the borrow of the previous bit which itself has a borrow in.
-                cd.addGate(a1.mWires[i - 1], a2.mWires[i - 1], GateType::Xor, temp);
-                cd.addGate(aXorBorrow, temp, GateType::Or, temp);
-                cd.addGate(temp, a1.mWires[i - 1], GateType::Xor, borrow);
-            }
+        // special case for when one of the inputs is longer than the other
+        //u64 minSizeA1 = std::min(a1.mWires.size(), diff.mWires.size());
+        //u64 minSizeA2 = std::min(a2.mWires.size(), diff.mWires.size());
+        //if (minSizeA1 > i || minSizeA2 > i)
+        //{
 
-            if (minSizeA1 > i)
-            {
-                cd.addGate(a1.mWires[i], borrow, GateType::Xor, d[i]);
-                ++i;
+        //    // compute the borrow from the last normal subtraction bit index
+        //    if (i == 1)
+        //    {
+        //        cd.addGate(a1.mWires[0], a2.mWires[0], GateType::na_And, borrow);
+        //    }
+        //    else
+        //    {
+        //        // compute the borrow of the previous bit which itself has a borrow in.
+        //        cd.addGate(a1.mWires[i - 1], a2.mWires[i - 1], GateType::Xor, temp);
+        //        cd.addGate(aXorBorrow, temp, GateType::Or, temp);
+        //        cd.addGate(temp, a1.mWires[i - 1], GateType::Xor, borrow);
+        //    }
 
-                for (; i < minSizeA1; ++i)
-                {
-                    cd.addGate(a1.mWires[i - 1], borrow, GateType::na_And, borrow);
-                    cd.addGate(a1.mWires[i], borrow, GateType::Xor, d[i]);
-                }
-            }
-            else
-            {
-                cd.addGate(a2.mWires[i], borrow, GateType::Xor, d[i]);
-                ++i;
+        //    if (minSizeA1 > i)
+        //    {
 
-                for (; i < minSizeA2; ++i)
-                {
-                    cd.addGate(a2.mWires[i - 1], borrow, GateType::Or, borrow);
-                    cd.addGate(a2.mWires[i], borrow, GateType::Xor, d[i]);
-                }
-            }
-        }
+        //        cd.addGate(a1.mWires[i], borrow, GateType::Xor, d[i]);
+        //        ++i;
+        //    }
+
+        //    //if (minSizeA1 > i)
+        //    //{
+        //    //    // a1 is longer than 
+
+        //    //    cd.addGate(a1.mWires[i], borrow, GateType::Xor, d[i]);
+        //    //    ++i;
+
+        //    //    for (; i < minSizeA1; ++i)
+        //    //    {
+        //    //        cd.addGate(a1.mWires[i - 1], borrow, GateType::na_And, borrow);
+        //    //        cd.addGate(a1.mWires[i], borrow, GateType::Xor, d[i]);
+        //    //    }
+        //    //}
+        //    //else
+        //    //{
+        //    //    cd.addGate(a2.mWires[i], borrow, GateType::Xor, d[i]);
+        //    //    ++i;
+
+        //    //    for (; i < minSizeA2; ++i)
+        //    //    {
+        //    //        cd.addGate(a2.mWires[i - 1], borrow, GateType::Or, borrow);
+        //    //        cd.addGate(a2.mWires[i], borrow, GateType::Xor, d[i]);
+        //    //    }
+        //    //}
+        //}
 
     }
 
