@@ -71,9 +71,9 @@ void Circuit_Adder_Test()
     for (u64 i = 0; i < tries; ++i)
     {
 
-        u64 aSize = prng.get<u32>() % 64 + 1,
-            bSize = prng.get<u32>() % 64 + 1,
-            cSize = std::min<u64>(prng.get<u32>() % 64 + 1, std::max(aSize, bSize));
+        u64 aSize = prng.get<u32>() % 24 + 1,
+            bSize = prng.get<u32>() % 24 + 1,
+            cSize = std::min<u64>(prng.get<u32>() % 24 + 1, std::max(aSize, bSize) + 1);
 
         auto* cir = lib.int_int_add(aSize, bSize, cSize);
 
@@ -97,6 +97,8 @@ void Circuit_Adder_Test()
 
         if (cc != c)
         {
+            std::cout << "i " << i << std::endl;
+
             BitVector cExp;
             cExp.append((u8*)&c, cSize);
             std::cout << "a  : " << inputs[0] << std::endl;
@@ -127,9 +129,9 @@ void Circuit_Subtractor_Test()
     for (u64 i = 0; i < tries; ++i)
     {
 
-        u64 aSize = prng.get<u32>() % 64 + 1,
-            bSize = prng.get<u32>() % 64 + 1,
-            cSize = std::min<u64>(prng.get<u32>() % 64 + 1, std::max(aSize, bSize));
+        u64 aSize = prng.get<u32>() % 24 + 1,
+            bSize = prng.get<u32>() % 24 + 1,
+            cSize = std::min<u64>(prng.get<u32>() % 24 + 1, std::max(aSize, bSize));
 
         auto* cir = lib.int_int_subtract(aSize, bSize, cSize);
 
@@ -159,6 +161,61 @@ void Circuit_Subtractor_Test()
             std::cout << "-b : " << inputs[1] << std::endl;
             std::cout << "exp: " << cExp << std::endl;
             std::cout << "act: " << output[0] << std::endl;
+
+            throw UnitTestFail();
+        }
+    }
+}
+
+
+
+void Circuit_Multiply_Test()
+{
+    setThreadName("CP_Test_Thread");
+
+
+    CircuitLibrary lib;
+
+
+    PRNG prng(ZeroBlock);
+    u64 tries = 200;
+
+
+    for (u64 i = 0; i < tries; ++i)
+    {
+
+        u64 aSize = prng.get<u32>() % 16 + 1,
+            bSize = prng.get<u32>() % 16 + 1,
+            cSize = std::min<u64>(aSize + bSize, std::min<u64>(prng.get<u32>() % 16 + 1, std::max(aSize, bSize)));
+
+        auto* cir = lib.int_int_mult(aSize, bSize, cSize);
+
+
+        i64 a = signExtend(prng.get<i64>(), aSize);
+        i64 b = signExtend(prng.get<i64>(), bSize);
+        i64 c = signExtend((a * b), cSize);
+
+
+        std::vector<BitVector> inputs(2), output(1);
+        inputs[0].append((u8*)&a, aSize);
+        inputs[1].append((u8*)&b, bSize);
+        output[0].resize(cSize);
+
+        cir->evaluate(inputs, output, i == 125);
+
+        i64 cc = 0;
+        memcpy(&cc, output[0].data(), output[0].sizeBytes());
+        cc = signExtend(cc, cSize);
+
+        if (cc != c)
+        {
+            std::cout << "i " << i << std::endl;
+            BitVector cExp;
+            cExp.append((u8*)&c, cSize);
+            std::cout << " a : " << inputs[0] << "  " << a << std::endl;
+            std::cout << "*b : " << inputs[1] << "  " << b << std::endl;
+            std::cout << "exp: " << cExp << "   " << c << std::endl;
+            std::cout << "act: " << output[0] << "   " << cc<< std::endl;
 
             throw UnitTestFail();
         }

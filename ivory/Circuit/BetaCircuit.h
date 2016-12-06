@@ -38,6 +38,7 @@ namespace osuCrypto
 	
 	struct BetaBundle
 	{
+        BetaBundle() {}
 		BetaBundle(u64 s) :mWires(s) {}
 		std::vector<BetaWire> mWires;
 	};
@@ -62,12 +63,13 @@ namespace osuCrypto
 		void addOutputBundle(BetaBundle& in);
 		void addGate(BetaWire in0, BetaWire in2, GateType gt, BetaWire out);
 
+        void addPrint(BetaBundle in);
         void addPrint(BetaWire wire);
         void addPrint(std::string);
 
         std::vector<BetaBundle> mInputs, mOutputs;
         
-        void evaluate(ArrayView<BitVector> input, ArrayView<BitVector> output);
+        void evaluate(ArrayView<BitVector> input, ArrayView<BitVector> output, bool print = true);
 
 		void levelize();
 	};

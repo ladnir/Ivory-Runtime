@@ -139,7 +139,7 @@ namespace osuCrypto
         if (temps.mWires.size() < 3)
             throw std::runtime_error(LOCATION);
 
-        if (sum.mWires.size() > std::max<u64>(a1.mWires.size(), a2.mWires.size()))
+        if (sum.mWires.size() > std::max<u64>(a1.mWires.size(), a2.mWires.size()) + 1)
             throw std::runtime_error(LOCATION);
 
         BetaWire& carry = temps.mWires[0];
@@ -152,7 +152,7 @@ namespace osuCrypto
 
         u64 a1Size = a1.mWires.size();
         u64 a2Size = a2.mWires.size();
-        u64 minSize = std::min<u64>(sum.mWires.size(), std::max<u64>(a1.mWires.size(), a2.mWires.size()));
+        u64 minSize = sum.mWires.size();
 
         // sum is computed as a1[i] ^ a2[i] ^ carry[i-1]
         // carry[i] is computed as
@@ -175,7 +175,7 @@ namespace osuCrypto
         // now do the full adder while we have inputs from both a1,a2
         u64 i = 1;
         if (minSize > 1)
-        { 
+        {
 
             // compute the carry from the 0 bits (special case)
             cd.addGate(a1.mWires[i - 1], a2.mWires[i - 1], GateType::And, carry);
@@ -217,9 +217,9 @@ namespace osuCrypto
         //    }
         //    else
         //    {
-        //        cd.addGate(a2.mWires[i - 1], carry, GateType::Xor, temp);
-        //        cd.addGate(temp, aXorC, GateType::And, temp);
-        //        cd.addGate(temp, carry, GateType::Xor, carry);
+        //        cd.addGate(a2.mWires[i - 1], carry, GateType::Xor, additonTemp);
+        //        cd.addGate(additonTemp, aXorC, GateType::And, additonTemp);
+        //        cd.addGate(additonTemp, carry, GateType::Xor, carry);
         //    }
 
 
@@ -291,7 +291,7 @@ namespace osuCrypto
                 ++i;
 
                 for (; i < minSize; ++i)
-                {                             
+                {
                     // compute the borrow of the previous bit which itself has a borrow in.
                     cd.addGate(a1.mWires[a1Idx], a2.mWires[a2Idx], GateType::Xor, temp);
                     cd.addGate(aXorBorrow, temp, GateType::Or, temp);
@@ -321,9 +321,9 @@ namespace osuCrypto
         //    else
         //    {
         //        // compute the borrow of the previous bit which itself has a borrow in.
-        //        cd.addGate(a1.mWires[i - 1], a2.mWires[i - 1], GateType::Xor, temp);
-        //        cd.addGate(aXorBorrow, temp, GateType::Or, temp);
-        //        cd.addGate(temp, a1.mWires[i - 1], GateType::Xor, borrow);
+        //        cd.addGate(a1.mWires[i - 1], a2.mWires[i - 1], GateType::Xor, additonTemp);
+        //        cd.addGate(aXorBorrow, additonTemp, GateType::Or, additonTemp);
+        //        cd.addGate(additonTemp, a1.mWires[i - 1], GateType::Xor, borrow);
         //    }
 
         //    if (minSizeA1 > i)
@@ -368,83 +368,150 @@ namespace osuCrypto
         BetaBundle & c)
     {
 
-        u64 N = c.mWires.size();
+        if (c.mWires.size() > a.mWires.size() + b.mWires.size())
+            throw std::runtime_error(LOCATION);
 
-        std::vector<BetaBundle> terms;
-        terms.reserve(N);
+        if (a.mWires.size() < b.mWires.size())
+        {
+            int_int_mult_build(cd, b, a, c);
+            return;
+        }
+
+        u64 numRows = c.mWires.size();
+
+
+        // rows will hold
+        // {  b[0] * a ,
+        //    b[1] * a ,
+        //    ...      ,
+        //    b[n] * a }
+        // where row i contains min(c.mWires.size() - i, a.mWires.size())
+        std::vector<BetaBundle> rows(numRows);
 
 
         // first, we compute the AND between the two inputs.
-        for (u64 i = 0; i < b.mWires.size(); ++i)
+        for (u64 i = 0; i < rows.size(); ++i)
         {
-            const BetaWire& multBit = b.mWires[i];
 
-            // this will hold the b[i] * a, a vector of N-i bits
-            terms.emplace_back(N - i);
+            // this will hold the b[i] * a
+            rows[i].mWires.resize(std::min(c.mWires.size() - i, a.mWires.size()));
 
             // initialize some unused wires, these will
             // hold intermediate sums.
-            cd.addTempWireBundle(terms.back());
+            cd.addTempWireBundle(rows[i]);
 
             if (i == 0)
             {
                 // later, we will sum together all the 
-                // terms, and this term at idx 0 will be 
+                // rows, and this row at idx 0 will be 
                 // the running total, so we want it to be 
                 // the wires that represent the product c.
-                terms[0].mWires[0] = c.mWires[0];
+                rows[0].mWires[0] = c.mWires[0];
             }
 
+            if (rows.size() == 1)
+            {
+                for (u64 j = 1; j < rows[0].mWires.size(); ++j)
+                {
+                    rows[0].mWires[j] = c.mWires[j];
+                }
+            }
+
+            if (a.mWires.size() == 1)
+            {
+                rows[i].mWires[0] = c.mWires[i];
+            }
+
+            const BetaWire& bi = b.mWires[std::min(i, b.mWires.size() - 1)];
+
             // compute the AND between b[i] * a[j].
-            for (u64 j = 0; j + i < N; ++j)
+            for (u64 j = 0; j < rows[i].mWires.size(); ++j)
             {
                 cd.addGate(
-                    multBit,
+                    bi,
                     a.mWires[j],
                     GateType::And,
-                    terms[i].mWires[j]);
+                    rows[i].mWires[j]);
             }
         }
 
 #define SERIAL
 #ifdef SERIAL
-
-        BetaBundle temp(3), temp2(N - 1);
-        cd.addTempWireBundle(temp);
-        cd.addTempWireBundle(temp2);
-
-        std::array<BetaBundle, 2> temps{ temp2, terms[0] };
-
-        for (u64 i = 1; i < N; i++)
+        if (rows.size() > 1)
         {
-            auto& t0 = temps[(i & 1)];
-            auto& t1 = temps[(i & 1) ^ 1];
 
-            t0.mWires.erase(t0.mWires.begin());
-            t1.mWires.resize(t0.mWires.size());
+            BetaBundle additonTemp(3), temp2(rows[1].mWires.size());
+            cd.addTempWireBundle(additonTemp);
+            cd.addTempWireBundle(temp2);
+            //cd.addPrint("+");
+            //cd.addPrint(rows[0]);
+            //cd.addPrint("\n");
 
-            t1.mWires[0] = c.mWires[i];
+            rows[0].mWires.erase(rows[0].mWires.begin());
 
-            int_int_add_built(cd, t0, terms[i], t1, temp);
+            // starting with rows[0] + rows[1], sum the rows together
+            // note that, after each sum, we will have computed one more
+            // bit of the final product.
+            for (u64 i = 1; i < rows.size(); i++)
+            {
+                BetaBundle sum(std::min(rows[i].mWires.size() + 1, c.mWires.size() - i));
+
+
+                //cd.addPrint("+");
+                //cd.addPrint(std::string(i, ' '));
+                //cd.addPrint(rows[i]);
+                //cd.addPrint("\n-----------------------------------------------------------------" + std::to_string(i) + " / " + std::to_string(b.mWires.size())+"  ");
+                //cd.addPrint(b.mWires[std::min(i, b.mWires.size() - 1)]);
+                //cd.addPrint("\n " + std::string(i, ' '));
+
+                cd.addTempWireBundle(sum);
+
+                sum.mWires[0] = c.mWires[i];
+
+                if (i == rows.size() - 1)
+                {
+                    for (u64 j = 1; j < sum.mWires.size(); ++j)
+                    {
+                        sum.mWires[j] = c.mWires[i + j];
+                    }
+                }
+
+                int_int_add_built(cd, rows[i - 1], rows[i], sum, additonTemp);
+
+
+                //cd.addPrint(sum);
+                //cd.addPrint("\n ");
+                //cd.addPrint(c);
+                //cd.addPrint("\n");
+
+                rows[i].mWires.clear();
+                rows[i].mWires.insert(rows[i].mWires.begin(), sum.mWires.begin() + 1, sum.mWires.end());
+            }
         }
+
+
+        //cd.addPrint("=");
+        //cd.addPrint(c);
+        //cd.addPrint("\n\n");
 #else
+        this code has not been tested and surely contains errors
 
-        // while the serial code above should work, it is more sequential. 
-        // as such, then using the 'leveled' presentation, fewer operations
-        // can be pipelined. 
+            // while the serial code above should work, it is more sequential. 
+            // as such, then using the 'leveled' presentation, fewer operations
+            // can be pipelined. 
 
-        u64 k = 1, p = 1;
-        while (terms.size() > 1)
+            u64 k = 1, p = 1;
+        while (rows.size() > 1)
         {
             std::vector<BetaBundle> newTerms;
 
 
-            for (u64 i = 0; i < terms.size(); i += 2)
+            for (u64 i = 0; i < rows.size(); i += 2)
             {
-                BetaBundle temp(3);
-                cd.addTempWireBundle(temp);
+                BetaBundle additonTemp(3);
+                cd.addTempWireBundle(additonTemp);
 
-                newTerms.emplace_back(terms[i + 1].mWires.size());
+                newTerms.emplace_back(rows[i + 1].mWires.size());
                 auto& prod = newTerms.back();
                 cd.addTempWireBundle(prod);
 
@@ -458,27 +525,27 @@ namespace osuCrypto
                     k *= 2;
                 }
 
-                auto sizeDiff = terms[i].mWires.size() - terms[i + 1].mWires.size();
+                auto sizeDiff = rows[i].mWires.size() - rows[i + 1].mWires.size();
 
                 std::vector<BetaWire> bottomBits(
-                    terms[i].mWires.begin(),
-                    terms[i].mWires.begin() + sizeDiff);
+                    rows[i].mWires.begin(),
+                    rows[i].mWires.begin() + sizeDiff);
 
-                terms[i].mWires.erase(
-                    terms[i].mWires.begin(),
-                    terms[i].mWires.begin() + sizeDiff);
+                rows[i].mWires.erase(
+                    rows[i].mWires.begin(),
+                    rows[i].mWires.begin() + sizeDiff);
 
-                int_int_add_built(cd, terms[i], terms[i + 1], prod, temp);
+                int_int_add_built(cd, rows[i], rows[i + 1], prod, additonTemp);
 
                 prod.mWires.insert(prod.mWires.begin(), bottomBits.begin(), bottomBits.end());
-        }
+            }
 
-            terms = std::move(newTerms);
-    }
+            rows = std::move(newTerms);
+        }
 
 #endif
         cd.levelize();
-}
+    }
     void CircuitLibrary::int_int_bitwiseAnd_build(BetaCircuit & cd, BetaBundle & a1, BetaBundle & a2, BetaBundle & out)
     {
         for (u64 j = 0; j < out.mWires.size(); ++j)

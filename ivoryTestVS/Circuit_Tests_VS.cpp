@@ -23,5 +23,11 @@ namespace libBDXTests
             InitDebugPrinting();
             Circuit_Subtractor_Test();
         }
+
+        TEST_METHOD(Circuit_Multiply)
+        {
+            InitDebugPrinting();
+            Circuit_Multiply_Test();
+        }
 	};
 }

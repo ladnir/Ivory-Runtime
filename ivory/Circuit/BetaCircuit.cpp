@@ -66,6 +66,14 @@ namespace osuCrypto
 
     }
 
+    void BetaCircuit::addPrint(BetaBundle in)
+    {
+        for (auto& i : in.mWires)
+        {
+            addPrint(i);
+        }
+    }
+
     void osuCrypto::BetaCircuit::addPrint(BetaWire wire)
     {
         mPrints.emplace_back(mGates.size(), wire, "");
@@ -75,7 +83,7 @@ namespace osuCrypto
     {
         mPrints.emplace_back(mGates.size(), -1,str);
     }
-    void BetaCircuit::evaluate(ArrayView<BitVector> input, ArrayView<BitVector> output)
+    void BetaCircuit::evaluate(ArrayView<BitVector> input, ArrayView<BitVector> output, bool print)
     {
         BitVector mem(mWireCount);
 
@@ -98,7 +106,7 @@ namespace osuCrypto
 
         for (u64 i = 0; i < mGates.size(); ++i)
         {
-            while (iter != mPrints.end() && std::get<0>(*iter) == i)
+            while (print && iter != mPrints.end() && std::get<0>(*iter) == i)
             {
                 auto wireIdx = std::get<1>(*iter);
                 auto str = std::get<2>(*iter);
@@ -121,7 +129,7 @@ namespace osuCrypto
             mem[idx2] = GateEval(mGates[i].mType, (bool)a, (bool)b);
 
         }
-        while (iter != mPrints.end())
+        while (print && iter != mPrints.end())
         {
             auto wireIdx = std::get<1>(*iter);
             auto str = std::get<2>(*iter);

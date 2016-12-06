@@ -40,7 +40,7 @@ void multTest()
             output[0].reserve(32);
             i32 c = *(u32*)output[0].data();
 
-            if (c != (a * b) & (1 << bitCount))
+            if (c != ((a * b) & (1 << bitCount)))
             {
                 std::cout  << "bad " << c << "  " << (a*b) << "  " << a << " " << b << std::endl;
                 return;
