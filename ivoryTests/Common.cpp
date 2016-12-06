@@ -10,7 +10,7 @@ std::string testData("../..");
 
 void InitDebugPrinting(std::string filePath)
 {
-	Log::out << "changing sink" << Log::endl;
+	std::cout  << "changing sink" << std::endl;
 
 	if (file == nullptr)
 	{
@@ -28,8 +28,10 @@ void InitDebugPrinting(std::string filePath)
 
 	//time_t now = time(0);
 
-	Log::SetSink(*file);
+	//Log::SetSink(*file);
 
+    std::cout.rdbuf(file->rdbuf());
+    std::cerr.rdbuf(file->rdbuf());
 	
-	//Log::out << "Test - " << ctime(&now) << Log::endl;
+	//std::cout  << "Test - " << ctime(&now) << std::endl;
 }

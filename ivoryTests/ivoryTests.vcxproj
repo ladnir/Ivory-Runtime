@@ -50,7 +50,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(libOTeDir)/libOTe;$(SolutionDir)\cryptoTools;$(SolutionDir)/ivory;$(ProjectDir);C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SOLUTION_DIR=R"**($(SolutionDir))**";_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -65,7 +65,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(libOTeDir)/libOTe;$(SolutionDir)\cryptoTools;$(SolutionDir)/ivory;$(ProjectDir);C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SOLUTION_DIR=R"**($(SolutionDir))**";_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>

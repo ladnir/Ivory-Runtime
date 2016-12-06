@@ -3,8 +3,8 @@
 
 #include "Common/Defines.h"
 
-void InitDebugPrinting(std::string file = "../test.out");
-
+void InitDebugPrinting(std::string file = SOLUTION_DIR"/unitTest.txt");
+ 
 extern std::string testData;
 
 class UnitTestFail : public std::exception 

@@ -24,7 +24,7 @@ using namespace osuCrypto;
 
 void NaorPinkasOt_Test_Impl()
 {
-		Log::setThreadName("Sender");
+		setThreadName("Sender");
 
 		BtIOService ios(0);
 		BtEndpoint ep0(ios, "127.0.0.1", 1212, true, "ep");
@@ -45,7 +45,7 @@ void NaorPinkasOt_Test_Impl()
 
 
 		std::thread thrd = std::thread([&]() {
-			Log::setThreadName("receiver");
+			setThreadName("receiver");
 
 
 			NaorPinkas baseOTs;

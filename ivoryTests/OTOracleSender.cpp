@@ -34,7 +34,7 @@ void OTOracleSender::send(
 		messages[doneIdx][0] = mPrng.get<block>();
 		messages[doneIdx][1] = mPrng.get<block>(); 
 
-		//Log::out << " idx  " << doneIdx << "   " << messages[doneIdx][0] << "   " << messages[doneIdx][1] << Log::endl;
+		//std::cout  << " idx  " << doneIdx << "   " << messages[doneIdx][0] << "   " << messages[doneIdx][1] << std::endl;
 
 	}
 }

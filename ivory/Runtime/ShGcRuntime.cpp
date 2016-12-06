@@ -90,7 +90,8 @@ namespace osuCrypto
             item.mInputBundleCount = 2;
             break;
         case osuCrypto::Op::Subtract:
-            throw std::runtime_error(LOCATION);
+            item.mCircuit = mLibrary.int_int_subtract(sizes[0], sizes[1], sizes[2]);
+            item.mInputBundleCount = 2;
             break;
         case osuCrypto::Op::Multiply:
             item.mCircuit = mLibrary.int_int_mult(sizes[0], sizes[1], sizes[2]);
@@ -407,12 +408,12 @@ namespace osuCrypto
             }
 
 
-            //Log::out << Log::lock;
+            //std::cout  << IoStream::lock;
             //for (auto ii = 0; ii < item.mLabels[2]->size(); ++ii)
             //{
-            //    Log::out << "e out[" << ii << "] " << (*item.mLabels[2])[ii] << Log::endl;
+            //    std::cout  << "e out[" << ii << "] " << (*item.mLabels[2])[ii] << std::endl;
             //}
-            //Log::out << Log::unlock;
+            //std::cout  << IoStream::unlock;
 
             mCrtQueue.pop();
         }
@@ -445,16 +446,16 @@ namespace osuCrypto
                 {
                     if (neq(sharedMem[i], (*item.mLabels)[i]) && neq(sharedMem[i], (*item.mLabels)[i] ^ mGlobalOffset))
                     {
-                        Log::out << Log::lock << "output reveal error at " << i << ":\n   " << sharedMem[i] << "  != " << (*item.mLabels)[i]
-                            << " (0) AND \n   " << sharedMem[i] << "  != " << ((*item.mLabels)[i] ^ mGlobalOffset) << Log::endl << Log::unlock;
+                        std::cout  << IoStream::lock << "output reveal error at " << i << ":\n   " << sharedMem[i] << "  != " << (*item.mLabels)[i]
+                            << " (0) AND \n   " << sharedMem[i] << "  != " << ((*item.mLabels)[i] ^ mGlobalOffset) << std::endl << IoStream::unlock;
 
                         throw std::runtime_error(LOCATION);
                     }
 
                     //if (i == 1)
                     //{
-                    //    Log::out << Log::lock << "output reveal at " << i << ":\n   " << sharedMem[i] << "  ?= " << (*item.mLabels)[i]
-                    //        << " (0) AND \n   " << sharedMem[i] << "  ?= " << ((*item.mLabels)[i] ^ mGlobalOffset) << Log::endl << Log::unlock;
+                    //    std::cout  << IoStream::lock << "output reveal at " << i << ":\n   " << sharedMem[i] << "  ?= " << (*item.mLabels)[i]
+                    //        << " (0) AND \n   " << sharedMem[i] << "  ?= " << ((*item.mLabels)[i] ^ mGlobalOffset) << std::endl << IoStream::unlock;
 
                     //}
 
@@ -533,7 +534,7 @@ namespace osuCrypto
         ArrayView<GarbledGate<2>> garbledGates)
     {
         auto garbledGateIter = garbledGates.begin();
-        //Log::out << Log::lock;
+        //std::cout  << IoStream::lock;
 
         //u64 i = 0;
 
@@ -624,7 +625,7 @@ namespace osuCrypto
                     auto& garbledTable = garbledGateIter++->mGarbledTable;
 
 
-                    //Log::out << "e "<<i<<" " << garbledTable[0] << " " << garbledTable[1] << Log::endl;
+                    //std::cout  << "e "<<i<<" " << garbledTable[0] << " " << garbledTable[1] << std::endl;
 
                     zeroAndGarbledTable[1][0] = garbledTable[0];
                     zeroAndGarbledTable[1][1] = garbledTable[1] ^ a;
@@ -637,19 +638,19 @@ namespace osuCrypto
                         zeroAndGarbledTable[PermuteBit(a)][0] ^
                         zeroAndGarbledTable[PermuteBit(b)][1];
 
-                    //Log::out << "e " << i++ << gateToString(gate.mType) << Log::endl <<
-                    //    " gt  " << garbledTable[0] << "  " << garbledTable[1] << Log::endl <<
-                    //    " t   " << tweaks[0] << "  " << tweaks[1] << Log::endl <<
-                    //    " a   " << a << Log::endl <<
-                    //    " b   " << b << Log::endl <<
-                    //    " c   " << c << Log::endl;
+                    //std::cout  << "e " << i++ << gateToString(gate.mType) << std::endl <<
+                    //    " gt  " << garbledTable[0] << "  " << garbledTable[1] << std::endl <<
+                    //    " t   " << tweaks[0] << "  " << tweaks[1] << std::endl <<
+                    //    " a   " << a << std::endl <<
+                    //    " b   " << b << std::endl <<
+                    //    " c   " << c << std::endl;
 
                 }
 
             }
         }
 
-        //Log::out << Log::unlock;
+        //std::cout  << IoStream::unlock;
 
     }
 
@@ -660,10 +661,10 @@ namespace osuCrypto
         ArrayView<GarbledGate<2>> gates)
     {
         auto gateIter = gates.data();
-        //Log::out << Log::lock;
+        //std::cout  << IoStream::lock;
         //u64 i = 0;
 
-        if (cir.mLevelGates.size())
+        if (cir.mLevelGates.size() & 0)
         {
             u8 aPermuteBit, bPermuteBit, bAlphaBPermute, cPermuteBit;
             block hash[16], temp[16];
@@ -881,7 +882,7 @@ namespace osuCrypto
                     garbledTable[0] = hash[0] ^ hash[1] ^ mZeroAndGlobalOffset[bAlphaBPermute];
                     garbledTable[1] = hash[2] ^ hash[3] ^ a ^ mZeroAndGlobalOffset[aAlpha];
 
-                    //Log::out << "g "<<i<<" " << garbledTable[0] << " " << garbledTable[1] << Log::endl;
+                    //std::cout  << "g "<<i<<" " << garbledTable[0] << " " << garbledTable[1] << std::endl;
 
 
                     // compute the out wire
@@ -889,18 +890,18 @@ namespace osuCrypto
                         hash[2 ^ bPermuteBit] ^
                         mZeroAndGlobalOffset[cPermuteBit];
 
-                    //Log::out << "g " << i++  << gateToString(gate.mType) << Log::endl <<
-                    //    " gt  " << garbledTable[0] << "  " << garbledTable[1] << Log::endl <<
-                    //    " t   " << tweaks[0] << "  " << tweaks[1] << Log::endl <<
-                    //    " a   " << a << "  " << (a ^ mGlobalOffset) << Log::endl <<
-                    //    " b   " << b << "  " << (b ^ mGlobalOffset) << Log::endl <<
-                    //    " c   " << c << "  " << (c ^ mGlobalOffset) << Log::endl;
+                    //std::cout  << "g " << i++  << gateToString(gate.mType) << std::endl <<
+                    //    " gt  " << garbledTable[0] << "  " << garbledTable[1] << std::endl <<
+                    //    " t   " << tweaks[0] << "  " << tweaks[1] << std::endl <<
+                    //    " a   " << a << "  " << (a ^ mGlobalOffset) << std::endl <<
+                    //    " b   " << b << "  " << (b ^ mGlobalOffset) << std::endl <<
+                    //    " c   " << c << "  " << (c ^ mGlobalOffset) << std::endl;
 
                 }
 
             }
         }
-        //Log::out << Log::unlock;
+        //std::cout  << IoStream::unlock;
 
     }
 

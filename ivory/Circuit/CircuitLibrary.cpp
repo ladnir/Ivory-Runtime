@@ -42,6 +42,36 @@ namespace osuCrypto
         return iter->second;
     }
 
+    BetaCircuit * CircuitLibrary::int_int_subtract(u64 aSize, u64 bSize, u64 cSize)
+    {
+        auto key = "subtract" + ToString(aSize) + "x" + ToString(bSize) + "x" + ToString(cSize);
+
+        auto iter = mCirMap.find(key);
+
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle b(bSize);
+            BetaBundle c(cSize);
+            BetaBundle t(3);
+
+            cd->addInputBundle(a);
+            cd->addInputBundle(b);
+
+            cd->addOutputBundle(c);
+
+            cd->addTempWireBundle(t);
+
+            int_int_subtract_built(*cd, a, b, c, t);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
     BetaCircuit * CircuitLibrary::int_int_mult(u64 aSize, u64 bSize, u64 cSize)
     {
         auto key = "mult" + ToString(aSize) + "x" + ToString(bSize) + "x" + ToString(cSize);
@@ -106,37 +136,57 @@ namespace osuCrypto
         BetaBundle & temps)
     {
 
+        if (temps.mWires.size() < 3)
+            throw std::runtime_error(LOCATION);
 
-        if (a1.mWires.size() != a2.mWires.size() ||
-            a1.mWires.size() != sum.mWires.size() ||
-            temps.mWires.size() < 3)
-            throw std::runtime_error("");
+        if (sum.mWires.size() > std::max<u64>(a1.mWires.size(), a2.mWires.size()))
+            throw std::runtime_error(LOCATION);
 
         BetaWire& carry = temps.mWires[0];
         BetaWire& aXorC = temps.mWires[1];
         BetaWire& temp = temps.mWires[2];
 
-        // half adder
-        cd.addGate(a1.mWires[0], a2.mWires[0], GateType::Xor, sum.mWires[0]);
-
         if (a1.mWires[0] == sum.mWires[0] ||
             a2.mWires[0] == sum.mWires[0])
             throw std::runtime_error("");
 
+        u64 minSize = std::min<u64>(sum.mWires.size(), std::min<u64>(a1.mWires.size(), a2.mWires.size()));
 
-        if (a1.mWires.size() > 1)
+        // sum is computed as a1[i] ^ a2[i] ^ carry[i-1]
+        // carry[i] is computed as
+        //
+        //  carry[i-1] -*--*--------------------*
+        //              |  |                    |
+        //              |  >= xor ---*          >= xor --- carry[i]
+        //              |  |         |          |
+        //  a2[i] ------|--*          >= and ---*
+        //              |            |
+        //              >==== xor ---*
+        //              |            
+        //  a1[i] ------*
+
+
+        // half adder
+        cd.addGate(a1.mWires[0], a2.mWires[0], GateType::Xor, sum.mWires[0]);
+
+
+        // now do the full adder while we have inputs from both a1,a2
+        u64 i = 1;
+        if (minSize > 1)
         {
-            if (a1.mWires[1] == sum.mWires[1] ||
-                a2.mWires[1] == sum.mWires[1])
+            if (a1.mWires[i] == sum.mWires[i] ||
+                a2.mWires[i] == sum.mWires[i])
                 throw std::runtime_error("");
 
-            // compute the carry from the 0 bits
-            cd.addGate(a1.mWires[0], a2.mWires[0], GateType::And, carry);
+            // compute the carry from the 0 bits (special case)
+            cd.addGate(a1.mWires[i - 1], a2.mWires[i - 1], GateType::And, carry);
 
-            cd.addGate(a1.mWires[1], carry, GateType::Xor, aXorC);
-            cd.addGate(a2.mWires[1], aXorC, GateType::Xor, sum.mWires[1]);
+            // compute the sum
+            cd.addGate(a1.mWires[i], carry, GateType::Xor, aXorC);
+            cd.addGate(a2.mWires[i], aXorC, GateType::Xor, sum.mWires[i]);
 
-            for (u64 i = 2; i < a1.mWires.size(); ++i)
+            // general case.
+            for (i = 2; i < minSize; ++i)
             {
                 if (a1.mWires[i] == sum.mWires[i] ||
                     a2.mWires[i] == sum.mWires[i])
@@ -151,6 +201,140 @@ namespace osuCrypto
                 cd.addGate(a2.mWires[i], aXorC, GateType::Xor, sum.mWires[i]);
             }
         }
+
+
+        // now special case the situation that a1 and a2 are different sizes
+        auto& aa = a1.mWires.size() > a2.mWires.size() ? a1 : a2;
+        minSize = std::min<u64>(aa.mWires.size(), sum.mWires.size());
+
+        if (i < minSize)
+        {
+            // compute the previous carry (special case)
+            if (i == 1)
+            {
+                cd.addGate(a1.mWires[i - 1], a2.mWires[i - 1], GateType::And, carry);
+            }
+            else
+            {
+                cd.addGate(a2.mWires[i - 1], carry, GateType::Xor, temp);
+                cd.addGate(temp, aXorC, GateType::And, temp);
+                cd.addGate(temp, carry, GateType::Xor, carry);
+            }
+
+
+            cd.addGate(carry, aa.mWires[i], GateType::Xor, sum.mWires[i]);
+            ++i;
+
+
+            // compute the general case
+            for (; i < minSize; ++i)
+            {
+                // compute the previous carry
+                cd.addGate(carry, aa.mWires[i - 1], GateType::And, carry);
+
+                cd.addGate(carry, aa.mWires[i], GateType::Xor, sum.mWires[i]);
+            }
+        }
+    }
+
+    void CircuitLibrary::int_int_subtract_built(
+        BetaCircuit & cd,
+        BetaBundle & a1,
+        BetaBundle & a2,
+        BetaBundle & diff,
+        BetaBundle & temps)
+    {
+
+        u64 minSize = std::min(std::min(diff.mWires.size(), a1.mWires.size()), a2.mWires.size());
+
+        BetaWire borrow = temps.mWires[0];
+        BetaWire aXorBorrow = temps.mWires[1];
+        BetaWire temp = temps.mWires[2];
+        std::vector<BetaWire>& d = diff.mWires;
+
+        // we are computing a1 - a2 = diff
+        // diff is computed as a1[i] ^ a2[i] ^ borrow[i-1]
+        // borrow[i] is computed as
+        //
+        //  a1[i] ------*--*-------------------*
+        //              |  |                   |
+        //              |  >= xor ---*         >= xor --- borrow[i]
+        //              |  |         |         |
+        //  a2[i] ------|--*          >= or ---*
+        //              |            |
+        //              >==== xor ---*
+        //              |  
+        // borrow[i-1] -*
+
+        u64 i = 0;
+        if (minSize)
+        {
+            cd.addGate(a1.mWires[0], a2.mWires[0], GateType::Xor, diff.mWires[0]);
+            ++i;
+
+            if (minSize > 1)
+            {
+                cd.addGate(a1.mWires[0], a2.mWires[0], GateType::na_And, borrow);
+
+                // second bit is the xor of borrow and input;
+                cd.addGate(borrow, a1.mWires[1], GateType::Xor, aXorBorrow);
+                cd.addGate(aXorBorrow, a2.mWires[1], GateType::Xor, d[1]);
+                ++i;
+
+                for (; i < minSize; ++i)
+                {
+                    // compute the borrow of the previous bit which itself has a borrow in.
+                    cd.addGate(a1.mWires[i - 1], a2.mWires[i - 1], GateType::Xor, temp);
+                    cd.addGate(aXorBorrow, temp, GateType::Or, temp);
+                    cd.addGate(temp, a1.mWires[i - 1], GateType::Xor, borrow);
+
+                    // compute the difference as the xor of the input and prev borrow.
+                    cd.addGate(borrow, a1.mWires[i], GateType::Xor, aXorBorrow);
+                    cd.addGate(aXorBorrow, a2.mWires[i], GateType::Xor, d[i]);
+                }
+            }
+        }
+
+        u64 minSizeA1 = std::min(a1.mWires.size(), diff.mWires.size());
+        u64 minSizeA2 = std::min(a2.mWires.size(), diff.mWires.size());
+        if (minSizeA1 > i || minSizeA2 > i)
+        {
+            if (i == 1)
+            {
+                cd.addGate(a1.mWires[0], a2.mWires[0], GateType::na_And, borrow);
+            }
+            else
+            {
+                // compute the borrow of the previous bit which itself has a borrow in.
+                cd.addGate(a1.mWires[i - 1], a2.mWires[i - 1], GateType::Xor, temp);
+                cd.addGate(aXorBorrow, temp, GateType::Or, temp);
+                cd.addGate(temp, a1.mWires[i - 1], GateType::Xor, borrow);
+            }
+
+            if (minSizeA1 > i)
+            {
+                cd.addGate(a1.mWires[i], borrow, GateType::Xor, d[i]);
+                ++i;
+
+                for (; i < minSizeA1; ++i)
+                {
+                    cd.addGate(a1.mWires[i - 1], borrow, GateType::na_And, borrow);
+                    cd.addGate(a1.mWires[i], borrow, GateType::Xor, d[i]);
+                }
+            }
+            else
+            {
+                cd.addGate(a2.mWires[i], borrow, GateType::Xor, d[i]);
+                ++i;
+
+                for (; i < minSizeA2; ++i)
+                {
+                    cd.addGate(a2.mWires[i - 1], borrow, GateType::Or, borrow);
+                    cd.addGate(a2.mWires[i], borrow, GateType::Xor, d[i]);
+                }
+            }
+        }
+
     }
 
     void CircuitLibrary::int_int_mult_build(
@@ -159,9 +343,6 @@ namespace osuCrypto
         BetaBundle & b,
         BetaBundle & c)
     {
-        //cd.addInputBundle(a);
-        //cd.addInputBundle(b);
-        //cd.addOutputBundle(c);
 
         u64 N = c.mWires.size();
 
@@ -177,6 +358,9 @@ namespace osuCrypto
             // this will hold the b[i] * a, a vector of N-i bits
             terms.emplace_back(N - i);
 
+            // initialize some unused wires, these will
+            // hold intermediate sums.
+            cd.addTempWireBundle(terms.back());
 
             if (i == 0)
             {
@@ -185,12 +369,6 @@ namespace osuCrypto
                 // the running total, so we want it to be 
                 // the wires that represent the product c.
                 terms[0].mWires[0] = c.mWires[0];
-            }
-            else
-            {
-                // initialize some unused wires, these will
-                // hold intermediate sums.
-                cd.addTempWireBundle(terms.back());
             }
 
             // compute the AND between b[i] * a[j].
@@ -204,8 +382,9 @@ namespace osuCrypto
             }
         }
 
-//#define SERIAL
+#define SERIAL
 #ifdef SERIAL
+
         BetaBundle temp(3), temp2(N - 1);
         cd.addTempWireBundle(temp);
         cd.addTempWireBundle(temp2);
@@ -268,17 +447,17 @@ namespace osuCrypto
                 int_int_add_built(cd, terms[i], terms[i + 1], prod, temp);
 
                 prod.mWires.insert(prod.mWires.begin(), bottomBits.begin(), bottomBits.end());
-            }
+        }
 
             terms = std::move(newTerms);
-        }
+    }
 
 #endif
         cd.levelize();
-    }
+}
     void CircuitLibrary::int_int_bitwiseAnd_build(BetaCircuit & cd, BetaBundle & a1, BetaBundle & a2, BetaBundle & out)
     {
-        for (u64 j = 0; j  < out.mWires.size(); ++j)
+        for (u64 j = 0; j < out.mWires.size(); ++j)
         {
             cd.addGate(
                 a1.mWires[j],

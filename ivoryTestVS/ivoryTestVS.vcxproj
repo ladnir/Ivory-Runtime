@@ -58,7 +58,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(SolutionDir)/cryptoTools;$(SolutionDir)ivoryTests;$(SolutionDir)ivory;$(VCInstallDir)UnitTest\include;C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SOLUTION_DIR=R"**($(SolutionDir))**";_WIN32_WINNT=0x0501;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -77,7 +77,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(SolutionDir)/cryptoTools;$(SolutionDir)ivoryTests;$(SolutionDir)ivory;$(VCInstallDir)UnitTest\include;C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SOLUTION_DIR=R"**($(SolutionDir))**";_WIN32_WINNT=0x0501;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>

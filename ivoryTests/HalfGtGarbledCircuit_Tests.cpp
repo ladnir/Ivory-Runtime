@@ -50,7 +50,7 @@ void HalfGtGC_BasicGates_Test_Impl()
 		std::vector<block> maskCopy = masks;
 		//for (u64 i = 0; i < masks.size(); ++i)
 		//{
-		//	Log::out << masks[i] << " " << maskCopy[i] << Log::endl;
+		//	std::cout  << masks[i] << " " << maskCopy[i] << std::endl;
 		//}
 
 		gc.Garble(cd, seed, indexArray, maskCopy);
@@ -235,9 +235,9 @@ void HalfGtGC_Stream_BitAdder_Test_Impl()
 				if ((outputVec[i] > 0) != (expectedOut[i]))
 				{
 
-					Log::out
-						<< "expected  " << expectedOut << Log::endl
-						<< "actual    " << outputVec << Log::endl;
+					std::cout 
+						<< "expected  " << expectedOut << std::endl
+						<< "actual    " << outputVec << std::endl;
 
 					throw UnitTestFail();
 				}

@@ -19,9 +19,9 @@ using namespace osuCrypto;
 void multTest()
 {
     CircuitLibrary lib;
+    u64 bitCount = 32;
 
-
-    auto cir = lib.int_int_mult(32, 32, 32);
+    auto cir = lib.int_int_mult(bitCount, bitCount, bitCount);
 
     for (i32 a = 0; a < 100; ++a)
     {
@@ -30,18 +30,19 @@ void multTest()
             std::vector<BitVector> input(2);
             std::vector<BitVector> output(1);
 
-            input[0].append((u8*)&a, 32);
-            input[1].append((u8*)&b, 32);
+            input[0].append((u8*)&a, bitCount);
+            input[1].append((u8*)&b, bitCount);
 
-            output[0] = BitVector(32);
+            output[0] = BitVector(bitCount);
 
             cir->evaluate(input, output);
 
+            output[0].reserve(32);
             i32 c = *(u32*)output[0].data();
 
-            if (c != a * b)
+            if (c != (a * b) & (1 << bitCount))
             {
-                Log::out << "bad " << c << "  " << (a*b) << "  " << a << " " << b << Log::endl;
+                std::cout  << "bad " << c << "  " << (a*b) << "  " << a << " " << b << std::endl;
                 return;
             }
         }
@@ -52,18 +53,19 @@ void multTest()
 i32 program(std::array<Party, 2> parties, i64 myInput)
 {
     // choose how large the arithmetic should be.
-    u64 bitCount = 32;
+    u64 bitCount0 = 16;
+    u64 bitCount1 = 32;
 
     // get the two input variables. If this party is
     // the local party, then lets use our input value.
     // Otherwise the remote party will provide the value.
     auto input0 = parties[0].isLocalParty() ?
-        parties[0].input<sInt>(myInput, bitCount) :
-        parties[0].input<sInt>(bitCount);
+        parties[0].input<sInt>(myInput, bitCount0) :
+        parties[0].input<sInt>(bitCount0);
 
     auto input1 = parties[1].isLocalParty() ?
-        parties[1].input<sInt>(myInput, bitCount) :
-        parties[1].input<sInt>(bitCount);
+        parties[1].input<sInt>(myInput, bitCount1) :
+        parties[1].input<sInt>(bitCount1);
 
 
     // perform some computation
@@ -74,9 +76,11 @@ i32 program(std::array<Party, 2> parties, i64 myInput)
     parties[0].reveal(out);
     parties[1].reveal(out);
 
-    i32 result = (i32)out.getValue();
 
-    Log::out << result << Log::endl;
+
+    i32 result = out.getValue();
+
+    std::cout  << result << std::endl;
 
 
     // Get the value what was just revealed to us.
@@ -85,6 +89,9 @@ i32 program(std::array<Party, 2> parties, i64 myInput)
 
 int main(int argc, char**argv)
 {
+    //multTest();
+    //return 0;
+
     PRNG prng(OneBlock);
 
 
@@ -95,7 +102,7 @@ int main(int argc, char**argv)
     std::thread thrd([&]() {
 
 
-        Log::setThreadName("party1");
+        setThreadName("party1");
 
 
 
@@ -120,7 +127,7 @@ int main(int argc, char**argv)
 
     });
 
-    Log::setThreadName("party0");
+    setThreadName("party0");
 
 
 

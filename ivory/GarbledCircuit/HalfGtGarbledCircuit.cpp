@@ -281,7 +281,7 @@ namespace osuCrypto
 		std::array<block, 2> zeroAndGlobalOffset{ { ZeroBlock, mGlobalOffset } };
 
 
-		//Log::out << "cir size " << buff->size() << Log::endl;
+		//std::cout  << "cir size " << buff->size() << std::endl;
 		auto gateIter = reinterpret_cast<GarbledGate<2>*>(buff->data());
 #ifdef ADAPTIVE_SECURE 
 		auto maskIter = tableMasks.begin();

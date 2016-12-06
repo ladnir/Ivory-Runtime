@@ -24,7 +24,7 @@ namespace osuCrypto
 
 
         sInt operator+(const sInt&);
-        //sInt operator-(const sInt&);
+        sInt operator-(const sInt&);
         sInt operator*(const sInt&);
         //sInt operator/(const sInt&);
         

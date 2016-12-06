@@ -56,8 +56,8 @@ void KProbe_XORTransitive_Test_Impl()
 	kprobe.decode(encoding1, decoding1);
 	kprobe.decode(deltaEcoding, deltaDecoding);
 
-	//Log::out << encoding0 << "  " << encoding0 << Log::endl;
-	//Log::out << encoding1 << "  " << encoding1 << Log::endl;
+	//std::cout  << encoding0 << "  " << encoding0 << std::endl;
+	//std::cout  << encoding1 << "  " << encoding1 << std::endl;
 
 	BitVector decodingXor(decoding0);
 	decodingXor ^= decoding1;
@@ -103,7 +103,7 @@ void KProbe_BlockBitVector_Test_Impl()
 
 void KProbe_SaveLoad_Test_Impl()
 {
-	Log::setThreadName("KProbe");
+	setThreadName("KProbe");
 	//InitDebugPrinting("..\\test.out");
 
 	PRNG prng(_mm_set_epi64x(222, 22));
@@ -141,7 +141,7 @@ void KProbe_SaveLoad_Test_Impl()
 #ifdef ENCODABLE_KPROBE
 void KProbe_BitVector_Test_Impl()
 {
-	Log::setThreadName("KProbe");
+	setThreadName("KProbe");
 	//InitDebugPrinting("..\\test.out");
 
 	PRNG prng(_mm_set_epi64x(222, 22));
@@ -161,28 +161,28 @@ void KProbe_BitVector_Test_Impl()
 
 	if (input != decodedInput)
 	{
-		Log::out << "Failed " << Log::endl
-			<< input << Log::endl
-			<< decodedInput << Log::endl;
+		std::cout  << "Failed " << std::endl
+			<< input << std::endl
+			<< decodedInput << std::endl;
 		throw UnitTestFail();
 	}
 	else
 	{
-		//Log::out << "n=" << inputSize << Log::endl
-		//	<< "k=" << secParam << Log::endl;
+		//std::cout  << "n=" << inputSize << std::endl
+		//	<< "k=" << secParam << std::endl;
 
-		//Log::out << "m=" << encoding.size() << Log::endl;
+		//std::cout  << "m=" << encoding.size() << std::endl;
 
-		//Log::out << "input/encoding" << Log::endl
-		//	<< input << Log::endl
-		//	<< encoding << Log::endl;
+		//std::cout  << "input/encoding" << std::endl
+		//	<< input << std::endl
+		//	<< encoding << std::endl;
 	}
 }
 
 
 void KProbe_ZeroLabels_Test_Impl()
 {
-	Log::setThreadName("KProbe");
+	setThreadName("KProbe");
 	//InitDebugPrinting("..\\test.out");
 
 	PRNG prng(_mm_set_epi64x(222, 22));
@@ -209,9 +209,9 @@ void KProbe_ZeroLabels_Test_Impl()
 	{
 		if (neq(zeroLabels[i], decodedInput[i]))
 		{
-			Log::out << "Failed[" << i << "] " << Log::endl
-				<< zeroLabels[i] << Log::endl
-				<< decodedInput[i] << Log::endl;
+			std::cout  << "Failed[" << i << "] " << std::endl
+				<< zeroLabels[i] << std::endl
+				<< decodedInput[i] << std::endl;
 			throw UnitTestFail();
 		}
 	}
@@ -219,7 +219,7 @@ void KProbe_ZeroLabels_Test_Impl()
 
 void KProbe_Labels_Test_Impl()
 {
-	Log::setThreadName("KProbe");
+	setThreadName("KProbe");
 	//InitDebugPrinting("..\\test.out");
 
 	PRNG prng(_mm_set_epi64x(222, 22));
@@ -275,9 +275,9 @@ void KProbe_Labels_Test_Impl()
 	{
 		if (neq(expectedInputLabels[i], decodedInput[i]))
 		{
-			Log::out << "Failed[" << i << "] " << Log::endl
-				<< expectedInputLabels[i] << Log::endl
-				<< decodedInput[i] << Log::endl;
+			std::cout  << "Failed[" << i << "] " << std::endl
+				<< expectedInputLabels[i] << std::endl
+				<< decodedInput[i] << std::endl;
 			throw UnitTestFail();
 		}
 	}

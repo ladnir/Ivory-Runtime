@@ -98,7 +98,7 @@ namespace osuCrypto {
 	//{
 	//	labels.resize(mWireCount);
 
-	//	//Log::out << "in " << labels << Log::endl;
+	//	//std::cout  << "in " << labels << std::endl;
 
 	//	for (auto& gate : mGates)
 	//	{
@@ -122,7 +122,7 @@ namespace osuCrypto {
 	{
 		labels.resize(mWireCount);
 
-		//Log::out << "in " << labels << Log::endl;
+		//std::cout  << "in " << labels << std::endl;
 
 		for (auto& gate : mGates)
 		{

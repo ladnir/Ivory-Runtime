@@ -64,7 +64,7 @@ namespace osuCrypto
 		ss << "./kProbe_" << inputSize << "_" << secParam << "_" << prng.get<block>();
 		std::string filename = ss.str();
 
-		//Log::out << "kprobe " << prng.get<block>() << Log::endl;
+		//std::cout  << "kprobe " << prng.get<block>() << std::endl;
 
 		std::fstream file;
 		file.open(filename, std::ios::binary | std::ios::in);
