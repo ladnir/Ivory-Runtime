@@ -1,6 +1,5 @@
 #include "CircuitLibrary.h"
 
-
 namespace osuCrypto
 {
     CircuitLibrary::CircuitLibrary()
@@ -34,7 +33,73 @@ namespace osuCrypto
 
             cd->addTempWireBundle(t);
 
-            int_int_add_built(*cd, a, b, c, t);
+            int_int_add_build(*cd, a, b, c, t);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
+    BetaCircuit * CircuitLibrary::uint_uint_add(u64 aSize, u64 bSize, u64 cSize)
+    {
+        auto key = "uintAdd" + ToString(aSize) + "x" + ToString(bSize) + "x" + ToString(cSize);
+
+        auto iter = mCirMap.find(key);
+
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle b(bSize);
+            BetaBundle c(cSize);
+            BetaBundle t(3);
+
+            cd->addInputBundle(a);
+            cd->addInputBundle(b);
+
+            cd->addOutputBundle(c);
+
+            cd->addTempWireBundle(t);
+
+            uint_uint_add_build(*cd, a, b, c, t);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
+    BetaCircuit * CircuitLibrary::int_intConst_add(
+        u64 aSize, 
+        u64 bSize, 
+        i64 bVal, 
+        u64 cSize)
+    {
+        auto key = "add" + ToString(aSize) + "xConst" + ToString(bSize) + "v" + ToString(bVal)+ "x" + ToString(cSize);
+
+        auto iter = mCirMap.find(key);
+
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle b(bSize);
+            BetaBundle c(cSize);
+            BetaBundle t(3);
+
+            cd->addInputBundle(a);
+            
+            BitVector bb((u8*)&bVal, bSize);
+            cd->addConstBundle(b, bb);
+
+            cd->addOutputBundle(c);
+
+            cd->addTempWireBundle(t);
+
+            int_int_add_build(*cd, a, b, c, t);
 
             iter = mCirMap.insert(std::make_pair(key, cd)).first;
         }
@@ -64,7 +129,70 @@ namespace osuCrypto
 
             cd->addTempWireBundle(t);
 
-            int_int_subtract_built(*cd, a, b, c, t);
+            int_int_subtract_build(*cd, a, b, c, t);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
+    BetaCircuit * CircuitLibrary::uint_uint_subtract(u64 aSize, u64 bSize, u64 cSize)
+    {
+
+        auto key = "uintSubtract" + ToString(aSize) + "x" + ToString(bSize) + "x" + ToString(cSize);
+
+        auto iter = mCirMap.find(key);
+
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle b(bSize);
+            BetaBundle c(cSize);
+            BetaBundle t(3);
+
+            cd->addInputBundle(a);
+            cd->addInputBundle(b);
+
+            cd->addOutputBundle(c);
+
+            cd->addTempWireBundle(t);
+
+            uint_uint_subtract_build(*cd, a, b, c, t);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
+    BetaCircuit * CircuitLibrary::int_intConst_subtract(u64 aSize, u64 bSize, i64 bVal, u64 cSize)
+    {
+        auto key = "subtract" + ToString(aSize) + "xConst" + ToString(bSize) + "v" + ToString(bVal) + "x" + ToString(cSize);
+
+        auto iter = mCirMap.find(key);
+
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle b(bSize);
+            BetaBundle c(cSize);
+            BetaBundle t(3);
+
+            cd->addInputBundle(a);
+
+            BitVector bb((u8*)&bVal, bSize);
+            cd->addConstBundle(b, bb);
+
+            cd->addOutputBundle(c);
+
+            cd->addTempWireBundle(t);
+
+            int_int_subtract_build(*cd, a, b, c, t);
 
             iter = mCirMap.insert(std::make_pair(key, cd)).first;
         }
@@ -100,6 +228,60 @@ namespace osuCrypto
 
     }
 
+    BetaCircuit * CircuitLibrary::int_int_div(u64 aSize, u64 bSize, u64 cSize)
+    {
+
+        auto key = "div" + ToString(aSize) + "x" + ToString(bSize) + "x" + ToString(cSize);
+
+        auto iter = mCirMap.find(key);
+
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle b(bSize);
+            BetaBundle q(cSize);
+            BetaBundle r(0);
+
+            cd->addInputBundle(a);
+            cd->addInputBundle(b);
+
+            cd->addOutputBundle(q);
+            //cd->addOutputBundle(r);
+
+            int_int_div_rem_build(*cd, a, b, q, r);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
+    BetaCircuit * CircuitLibrary::int_bitInvert(u64 aSize)
+    {
+        auto key = "bitInvert" + ToString(aSize);
+
+        auto iter = mCirMap.find(key);
+
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle c(aSize);
+
+            cd->addInputBundle(a);
+            cd->addOutputBundle(c);
+
+            int_bitInvert_build(*cd, a, c);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
     BetaCircuit * CircuitLibrary::int_int_bitwiseAnd(u64 aSize, u64 bSize, u64 cSize)
     {
         auto key = "bitwiseAnd" + ToString(aSize) + "x" + ToString(bSize) + "x" + ToString(cSize);
@@ -127,8 +309,215 @@ namespace osuCrypto
         return iter->second;
     }
 
+    BetaCircuit * CircuitLibrary::int_int_lt(u64 aSize, u64 bSize)
+    {
+        auto key = "lessThan" + ToString(aSize) + "x" + ToString(bSize);
 
-    void CircuitLibrary::int_int_add_built(
+        auto iter = mCirMap.find(key);
+
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle b(bSize);
+            BetaBundle c(1);
+
+            cd->addInputBundle(a);
+            cd->addInputBundle(b);
+            cd->addOutputBundle(c);
+
+            int_int_lt_build(*cd, a, b, c);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
+    BetaCircuit * CircuitLibrary::int_int_gteq(u64 aSize, u64 bSize)
+    {
+        auto key = "greatThanEq" + ToString(aSize) + "x" + ToString(bSize);
+
+        auto iter = mCirMap.find(key);
+
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle b(bSize);
+            BetaBundle c(1);
+
+            cd->addInputBundle(a);
+            cd->addInputBundle(b);
+            cd->addOutputBundle(c);
+
+            int_int_gteq_build(*cd, a, b, c);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
+    BetaCircuit * CircuitLibrary::uint_uint_lt(u64 aSize, u64 bSize)
+    {
+        auto key = "uintLessThan" + ToString(aSize) + "x" + ToString(bSize);
+        auto iter = mCirMap.find(key);
+
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle b(bSize);
+            BetaBundle c(1);
+
+            cd->addInputBundle(a);
+            cd->addInputBundle(b);
+            cd->addOutputBundle(c);
+
+            uint_uint_lt_build(*cd, a, b, c);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
+    BetaCircuit * CircuitLibrary::uint_uint_gteq(u64 aSize, u64 bSize)
+    {
+        auto key = "uintGreatThanEq" + ToString(aSize) + "x" + ToString(bSize);
+        auto iter = mCirMap.find(key);
+
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle b(bSize);
+            BetaBundle c(1);
+
+            cd->addInputBundle(a);
+            cd->addInputBundle(b);
+            cd->addOutputBundle(c);
+
+            uint_uint_gteq_build(*cd, a, b, c);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
+    BetaCircuit * CircuitLibrary::int_int_multiplex(u64 aSize)
+    {
+
+        auto key = "multiplex" + ToString(aSize);
+
+        auto iter = mCirMap.find(key);
+
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle b(aSize);
+            BetaBundle c(1);
+            BetaBundle d(aSize);
+            BetaBundle t(3);
+
+            cd->addInputBundle(a);
+            cd->addInputBundle(b);
+            cd->addInputBundle(c);
+            cd->addOutputBundle(d);
+            cd->addTempWireBundle(t);
+
+            int_int_multiplex_build(*cd, a, b, c, d, t);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
+    BetaCircuit * CircuitLibrary::int_removeSign(u64 aSize)
+    {
+        auto key = "removeSign" + ToString(aSize);
+        auto iter = mCirMap.find(key);
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle c(aSize);
+            BetaBundle temp(3);
+
+            cd->addInputBundle(a);
+            cd->addOutputBundle(c);
+            cd->addTempWireBundle(temp);
+
+            int_removeSign_build(*cd, a, c, temp);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
+    BetaCircuit * CircuitLibrary::int_addSign(u64 aSize)
+    {
+        auto key = "addSign" + ToString(aSize);
+        auto iter = mCirMap.find(key);
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle c(aSize);
+            BetaBundle sign(1);
+            BetaBundle temp(3);
+
+            cd->addInputBundle(a);
+            cd->addInputBundle(sign);
+            cd->addOutputBundle(c);
+            cd->addTempWireBundle(temp);
+
+            int_addSign_build(*cd, a, sign,c, temp);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
+    BetaCircuit * CircuitLibrary::int_negate(u64 aSize)
+    {
+        auto key = "negate" + ToString(aSize);
+        auto iter = mCirMap.find(key);
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle c(aSize);
+            BetaBundle temp(3);
+
+            cd->addInputBundle(a);
+            cd->addOutputBundle(c);
+            cd->addTempWireBundle(temp);
+
+            int_negate_build(*cd, a, c, temp);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
+
+    void CircuitLibrary::int_int_add_build(
         BetaCircuit& cd,
         BetaBundle & a1,
         BetaBundle & a2,
@@ -146,9 +535,8 @@ namespace osuCrypto
         BetaWire& aXorC = temps.mWires[1];
         BetaWire& temp = temps.mWires[2];
 
-        if (a1.mWires[0] == sum.mWires[0] ||
-            a2.mWires[0] == sum.mWires[0])
-            throw std::runtime_error("");
+        if (!areDistint(a2, sum) || ! areDistint(a1, sum))
+            throw std::runtime_error("must be distinct" LOCATION);
 
         u64 a1Size = a1.mWires.size();
         u64 a2Size = a2.mWires.size();
@@ -167,10 +555,8 @@ namespace osuCrypto
         //              |            
         //  a1[i] ------*
 
-
         // half adder
         cd.addGate(a1.mWires[0], a2.mWires[0], GateType::Xor, sum.mWires[0]);
-
 
         // now do the full adder while we have inputs from both a1,a2
         u64 i = 1;
@@ -195,6 +581,7 @@ namespace osuCrypto
                 cd.addGate(temp, aXorC, GateType::And, temp);
                 cd.addGate(temp, carry, GateType::Xor, carry);
 
+
                 a1Idx = std::min<u64>(i, a1Size - 1);
                 a2Idx = std::min<u64>(i, a2Size - 1);
 
@@ -203,55 +590,47 @@ namespace osuCrypto
             }
         }
 
-
-        // now special case the situation that a1 and a2 are different sizes
-        //auto& aa = a1.mWires.size() > a2.mWires.size() ? a1 : a2;
-        //minSize = std::min<u64>(aa.mWires.size(), sum.mWires.size());
-
-        //if (i < minSize)
-        //{
-        //    // compute the previous carry (special case)
-        //    if (i == 1)
-        //    {
-        //        cd.addGate(a1.mWires[i - 1], a2.mWires[i - 1], GateType::And, carry);
-        //    }
-        //    else
-        //    {
-        //        cd.addGate(a2.mWires[i - 1], carry, GateType::Xor, additonTemp);
-        //        cd.addGate(additonTemp, aXorC, GateType::And, additonTemp);
-        //        cd.addGate(additonTemp, carry, GateType::Xor, carry);
-        //    }
-
-
-        //    cd.addGate(carry, aa.mWires[i], GateType::Xor, sum.mWires[i]);
-        //    ++i;
-
-
-        //    // compute the general case
-        //    for (; i < minSize; ++i)
-        //    {
-        //        // compute the previous carry
-        //        cd.addGate(carry, aa.mWires[i - 1], GateType::And, carry);
-
-        //        cd.addGate(carry, aa.mWires[i], GateType::Xor, sum.mWires[i]);
-        //    }
-        //}
     }
 
-    void CircuitLibrary::int_int_subtract_built(
+    void CircuitLibrary::uint_uint_add_build(
+        BetaCircuit & cd, 
+        BetaBundle & a1, 
+        BetaBundle & a2, 
+        BetaBundle & sum, 
+        BetaBundle & temps)
+    {
+        if (sum.mWires.size() > std::max<u64>(a1.mWires.size(), a2.mWires.size()) + 1)
+            throw std::runtime_error(LOCATION);
+
+        BetaBundle extra(2);
+        cd.addConstBundle(extra, BitVector(2));
+
+        BetaBundle aa1 = a1;
+        BetaBundle aa2 = a2;
+
+        aa1.mWires.push_back(extra.mWires[0]);
+        aa2.mWires.push_back(extra.mWires[1]);
+
+        int_int_add_build(cd, aa1, aa2, sum, temps);
+    }
+
+    void CircuitLibrary::int_int_subtract_build(
         BetaCircuit & cd,
         BetaBundle & a1,
         BetaBundle & a2,
         BetaBundle & diff,
         BetaBundle & temps)
     {
-        if (diff.mWires.size() > std::max<u64>(a1.mWires.size(), a2.mWires.size()))
+        if (diff.mWires.size() > std::max<u64>(a1.mWires.size(), a2.mWires.size()) + 1)
             throw std::runtime_error(LOCATION);
 
 
+        if (!areDistint(a2, diff) || !areDistint(a1, diff))
+            throw std::runtime_error("must be distinct " LOCATION);
+
         u64 a1Size = a1.mWires.size();
         u64 a2Size = a2.mWires.size();
-        u64 minSize = std::min(std::max(a1.mWires.size(), a2.mWires.size()), diff.mWires.size());
+        u64 minSize = diff.mWires.size();
 
         BetaWire borrow = temps.mWires[0];
         BetaWire aXorBorrow = temps.mWires[1];
@@ -306,59 +685,29 @@ namespace osuCrypto
                 }
             }
         }
+    }
 
-        // special case for when one of the inputs is longer than the other
-        //u64 minSizeA1 = std::min(a1.mWires.size(), diff.mWires.size());
-        //u64 minSizeA2 = std::min(a2.mWires.size(), diff.mWires.size());
-        //if (minSizeA1 > i || minSizeA2 > i)
-        //{
+    void CircuitLibrary::uint_uint_subtract_build(
+        BetaCircuit & cd,
+        BetaBundle & a1, 
+        BetaBundle & a2, 
+        BetaBundle & diff, 
+        BetaBundle & temps)
+    {
 
-        //    // compute the borrow from the last normal subtraction bit index
-        //    if (i == 1)
-        //    {
-        //        cd.addGate(a1.mWires[0], a2.mWires[0], GateType::na_And, borrow);
-        //    }
-        //    else
-        //    {
-        //        // compute the borrow of the previous bit which itself has a borrow in.
-        //        cd.addGate(a1.mWires[i - 1], a2.mWires[i - 1], GateType::Xor, additonTemp);
-        //        cd.addGate(aXorBorrow, additonTemp, GateType::Or, additonTemp);
-        //        cd.addGate(additonTemp, a1.mWires[i - 1], GateType::Xor, borrow);
-        //    }
+        if (diff.mWires.size() > std::max<u64>(a1.mWires.size(), a2.mWires.size()) + 1)
+            throw std::runtime_error(LOCATION);
 
-        //    if (minSizeA1 > i)
-        //    {
+        BetaBundle extra(2);
+        cd.addConstBundle(extra, BitVector(2));
 
-        //        cd.addGate(a1.mWires[i], borrow, GateType::Xor, d[i]);
-        //        ++i;
-        //    }
+        BetaBundle aa1 = a1;
+        BetaBundle aa2 = a2;
 
-        //    //if (minSizeA1 > i)
-        //    //{
-        //    //    // a1 is longer than 
+        aa1.mWires.push_back(extra.mWires[0]);
+        aa2.mWires.push_back(extra.mWires[1]);
 
-        //    //    cd.addGate(a1.mWires[i], borrow, GateType::Xor, d[i]);
-        //    //    ++i;
-
-        //    //    for (; i < minSizeA1; ++i)
-        //    //    {
-        //    //        cd.addGate(a1.mWires[i - 1], borrow, GateType::na_And, borrow);
-        //    //        cd.addGate(a1.mWires[i], borrow, GateType::Xor, d[i]);
-        //    //    }
-        //    //}
-        //    //else
-        //    //{
-        //    //    cd.addGate(a2.mWires[i], borrow, GateType::Xor, d[i]);
-        //    //    ++i;
-
-        //    //    for (; i < minSizeA2; ++i)
-        //    //    {
-        //    //        cd.addGate(a2.mWires[i - 1], borrow, GateType::Or, borrow);
-        //    //        cd.addGate(a2.mWires[i], borrow, GateType::Xor, d[i]);
-        //    //    }
-        //    //}
-        //}
-
+        int_int_subtract_build(cd, aa1, aa2, diff, temps);
     }
 
     void CircuitLibrary::int_int_mult_build(
@@ -424,6 +773,7 @@ namespace osuCrypto
 
             const BetaWire& bi = b.mWires[std::min(i, b.mWires.size() - 1)];
 
+            u64 prev = cd.mNonXorGateCount;
             // compute the AND between b[i] * a[j].
             for (u64 j = 0; j < rows[i].mWires.size(); ++j)
             {
@@ -433,6 +783,8 @@ namespace osuCrypto
                     GateType::And,
                     rows[i].mWires[j]);
             }
+
+            //std::cout << "and[" << i << "] " << cd.mNonXorGateCount <<"  (+"<< (cd.mNonXorGateCount - prev) <<")" << std::endl;
         }
 
 #define SERIAL
@@ -476,8 +828,11 @@ namespace osuCrypto
                     }
                 }
 
-                int_int_add_built(cd, rows[i - 1], rows[i], sum, additonTemp);
+                u64 prev = cd.mNonXorGateCount;
 
+                int_int_add_build(cd, rows[i - 1], rows[i], sum, additonTemp);
+
+                //std::cout << "add[" << i << "] " << cd.mNonXorGateCount << "  (+" << (cd.mNonXorGateCount - prev) << ")" << std::endl;
 
                 //cd.addPrint(sum);
                 //cd.addPrint("\n ");
@@ -535,7 +890,7 @@ namespace osuCrypto
                     rows[i].mWires.begin(),
                     rows[i].mWires.begin() + sizeDiff);
 
-                int_int_add_built(cd, rows[i], rows[i + 1], prod, additonTemp);
+                int_int_add_build(cd, rows[i], rows[i + 1], prod, additonTemp);
 
                 prod.mWires.insert(prod.mWires.begin(), bottomBits.begin(), bottomBits.end());
             }
@@ -546,7 +901,352 @@ namespace osuCrypto
 #endif
         cd.levelize();
     }
-    void CircuitLibrary::int_int_bitwiseAnd_build(BetaCircuit & cd, BetaBundle & a1, BetaBundle & a2, BetaBundle & out)
+    void CircuitLibrary::int_int_div_rem_build(
+        BetaCircuit & cd, 
+        BetaBundle & signedA1, 
+        BetaBundle & signedA2, 
+        BetaBundle & quotient,
+        BetaBundle & rem
+        //,BetaBundle & divByZero,
+        //bool checkDivByZero
+    )
+    {
+        if (quotient.mWires.size() != signedA1.mWires.size())
+            throw std::runtime_error(LOCATION);
+
+        // we are computing a1 / a2 = quot  with optional remainder rem
+        BetaBundle 
+            a1Sign(1), 
+            a2Sign(1), 
+            sign(1),
+            temp(3),
+            a1(signedA1.mWires.size()), 
+            a2(signedA2.mWires.size());
+
+        a1Sign.mWires[0] = signedA1.mWires.back();
+        a2Sign.mWires[0] = signedA2.mWires.back();
+
+        cd.addTempWireBundle(sign);
+        cd.addTempWireBundle(temp);
+        cd.addTempWireBundle(a1);
+        cd.addTempWireBundle(a2);
+
+        cd.addGate(a1Sign.mWires.back(), a2Sign.mWires.back(), GateType::Xor, sign.mWires[0]);
+
+        //std::cout << "start      " << cd.mNonXorGateCount << std::endl;
+
+        // a1 = abs(signedA1)
+        int_removeSign_build(cd, signedA1, a1, temp);
+        //std::cout << "removeSign " << cd.mNonXorGateCount << std::endl;
+        int_removeSign_build(cd, signedA2, a2, temp);
+        //std::cout << "removeSign " << cd.mNonXorGateCount << std::endl;
+
+
+        //cd.addPrint(quotient);
+        //cd.addPrint("\n");
+
+
+        BetaBundle remainder(rem.mWires.size());
+        cd.addTempWireBundle(remainder);
+
+        uint_uint_div_rem_build(cd, a1, a2, quotient, remainder);
+
+
+
+        int_addSign_build(cd, quotient, sign, quotient, temp);
+        //std::cout << "addSign    " << cd.mNonXorGateCount << std::endl;
+
+        if (rem.mWires.size())
+        {
+            int_addSign_build(cd , remainder, a1Sign, rem, temp);
+            //std::cout << "addSign    " << cd.mNonXorGateCount << std::endl;
+        }
+        //cd.print(" = ", remainder);
+
+    }
+
+    void CircuitLibrary::uint_uint_div_rem_build(
+        BetaCircuit & cd, 
+        BetaBundle & a1, 
+        BetaBundle & a2, 
+        BetaBundle & quotient,
+        BetaBundle & rem)
+    {
+        BetaBundle
+            doSubtract(1),
+            temp(3),
+            ssub(a1.mWires.size());
+
+        cd.addTempWireBundle(ssub);
+        cd.addTempWireBundle(temp);
+
+
+        u64 shifts = quotient.mWires.size() - 1;
+
+
+        BetaBundle xtra(shifts + 1);
+        cd.addTempWireBundle(xtra);
+
+
+        BetaBundle remainder, remTemp;
+        //cd.addPrint("====================================\na1 = ");
+        //cd.addPrint(a1);
+        //cd.addPrint("\na2 = ");
+        //cd.addPrint(a2);
+        //cd.addPrint("\n");
+
+        for (i64 i = shifts; i >= 0; --i)
+        {
+            remainder.mWires.insert(remainder.mWires.begin(), a1.mWires[i]);
+            remTemp.mWires.push_back(xtra.mWires.back());
+            xtra.mWires.pop_back();
+
+            //partialrem.push_back(remainder);
+            //auto doSubtract = remainder >= a2;
+            doSubtract.mWires[0] = quotient.mWires[i];
+            u64 prev = cd.mNonXorGateCount;
+
+            uint_uint_gteq_build(cd, remainder, a2, doSubtract);
+
+
+            //std::cout << "iter[" << i << "]  geq  " << cd.mNonXorGateCount << "  (+" << (cd.mNonXorGateCount - prev) << ")  " << remTemp.mWires.size() << std::endl;
+
+            //cd.addPrint("rem[" + ToString(i) + "] = ");
+            //cd.addPrint(remainder);
+            //cd.addPrint("\n");
+            //cd.addPrint(remainder);
+            //cd.addPrint(" >= ");
+            //cd.addPrint(a2);
+            //cd.addPrint(" =: ");
+            //cd.addPrint(doSubtract);
+            //cd.addPrint("\n");
+
+
+            //quotient.mWires.insert(quotient.mWires.begin(), doSubtract.mWires[0]);
+
+            prev = cd.mNonXorGateCount;
+
+            BetaBundle sub;
+            sub.mWires.insert(sub.mWires.begin(), ssub.mWires.begin(), ssub.mWires.begin() + std::min(a2.mWires.size(), remainder.mWires.size()));
+
+            //for (auto& wire : a2.mWires)
+            for (u64 j = 0; j < sub.mWires.size(); ++j)
+                cd.addGate(a2.mWires[j], doSubtract.mWires[0], GateType::And, sub.mWires[j]);
+
+
+            //std::cout << "iter[" << i << "]  and  " << cd.mNonXorGateCount << "  (+" << (cd.mNonXorGateCount - prev) << ")  " << remTemp.mWires.size() << std::endl;
+
+            //cd.addPrint(" ( rem[" + ToString(i) + "] = ");
+            //cd.addPrint(remainder);
+            //cd.addPrint(") - (sub[" + ToString(i) + "] = ");
+            //cd.addPrint(sub);
+
+
+
+            //partialSubs.push_back(sub);
+
+            //if (cd.mDivPrint)
+            //{
+
+            //    cd.addPrint(remainder);
+            //    cd.addPrint(" - ");
+            //    cd.addPrint(a2);
+            //    cd.addPrint("\n");
+            //}
+            //remainder = remainder - sub;
+            //std::cout << "iter[" << i << "]'   " << cd.mNonXorGateCount << "  " << remTemp.mWires.size() << std::endl;
+
+            prev = cd.mNonXorGateCount;
+
+            uint_uint_subtract_build(cd, remainder, sub, remTemp, temp);
+
+
+            //std::cout << "iter[" << i << "]  sub  " << cd.mNonXorGateCount << "  (+" << (cd.mNonXorGateCount-prev)<<")  "<< remTemp .mWires.size()<< std::endl;
+            
+            
+            std::swap(remTemp.mWires, remainder.mWires);
+
+            //if (cd.mDivPrint)
+            //{
+
+            //    cd.addPrint(") =: ");
+            //    cd.addPrint(remainder);
+            //    cd.addPrint("     quo " );
+            //    cd.addPrint(quotient);
+            //    cd.addPrint("\n\n");
+            //}
+
+
+        }
+    }
+
+    void CircuitLibrary::int_int_lt_build(
+        BetaCircuit & cd, 
+        BetaBundle & a1, 
+        BetaBundle & a2, 
+        BetaBundle & out)
+    {
+
+        TODO("optimize this, we dont need the full subtraction result, only the sign");
+
+        auto bits = std::max(a1.mWires.size(), a2.mWires.size());
+        BetaBundle diff(bits + 1), temp(3);
+        cd.addTempWireBundle(temp);
+
+        for (u64 i = 0; i < diff.mWires.size(); ++i)
+        {
+            diff.mWires[i] = out.mWires[0];
+        }
+
+        int_int_subtract_build(cd, a1, a2, diff, temp);
+    }
+
+
+    void CircuitLibrary::int_int_gteq_build(
+        BetaCircuit & cd, 
+        BetaBundle & a1, 
+        BetaBundle & a2, 
+        BetaBundle & out)
+    {
+        int_int_lt_build(cd, a1, a2, out);
+
+        // invert the output
+        GateType gt = GateType((~(u8)cd.mGates.back().mType) &  15);
+        cd.mGates.back().setType(gt);
+    }
+
+    void CircuitLibrary::uint_uint_lt_build(
+        BetaCircuit & cd, 
+        BetaBundle & a1, 
+        BetaBundle & a2, 
+        BetaBundle & out)
+    {
+
+        TODO("optimize this, we dont need the full subtraction result, only the sign");
+
+        auto bits = std::max(a1.mWires.size(), a2.mWires.size());
+        BetaBundle diff(bits + 1), temp(3);
+        cd.addTempWireBundle(temp);
+
+        for (u64 i = 0; i < diff.mWires.size(); ++i)
+        {
+            diff.mWires[i] = out.mWires[0];
+        }
+
+        uint_uint_subtract_build(cd, a1, a2, diff, temp);
+
+    }
+
+    void CircuitLibrary::uint_uint_gteq_build(
+        BetaCircuit & cd, 
+        BetaBundle & a1, 
+        BetaBundle & a2, 
+        BetaBundle & out)
+    {
+        uint_uint_lt_build(cd, a1, a2, out);
+
+        // invert the output
+        GateType gt = GateType((~(u8)cd.mGates.back().mType) & 15);
+        cd.mGates.back().setType(gt);
+    }
+
+
+    void CircuitLibrary::int_removeSign_build(
+        BetaCircuit & cd, 
+        BetaBundle & a1, 
+        BetaBundle & ret,
+        BetaBundle & temp)
+    {
+
+        BetaBundle sign(1);
+        sign.mWires[0] = a1.mWires.back();
+
+        //auto ret = -a1;
+        int_negate_build(cd, a1, ret, temp);
+
+        int_int_multiplex_build(cd, ret, a1, sign, ret, temp);
+    }
+
+    void CircuitLibrary::int_addSign_build(
+        BetaCircuit & cd, 
+        BetaBundle & a1, 
+        BetaBundle & sign, 
+        BetaBundle & ret,
+        BetaBundle & temp)
+    {
+        //auto ret = -a1;
+        //cd.addPrint("add sign ");
+        //cd.addPrint(sign);
+        //cd.addPrint("  ");
+        //cd.addPrint(a1);
+
+        BetaBundle neg(a1.mWires.size());
+        cd.addTempWireBundle(neg);
+
+        int_negate_build(cd, a1, neg, temp);
+
+        //cd.addPrint("  ");
+        //cd.addPrint(a1);
+        //cd.addPrint("  -> ");
+        //cd.addPrint(ret);
+        //cd.addPrint(" -> ");
+
+        int_int_multiplex_build(cd, neg, a1, sign, ret, temp);
+
+        //cd.addPrint(ret);
+        //cd.addPrint("\n");
+    }
+
+    void CircuitLibrary::int_bitInvert_build(
+        BetaCircuit & cd, 
+        BetaBundle & a1, 
+        BetaBundle & out)
+    {
+        cd.addCopy(a1, out);
+
+        for (u64 i = 0; i < out.mWires.size(); ++i)
+        {
+            cd.addInvert(out.mWires[i]);
+        }
+    }
+
+    void CircuitLibrary::int_negate_build(
+        BetaCircuit & cd, 
+        BetaBundle & a1, 
+        BetaBundle & out,
+        BetaBundle & temp)
+    {
+        //if(areDistint(a1, out) == false)
+        //    throw std::runtime_error(LOCATION);
+        // for two's complement, negation is done as out = ~a1 + 1
+        BetaBundle invert(a1.mWires.size());
+        cd.addTempWireBundle(invert);
+
+        int_bitInvert_build(cd, a1, invert);
+
+        //cd.addPrint(" ~a1 ");
+        //cd.addPrint(invert);
+        //cd.addPrint(" ");
+
+        BetaBundle one(2);
+        BitVector oo(2);
+        oo[0] = 1;
+        cd.addConstBundle(one, oo);
+
+        //cd.addPrint(" a1 ");
+        //cd.addPrint(a1);
+        //cd.addPrint(" ");
+        int_int_add_build(cd, invert, one, out, temp);
+        //cd.addPrint("a1 ");
+        //cd.addPrint(a1);
+        //cd.addPrint(" ");
+    }
+
+    void CircuitLibrary::int_int_bitwiseAnd_build(
+        BetaCircuit & cd, 
+        BetaBundle & a1, 
+        BetaBundle & a2, 
+        BetaBundle & out)
     {
         for (u64 j = 0; j < out.mWires.size(); ++j)
         {
@@ -557,5 +1257,41 @@ namespace osuCrypto
                 out.mWires[j]);
         }
 
+    }
+
+
+    void CircuitLibrary::int_int_multiplex_build(
+        BetaCircuit & cd, 
+        BetaBundle & a1, 
+        BetaBundle & a2,
+        BetaBundle & choice,
+        BetaBundle & out,
+        BetaBundle & temp)
+    {
+        // multiplex them together as (a ^ b) & s ^ a
+        for (u64 i = 0; i < out.mWires.size(); ++i)
+        {
+            cd.addGate(a2.mWires[i], a1.mWires[i], GateType::Xor, temp.mWires[0]);
+            //cd.addPrint("a^b  [" + std::to_string(i) + "] = ");
+            //cd.addPrint(temp.mWires[0]);
+            //cd.addPrint("\n");
+
+            cd.addGate(temp.mWires[0], choice.mWires[0], GateType::And, temp.mWires[0]);
+
+            //cd.addPrint("a^b&s[" + std::to_string(i) + "] = ");
+            //cd.addPrint(temp.mWires[0]);
+            //cd.addPrint("\n");
+
+            cd.addGate(a2.mWires[i], temp.mWires[0], GateType::Xor, out.mWires[i]);
+        }
+    }
+    bool CircuitLibrary::areDistint(BetaBundle & a1, BetaBundle & a2)
+    {
+        for (u64 i = 0; i < a1.mWires.size(); ++i)
+        {
+            if (std::find(a2.mWires.begin(), a2.mWires.end(), a1.mWires[i]) != a2.mWires.end())
+                return false;
+        }
+        return true;
     }
 }

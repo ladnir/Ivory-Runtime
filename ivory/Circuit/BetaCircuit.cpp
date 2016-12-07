@@ -23,6 +23,8 @@ namespace osuCrypto
         {
             in.mWires[i] = mWireCount++;
         }
+
+        mWireFlags.resize(mWireCount, BetaWireFlag::Wire);
     }
 
     void BetaCircuit::addInputBundle(BetaBundle & in)
@@ -31,10 +33,11 @@ namespace osuCrypto
         {
             in.mWires[i] = mWireCount++;
         }
+        mWireFlags.resize(mWireCount, BetaWireFlag::Wire);
 
         mInputs.push_back(in);
     }
-    
+
 
     void BetaCircuit::addOutputBundle(BetaBundle & out)
     {
@@ -42,15 +45,53 @@ namespace osuCrypto
         {
             out.mWires[i] = mWireCount++;
         }
+        mWireFlags.resize(mWireCount, BetaWireFlag::Wire);
 
         mOutputs.push_back(out);
     }
 
+    void BetaCircuit::addConstBundle(BetaBundle & in, BitVector& val)
+    {
+        mWireFlags.resize(mWireCount + in.mWires.size(), BetaWireFlag::Wire);
+
+        for (u64 i = 0; i < in.mWires.size(); ++i)
+        {
+            in.mWires[i] = mWireCount++;
+            mWireFlags[in.mWires[i]] = val[i] ? BetaWireFlag::One : BetaWireFlag::Zero;
+        }
+    }
+
+
+    GateType invertInputWire(u64 wirePosition, const GateType& oldGateType)
+    {
+        if (wirePosition == 0)
+        {
+            // swap bit 0/1 and 2/3
+            auto s = u8(oldGateType);
+
+            return GateType(
+                (s & 1) << 1 | // bit 0 -> bit 1
+                (s & 2) >> 1 | // bit 1 -> bit 0
+                (s & 4) << 1 | // bit 3 -> bit 4
+                (s & 8) >> 1); // bit 4 -> bit 3
+        }
+        else if (wirePosition == 1)
+        {
+            // swap bit (0,1)/(2,3)
+            auto s = u8(oldGateType);
+
+            return GateType(
+                (s & 3) << 2 |  // bits (0,1) -> bits (2,3)
+                (s & 12) >> 2); // bits (2,3) -> bits (0,1)
+        }
+        else
+            throw std::runtime_error("");
+    }
 
     void BetaCircuit::addGate(
-        BetaWire in0, 
-        BetaWire in1, 
-        GateType gt, 
+        BetaWire aIdx,
+        BetaWire bIdx,
+        GateType gt,
         BetaWire out)
     {
         if (gt == GateType::a ||
@@ -61,9 +102,152 @@ namespace osuCrypto
             gt == GateType::Zero)
             throw std::runtime_error("");
 
-        if (gt != GateType::Xor && gt != GateType::Nxor) ++mNonXorGateCount;
-        mGates.emplace_back(in0, in1, gt, out);
 
+        auto
+            constA = isConst(aIdx),
+            constB = isConst(bIdx);
+
+
+        if (constA || constB)
+        {
+            if (constA && constB)
+            {
+                u8 val = GateEval(gt, constVal(aIdx), constVal(bIdx));
+                addConst(out, val);
+            }
+            else
+            {
+                u8 subgate;
+                const BetaWire* wireIdx;
+
+                if (constB)
+                {
+                    wireIdx = &aIdx;
+                    subgate = u8(gt) >> (2 * constVal(bIdx)) & 3;
+                }
+                else
+                {
+                    wireIdx = &bIdx;
+                    u8 g = static_cast<u8>(gt);
+
+                    auto val = constVal(aIdx);
+                    subgate = val
+                        ? ((g & 2) >> 1) | ((g & 8) >> 2)
+                        : (g & 1) | ((g & 4) >> 1);
+                }
+
+                switch (subgate)
+                {
+                case 0:
+                    addConst(out, 0);
+                    break;
+                case 1:
+                    addCopy(*wireIdx, out);
+                    addInvert(out);
+                    break;
+                case 2:
+                    addCopy(*wireIdx, out);
+                    break;
+                case 3:
+                    addConst(out, 1);
+                    break;
+                default:
+                    throw std::runtime_error(LOCATION);
+                    break;
+                }
+            }
+        }
+        else
+        {
+
+            if (isInvert(aIdx)) gt = invertInputWire(0, gt);
+            if (isInvert(bIdx)) gt = invertInputWire(1, gt);
+
+            if (gt != GateType::Xor && gt != GateType::Nxor) ++mNonXorGateCount;
+            mGates.emplace_back(aIdx, bIdx, gt, out);
+
+            mWireFlags[out] = BetaWireFlag::Wire;
+        }
+    }
+
+    void BetaCircuit::addConst(BetaWire  wire, u8 val)
+    {
+        mWireFlags[wire] = val ? BetaWireFlag::One : BetaWireFlag::Zero;
+    }
+
+    void BetaCircuit::addInvert(BetaWire wire)
+    {
+        switch (mWireFlags[wire])
+        {
+        case BetaWireFlag::Zero:
+            mWireFlags[wire] = BetaWireFlag::One;
+            break;
+        case BetaWireFlag::One:
+            mWireFlags[wire] = BetaWireFlag::Zero;
+            break;
+        case BetaWireFlag::Wire:
+            mWireFlags[wire] = BetaWireFlag::InvWire;
+            break;
+        case BetaWireFlag::InvWire:
+            mWireFlags[wire] = BetaWireFlag::Wire;
+            break;
+        default:
+            throw std::runtime_error(LOCATION);
+            break;
+        }
+    }
+
+    void BetaCircuit::addCopy(BetaWire src, BetaWire dest)
+    {
+        // copy 1 wire label starting at src to dest
+        // memcpy(dest, src, sizeof(block));
+        mGates.emplace_back(src, 1, GateType::a, dest);
+        mWireFlags[dest] = mWireFlags[src];
+    }
+
+    void BetaCircuit::addCopy(BetaBundle & src, BetaBundle & dest)
+    {
+        auto d = dest.mWires.begin();
+        auto dd = dest.mWires.end();
+        auto s = src.mWires.begin();
+        auto i = src.mWires.begin();
+
+
+        while (d != dest.mWires.end())
+        {
+            ++i;
+            u64 rem = (dd - d);
+            u64 len = 1;
+            while (len < rem && *i == *(i - 1) + 1)
+            {
+                ++i;
+                mWireFlags[*(d + len)] = mWireFlags[*(s + len)];
+                ++len;
+            }
+
+            mGates.emplace_back(*s, len, GateType::a, *d);
+            d += len;
+            s += len;
+        }
+
+    }
+
+    bool BetaCircuit::isConst(BetaWire wire)
+    {
+        return mWireFlags[wire] == BetaWireFlag::One || mWireFlags[wire] == BetaWireFlag::Zero;
+    }
+
+    bool BetaCircuit::isInvert(BetaWire wire)
+    {
+        return mWireFlags[wire] == BetaWireFlag::InvWire;
+    }
+
+    u8 BetaCircuit::constVal(BetaWire wire)
+    {
+        if (mWireFlags[wire] == BetaWireFlag::Wire)
+            throw std::runtime_error(LOCATION);
+
+        return mWireFlags[wire] == BetaWireFlag::One ? 1 : 0;
     }
 
     void BetaCircuit::addPrint(BetaBundle in)
@@ -81,11 +265,11 @@ namespace osuCrypto
 
     void osuCrypto::BetaCircuit::addPrint(std::string str)
     {
-        mPrints.emplace_back(mGates.size(), -1,str);
+        mPrints.emplace_back(mGates.size(), -1, str);
     }
     void BetaCircuit::evaluate(ArrayView<BitVector> input, ArrayView<BitVector> output, bool print)
     {
-        BitVector mem(mWireCount);
+        std::vector<u8> mem(mWireCount);
 
         if (input.size() != mInputs.size())
         {
@@ -111,23 +295,36 @@ namespace osuCrypto
                 auto wireIdx = std::get<1>(*iter);
                 auto str = std::get<2>(*iter);
 
-                if(wireIdx != -1)
-                    std::cout << (u64)mem[wireIdx];
-                if(str.size())
+                if (wireIdx != -1)
+                    std::cout << (u64)(mem[wireIdx] ^ (isInvert(wireIdx) ? 1 : 0));
+                if (str.size())
                     std::cout << str;
 
                 ++iter;
             }
 
-            u64 idx0 = mGates[i].mInput[0];
-            u64 idx1 = mGates[i].mInput[1];
-            u64 idx2 = mGates[i].mOutput;
+            if (mGates[i].mType == GateType::a)
+            {
+                u64 src = mGates[i].mInput[0];
+                u64 len = mGates[i].mInput[1];
+                u64 dest = mGates[i].mOutput;
 
-            u8 a = mem[idx0];
-            u8 b = mem[idx1];
+                memcpy(&*(mem.begin() + dest), &*(mem.begin() + src), len);
 
-            mem[idx2] = GateEval(mGates[i].mType, (bool)a, (bool)b);
+            }
+            else
+            {
 
+                u64 idx0 = mGates[i].mInput[0];
+                u64 idx1 = mGates[i].mInput[1];
+                u64 idx2 = mGates[i].mOutput;
+
+                u8 a = mem[idx0];
+                u8 b = mem[idx1];
+
+                mem[idx2] = GateEval(mGates[i].mType, (bool)a, (bool)b);
+
+            }
         }
         while (print && iter != mPrints.end())
         {
@@ -135,7 +332,7 @@ namespace osuCrypto
             auto str = std::get<2>(*iter);
 
             if (wireIdx != -1)
-                std::cout << (u64)mem[wireIdx];
+                std::cout << (u64)(mem[wireIdx] ^ (isInvert(wireIdx) ? 1 : 0));
             if (str.size())
                 std::cout << str;
 
@@ -155,7 +352,7 @@ namespace osuCrypto
 
             for (u64 j = 0; j < output[i].size(); ++j)
             {
-                output[i][j] = mem[mOutputs[i].mWires[j]];
+                output[i][j] = mem[mOutputs[i].mWires[j]] ^ (isInvert(mOutputs[i].mWires[j])? 1 : 0);
             }
         }
     }

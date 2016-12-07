@@ -56,7 +56,7 @@ i64 signExtend(i64 v, u64 b, bool print = false)
     }
 }
 
-void Circuit_Adder_Test()
+void Circuit_int_Adder_Test()
 {
     setThreadName("CP_Test_Thread");
 
@@ -113,8 +113,63 @@ void Circuit_Adder_Test()
 }
 
 
+void Circuit_int_Adder_const_Test()
+{
+    setThreadName("CP_Test_Thread");
 
-void Circuit_Subtractor_Test()
+
+    CircuitLibrary lib;
+
+
+    PRNG prng(ZeroBlock);
+    u64 tries = 1000;
+
+
+    for (u64 i = 0; i < tries; ++i)
+    {
+
+        u64 aSize = prng.get<u32>() % 16 + 1,
+            bSize = prng.get<u32>() % 16 + 1,
+            cSize = std::min<u64>(prng.get<u32>() % 24 + 1, std::max(aSize, bSize) + 1);
+
+        i64 a = signExtend(prng.get<i64>(), aSize);
+        i64 b = signExtend(prng.get<i64>(), bSize);
+        i64 c = signExtend((a + b), cSize);
+
+        auto* cir = lib.int_intConst_add(aSize, bSize, b, cSize);
+
+
+
+        std::vector<BitVector> inputs(1), output(1);
+        inputs[0].append((u8*)&a, aSize);
+        output[0].resize(cSize);
+
+        cir->evaluate(inputs, output);
+
+        i64 cc = 0;
+        memcpy(&cc, output[0].data(), output[0].sizeBytes());
+
+        cc = signExtend(cc, cSize);
+
+        if (cc != c)
+        {
+            std::cout << "i " << i << std::endl;
+
+            BitVector cExp;
+            cExp.append((u8*)&c, cSize);
+            std::cout << "a  : " << inputs[0] << "  " << a<< std::endl;
+            std::cout << "b  : " << BitVector((u8*)&b, bSize) << "  " << b  << std::endl;
+            std::cout << "exp: " << cExp << "   " << c<< std::endl;
+            std::cout << "act: " << output[0] << "   "<< cc << std::endl;
+
+            throw UnitTestFail();
+        }
+
+    }
+}
+
+
+void Circuit_int_Subtractor_Test()
 {
     setThreadName("CP_Test_Thread");
 
@@ -131,7 +186,7 @@ void Circuit_Subtractor_Test()
 
         u64 aSize = prng.get<u32>() % 24 + 1,
             bSize = prng.get<u32>() % 24 + 1,
-            cSize = std::min<u64>(prng.get<u32>() % 24 + 1, std::max(aSize, bSize));
+            cSize = std::min<u64>(prng.get<u32>() % 24 + 1, std::max(aSize, bSize) + 1);
 
         auto* cir = lib.int_int_subtract(aSize, bSize, cSize);
 
@@ -169,7 +224,7 @@ void Circuit_Subtractor_Test()
 
 
 
-void Circuit_Multiply_Test()
+void Circuit_int_Subtractor_const_Test()
 {
     setThreadName("CP_Test_Thread");
 
@@ -178,15 +233,174 @@ void Circuit_Multiply_Test()
 
 
     PRNG prng(ZeroBlock);
-    u64 tries = 200;
+    u64 tries = 1000;
 
 
     for (u64 i = 0; i < tries; ++i)
     {
 
-        u64 aSize = prng.get<u32>() % 16 + 1,
+        u64 aSize = prng.get<u32>() % 24 + 1,
+            bSize = prng.get<u32>() % 24 + 1,
+            cSize = std::min<u64>(prng.get<u32>() % 24 + 1, std::max(aSize, bSize) + 1);
+
+        i64 a = signExtend(prng.get<i64>(), aSize);
+        i64 b = signExtend(prng.get<i64>(), bSize);
+        i64 c = signExtend((a - b), cSize);
+
+
+        auto* cir = lib.int_intConst_subtract(aSize, bSize,b, cSize);
+
+
+        std::vector<BitVector> inputs(1), output(1);
+        inputs[0].append((u8*)&a, aSize);
+        output[0].resize(cSize);
+
+        cir->evaluate(inputs, output);
+
+        i64 cc = 0;
+        memcpy(&cc, output[0].data(), output[0].sizeBytes());
+        cc = signExtend(cc, cSize);
+
+        if (cc != c)
+        {
+            std::cout << "i " << i << std::endl;
+            BitVector cExp;
+            cExp.append((u8*)&c, cSize);
+            std::cout << " a : " << inputs[0] << std::endl;
+            std::cout << "-b : " << inputs[1] << std::endl;
+            std::cout << "exp: " << cExp << std::endl;
+            std::cout << "act: " << output[0] << std::endl;
+
+            throw UnitTestFail();
+        }
+    }
+}
+
+
+void Circuit_uint_Adder_Test()
+{
+    setThreadName("CP_Test_Thread");
+
+
+    CircuitLibrary lib;
+
+
+    PRNG prng(ZeroBlock);
+    u64 tries = 1000;
+
+
+    for (u64 i = 0; i < tries; ++i)
+    {
+
+        u64 aSize = prng.get<u32>() % 24 + 1,
+            bSize = prng.get<u32>() % 24 + 1,
+            cSize = std::min<u64>(prng.get<u32>() % 24 + 1, std::max(aSize, bSize) + 1);
+
+        auto* cir = lib.uint_uint_add(aSize, bSize, cSize);
+
+
+        u64 a = prng.get<i64>() & ((u64(1) << aSize) - 1);
+        u64 b = prng.get<i64>() & ((u64(1) << bSize) - 1);
+        u64 c = (a + b) & ((u64(1) << cSize) - 1);
+
+
+        std::vector<BitVector> inputs(2), output(1);
+        inputs[0].append((u8*)&a, aSize);
+        inputs[1].append((u8*)&b, bSize);
+        output[0].resize(cSize);
+
+        cir->evaluate(inputs, output);
+
+        i64 cc = 0;
+        memcpy(&cc, output[0].data(), output[0].sizeBytes());
+
+        if (cc != c)
+        {
+            std::cout << "i " << i << std::endl;
+
+            BitVector cExp;
+            cExp.append((u8*)&c, cSize);
+            std::cout << "a  : " << inputs[0] << std::endl;
+            std::cout << "b  : " << inputs[1] << std::endl;
+            std::cout << "exp: " << cExp << std::endl;
+            std::cout << "act: " << output[0] << std::endl;
+
+            throw UnitTestFail();
+        }
+
+    }
+}
+
+void Circuit_uint_Subtractor_Test()
+{
+    setThreadName("CP_Test_Thread");
+
+
+    CircuitLibrary lib;
+
+
+    PRNG prng(ZeroBlock);
+    u64 tries = 1000;
+
+
+    for (u64 i = 0; i < tries; ++i)
+    {
+
+        u64 aSize = prng.get<u32>() % 24 + 1,
+            bSize = prng.get<u32>() % 24 + 1,
+            cSize = std::min<u64>(prng.get<u32>() % 24 + 1, std::max(aSize, bSize) + 1);
+
+        auto* cir = lib.uint_uint_subtract(aSize, bSize, cSize);
+        
+        u64 a = prng.get<i64>() & ((u64(1) << aSize) - 1);
+        u64 b = prng.get<i64>() & ((u64(1) << bSize) - 1);
+        u64 c = (a - b) & ((u64(1) << cSize) - 1);
+
+
+        std::vector<BitVector> inputs(2), output(1);
+        inputs[0].append((u8*)&a, aSize);
+        inputs[1].append((u8*)&b, bSize);
+        output[0].resize(cSize);
+
+        cir->evaluate(inputs, output);
+
+        u64 cc = 0;
+        memcpy(&cc, output[0].data(), output[0].sizeBytes());
+
+        if (cc != c)
+        {
+            std::cout << "i " << i << std::endl;
+            BitVector cExp;
+            cExp.append((u8*)&c, cSize);
+            std::cout << " a : " << inputs[0] << std::endl;
+            std::cout << "-b : " << inputs[1] << std::endl;
+            std::cout << "exp: " << cExp<< "  " << c << std::endl;
+            std::cout << "act: " << output[0] << "  " << cc<< std::endl;
+
+            throw UnitTestFail();
+        }
+    }
+}
+
+
+void Circuit_int_Multiply_Test()
+{
+    setThreadName("CP_Test_Thread");
+
+
+    CircuitLibrary lib;
+
+
+    PRNG prng(ZeroBlock);
+    u64 tries = 100;
+
+
+    for (u64 i = 0; i < tries; ++i)
+    {
+
+        u64 aSize =  prng.get<u32>() % 16 + 1,
             bSize = prng.get<u32>() % 16 + 1,
-            cSize = std::min<u64>(aSize + bSize, std::min<u64>(prng.get<u32>() % 16 + 1, std::max(aSize, bSize)));
+            cSize =  std::min<u64>(aSize + bSize, std::min<u64>(prng.get<u32>() % 16 + 1, std::max(aSize, bSize)));
 
         auto* cir = lib.int_int_mult(aSize, bSize, cSize);
 
@@ -222,3 +436,561 @@ void Circuit_Multiply_Test()
     }
 }
 
+
+
+void Circuit_int_Divide_Test()
+{
+    setThreadName("CP_Test_Thread");
+
+
+    CircuitLibrary lib;
+
+
+    PRNG prng(ZeroBlock);
+    u64 tries = 200;
+
+
+    for (u64 i = 0; i < tries; ++i)
+    {
+
+        u64 aSize =prng.get<u32>() % 16 + 1,
+            bSize = prng.get<u32>() % 16 + 1,
+            cSize =  aSize;
+
+        auto* cir = lib.int_int_div(aSize, bSize, cSize);
+
+        //std::cout << aSize << "  " << cir->mGates.size() << "  " << cir->mNonXorGateCount << std::endl;
+
+        i64 a = signExtend(prng.get<i64>(), aSize);
+        i64 b = signExtend(prng.get<i64>(), bSize);
+        b = b ? b : signExtend(1, bSize);
+
+        i64 c = signExtend((a / b), cSize);
+
+
+        std::vector<BitVector> inputs(2), output(1);
+        inputs[0].append((u8*)&a, aSize);
+        inputs[1].append((u8*)&b, bSize);
+        output[0].resize(cSize);
+
+        cir->evaluate(inputs, output);
+
+        i64 cc = 0;
+        memcpy(&cc, output[0].data(), output[0].sizeBytes());
+        cc = signExtend(cc, cSize);
+
+        if (cc != c)
+        {
+            std::cout << "i " << i << std::endl;
+            BitVector cExp;
+            cExp.append((u8*)&c, cSize);
+            std::cout << " a : " << inputs[0] << "  " << a << std::endl;
+            std::cout << "/b : " << inputs[1] << "  " << b << std::endl;
+            std::cout << "exp: " << cExp << "   " << c << std::endl;
+            std::cout << "act: " << output[0] << "   " << cc << std::endl;
+
+            throw UnitTestFail();
+        }
+    }
+}
+
+
+
+
+void Circuit_int_LessThan_Test()
+{
+    setThreadName("CP_Test_Thread");
+
+
+    CircuitLibrary lib;
+
+
+    PRNG prng(ZeroBlock);
+    u64 tries = 200;
+
+
+    for (u64 i = 0; i < tries; ++i)
+    {
+
+        u64 aSize = prng.get<u32>() % 16 + 1,
+            bSize = prng.get<u32>() % 16 + 1;
+
+        auto* cir = lib.int_int_lt(aSize, bSize);
+
+
+        i64 a = signExtend(prng.get<i64>(), aSize);
+        i64 b = signExtend(prng.get<i64>(), bSize);
+        bool c = a < b;
+
+
+        std::vector<BitVector> inputs(2), output(1);
+        inputs[0].append((u8*)&a, aSize);
+        inputs[1].append((u8*)&b, bSize);
+        output[0].resize(1);
+
+        cir->evaluate(inputs, output);
+
+        i64 cc = 0;
+        memcpy(&cc, output[0].data(), output[0].sizeBytes());
+
+        if (cc != c)
+        {
+            std::cout << "i " << i << std::endl;
+            std::cout << " a : " << inputs[0] << "  " << a << std::endl;
+            std::cout << "<b : " << inputs[1] << "  " << b << std::endl;
+            std::cout << "exp: " << c << std::endl;
+            std::cout << "act: " << output[0] << "   " << cc << std::endl;
+
+
+            cir = lib.int_int_subtract(aSize, bSize, std::max(aSize, bSize));
+            output.clear();
+            output.emplace_back(std::max(aSize, bSize));
+
+            cir->evaluate(inputs, output);
+
+            std::cout << "act: " << output[0] << "   " << cc << std::endl;
+
+
+            throw UnitTestFail();
+        }
+    }
+}
+
+
+
+
+void Circuit_int_GreaterThanEq_Test()
+{
+    setThreadName("CP_Test_Thread");
+
+
+    CircuitLibrary lib;
+
+
+    PRNG prng(ZeroBlock);
+    u64 tries = 200;
+
+
+    for (u64 i = 0; i < tries; ++i)
+    {
+
+        u64 aSize = prng.get<u32>() % 16 + 1,
+            bSize = prng.get<u32>() % 16 + 1;
+
+        auto* cir = lib.int_int_gteq(aSize, bSize);
+
+
+        i64 a = signExtend(prng.get<i64>(), aSize);
+        i64 b = signExtend(prng.get<i64>(), bSize);
+        bool c = a >= b;
+
+
+        std::vector<BitVector> inputs(2), output(1);
+        inputs[0].append((u8*)&a, aSize);
+        inputs[1].append((u8*)&b, bSize);
+        output[0].resize(1);
+
+        cir->evaluate(inputs, output);
+
+        i64 cc = 0;
+        memcpy(&cc, output[0].data(), output[0].sizeBytes());
+
+        if (cc != c)
+        {
+            std::cout << "i " << i << std::endl;
+            std::cout << "  a : " << inputs[0] << "  " << a << std::endl;
+            std::cout << ">=b: " << inputs[1] << "  " << b << std::endl;
+            std::cout << "exp: " << c << std::endl;
+            std::cout << "act: " << output[0] << "   " << cc << std::endl;
+
+
+            cir = lib.int_int_subtract(aSize, bSize, std::max(aSize, bSize));
+            output.clear();
+            output.emplace_back(std::max(aSize, bSize));
+
+            cir->evaluate(inputs, output);
+
+            std::cout << "act: " << output[0] << "   " << cc << std::endl;
+
+
+            throw UnitTestFail();
+        }
+    }
+}
+
+void Circuit_uint_LessThan_Test()
+{
+    setThreadName("CP_Test_Thread");
+
+
+    CircuitLibrary lib;
+
+
+    PRNG prng(ZeroBlock);
+    u64 tries = 200;
+
+
+    for (u64 i = 0; i < tries; ++i)
+    {
+
+        u64 aSize = prng.get<u32>() % 16 + 1,
+            bSize = prng.get<u32>() % 16 + 1;
+        
+        u64 aMask = (u64(1) << aSize) - 1;
+        u64 bMask = (u64(1) << bSize) - 1;
+
+
+        u64 a = prng.get<u64>() & aMask;
+        u64 b = prng.get<u64>() & bMask;
+        bool c = a < b;
+
+
+        auto* cir = lib.uint_uint_lt(aSize, bSize);
+        std::vector<BitVector> inputs(2), output(1);
+        inputs[0].append((u8*)&a, aSize);
+        inputs[1].append((u8*)&b, bSize);
+        output[0].resize(1);
+
+        cir->evaluate(inputs, output);
+
+        i64 cc = 0;
+        memcpy(&cc, output[0].data(), output[0].sizeBytes());
+
+        if (cc != c)
+        {
+            std::cout << "i " << i << std::endl;
+            std::cout << " a : " << inputs[0] << "  " << a << std::endl;
+            std::cout << "<b : " << inputs[1] << "  " << b << std::endl;
+            std::cout << "exp: " << c << std::endl;
+            std::cout << "act: " << output[0] << "   " << cc << std::endl;
+
+
+            cir = lib.int_int_subtract(aSize, bSize, std::max(aSize, bSize));
+            output.clear();
+            output.emplace_back(std::max(aSize, bSize));
+
+            cir->evaluate(inputs, output);
+
+            std::cout << "act: " << output[0] << "   " << cc << std::endl;
+
+
+            throw UnitTestFail();
+        }
+    }
+}
+
+
+
+
+void Circuit_uint_GreaterThanEq_Test()
+{
+    setThreadName("CP_Test_Thread");
+
+
+    CircuitLibrary lib;
+
+
+    PRNG prng(ZeroBlock);
+    u64 tries = 200;
+
+
+    for (u64 i = 0; i < tries; ++i)
+    {
+
+        u64 aSize = prng.get<u32>() % 16 + 1,
+            bSize = prng.get<u32>() % 16 + 1;
+
+        u64 aMask = (u64(1) << aSize) - 1;
+        u64 bMask = (u64(1) << bSize) - 1;
+
+        u64 a = prng.get<u64>() & aMask;
+        u64 b = prng.get<u64>() & bMask;
+        bool c = a >= b;
+
+        auto* cir = lib.uint_uint_gteq(aSize, bSize);
+
+
+        std::vector<BitVector> inputs(2), output(1);
+        inputs[0].append((u8*)&a, aSize);
+        inputs[1].append((u8*)&b, bSize);
+        output[0].resize(1);
+
+        cir->evaluate(inputs, output);
+
+
+        i64 cc = 0;
+        memcpy(&cc, output[0].data(), output[0].sizeBytes());
+            std::cout << "i " << i << std::endl;
+            std::cout << "  a: " << inputs[0] << "  " << a << std::endl;
+            std::cout << ">=b: " << inputs[1] << "  " << b << std::endl;
+            std::cout << "exp: " << c << std::endl;
+            std::cout << "act: " << output[0] << "   " << cc << std::endl;
+
+
+            cir = lib.int_int_subtract(aSize, bSize, std::max(aSize, bSize));
+            output.clear();
+            output.emplace_back(std::max(aSize, bSize));
+
+            cir->evaluate(inputs, output);
+
+            std::cout << "act: " << output[0] << "   " << cc << std::endl;
+
+
+        if (cc != c)
+        {
+
+            throw UnitTestFail();
+        }
+    }
+}
+
+
+
+void Circuit_multiplex_Test()
+{
+    setThreadName("CP_Test_Thread");
+
+
+    CircuitLibrary lib;
+
+
+    PRNG prng(ZeroBlock);
+    u64 tries = 200;
+
+
+    for (u64 i = 0; i < tries; ++i)
+    {
+
+        u64 aSize = prng.get<u32>() % 16 + 1;
+
+        auto* cir = lib.int_int_multiplex(aSize);
+
+
+        i64 a = signExtend(prng.get<i64>(), aSize);
+        i64 b = signExtend(prng.get<i64>(), aSize);
+        i64 c = prng.getBit();
+        i64 d = c ? a : b;
+
+
+        std::vector<BitVector> inputs(3), output(1);
+        inputs[0].append((u8*)&a, aSize);
+        inputs[1].append((u8*)&b, aSize);
+        inputs[2].append((u8*)&c, 1);
+        output[0].resize(aSize);
+
+        cir->evaluate(inputs, output);
+
+        i64 cc = 0;
+        memcpy(&cc, output[0].data(), output[0].sizeBytes());
+        cc = signExtend(cc, aSize);
+
+        if (cc != d)
+        {
+            std::cout << "i " << i << std::endl;
+            std::cout << "  a : " << inputs[0] << "  " << a << std::endl;
+            std::cout << "  b : " << inputs[1] << "  " << b << std::endl;
+            std::cout << "  c : " << inputs[2] << "  " << c << std::endl;
+            std::cout << "exp: " << d << "  " << c << std::endl;
+            std::cout << "act: " << output[0] << "   " << cc << std::endl;
+
+
+            throw UnitTestFail();
+        }
+    }
+}
+
+
+
+void Circuit_bitInvert_Test()
+{
+    setThreadName("CP_Test_Thread");
+
+
+    CircuitLibrary lib;
+
+
+    PRNG prng(ZeroBlock);
+    u64 tries = 200;
+
+
+    for (u64 i = 0; i < tries; ++i)
+    {
+
+        u64 aSize = prng.get<u32>() % 16 + 1;
+
+        auto* cir = lib.int_bitInvert(aSize);
+
+
+        i64 a = signExtend(prng.get<i64>(), aSize);
+        i64 d = ~a;
+
+
+        std::vector<BitVector> inputs(1), output(1);
+        inputs[0].append((u8*)&a, aSize);
+        output[0].resize(aSize);
+
+        cir->evaluate(inputs, output);
+
+        i64 cc = 0;
+        memcpy(&cc, output[0].data(), output[0].sizeBytes());
+        cc = signExtend(cc, aSize);
+
+        if (cc != d)
+        {
+            std::cout << "i " << i << std::endl;
+            std::cout << "  a : " << inputs[0] << "  " << a << std::endl;
+            std::cout << "exp: " << d << std::endl;
+            std::cout << "act: " << output[0] << "   " << cc << std::endl;
+
+
+            throw UnitTestFail();
+        }
+    }
+}
+
+
+
+void Circuit_negate_Test()
+{
+    setThreadName("CP_Test_Thread");
+
+
+    CircuitLibrary lib;
+
+
+    PRNG prng(ZeroBlock);
+    u64 tries = 200;
+
+
+    for (u64 i = 0; i < tries; ++i)
+    {
+
+        u64 aSize = prng.get<u32>() % 16 + 1;
+
+        auto* cir = lib.int_negate(aSize);
+
+
+        i64 a = signExtend(prng.get<i64>(), aSize);
+        i64 d = signExtend (-a, aSize);
+
+
+        std::vector<BitVector> inputs(1), output(1);
+        inputs[0].append((u8*)&a, aSize);
+        output[0].resize(aSize);
+
+        cir->evaluate(inputs, output);
+
+        i64 cc = 0;
+        memcpy(&cc, output[0].data(), output[0].sizeBytes());
+        cc = signExtend(cc, aSize);
+
+        if (cc != d)
+        {
+            std::cout << "i " << i << std::endl;
+            std::cout << "  a : " << inputs[0] << "  " << a << std::endl;
+            std::cout << "exp: " << d << std::endl;
+            std::cout << "act: " << output[0] << "   " << cc << std::endl;
+
+
+            throw UnitTestFail();
+        }
+    }
+}
+
+
+
+void Circuit_removeSign_Test()
+{
+    setThreadName("CP_Test_Thread");
+
+
+    CircuitLibrary lib;
+
+
+    PRNG prng(ZeroBlock);
+    u64 tries = 200;
+
+
+    for (u64 i = 0; i < tries; ++i)
+    {
+
+        u64 aSize = prng.get<u32>() % 16 + 1;
+
+        auto* cir = lib.int_removeSign(aSize);
+
+
+        i64 a = signExtend(prng.get<i64>(), aSize);
+        i64 c = signExtend(a < 0? -a : a, aSize);
+
+
+        std::vector<BitVector> inputs(1), output(1);
+        inputs[0].append((u8*)&a, aSize);
+        output[0].resize(aSize);
+
+        cir->evaluate(inputs, output);
+
+        i64 cc = 0;
+        memcpy(&cc, output[0].data(), output[0].sizeBytes());
+        cc = signExtend(cc, aSize);
+
+        if (cc != c)
+        {
+            std::cout << "i " << i << std::endl;
+            std::cout << "  a : " << inputs[0] << "  " << a << std::endl;
+            std::cout << "exp: " << c << std::endl;
+            std::cout << "act: " << output[0] << "   " << cc << std::endl;
+
+
+            throw UnitTestFail();
+        }
+    }
+}
+
+void Circuit_addSign_Test()
+{
+    setThreadName("CP_Test_Thread");
+
+
+    CircuitLibrary lib;
+
+
+    PRNG prng(ZeroBlock);
+    u64 tries = 200;
+
+
+    for (u64 i = 0; i < tries; ++i)
+    {
+
+        u64 aSize = prng.get<u32>() % 16 + 1;
+
+        auto* cir = lib.int_addSign(aSize);
+
+
+        i64 a = signExtend(prng.get<i64>(), aSize);
+        bool sign = prng.getBit();
+        i64 c = signExtend(sign ? -a : a, aSize);
+
+
+        std::vector<BitVector> inputs(2), output(1);
+        inputs[0].append((u8*)&a, aSize);
+        inputs[1].append((u8*)&sign, 1);
+        output[0].resize(aSize);
+
+        cir->evaluate(inputs, output);
+
+        i64 cc = 0;
+        memcpy(&cc, output[0].data(), output[0].sizeBytes());
+        cc = signExtend(cc, aSize);
+
+        if (cc != c)
+        {
+            std::cout << "i " << i << std::endl;
+            std::cout << "  a : " << inputs[0] << "  " << a << std::endl;
+            std::cout << "exp: " << c << std::endl;
+            std::cout << "act: " << output[0] << "   " << cc << std::endl;
+
+
+            throw UnitTestFail();
+        }
+    }
+}
