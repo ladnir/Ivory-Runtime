@@ -52,26 +52,60 @@ namespace osuCrypto
 
     sInt sInt::operator-(const sInt & in2)
     {
-
         sInt ret(mRuntime, std::max(mBitCount, in2.mBitCount));
-
         std::array<RuntimeData*, 3> io{ mData.get(), in2.mData.get(), ret.mData.get() };
-
         mRuntime.scheduleOp(Op::Subtract, io);
-
-
         return ret;
     }
 
-    sInt sInt::operator&(sInt &in2)
+    sInt sInt::operator>=(const sInt & in2)
+    {
+        sInt ret(mRuntime, 1);
+        std::array<RuntimeData*, 3> io{ mData.get(), in2.mData.get(), ret.mData.get() };
+        mRuntime.scheduleOp(Op::GTEq, io);
+        return ret;
+    }
+
+    sInt sInt::operator>(const sInt &in2)
+    {
+        sInt ret(mRuntime, 1);
+        std::array<RuntimeData*, 3> io{ in2.mData.get(),mData.get(), ret.mData.get() };
+        mRuntime.scheduleOp(Op::LT, io);
+        return ret;
+    }
+
+    sInt sInt::operator<=(const sInt &in2)
+    {
+        sInt ret(mRuntime, 1);
+        std::array<RuntimeData*, 3> io{ in2.mData.get(), mData.get(), ret.mData.get() };
+        mRuntime.scheduleOp(Op::GTEq, io);
+        return ret;
+    }
+
+    sInt sInt::operator<(const sInt & in2)
+    {
+        sInt ret(mRuntime, 1);
+        std::array<RuntimeData*, 3> io{ mData.get(), in2.mData.get(), ret.mData.get() };
+        mRuntime.scheduleOp(Op::LT, io);
+        return ret;
+    }
+
+    sInt sInt::operator&(const sInt &in2)
     {
         sInt ret(mRuntime, std::max(mBitCount, in2.mBitCount));
-
         std::array<RuntimeData*, 3> io{ mData.get(), in2.mData.get(), ret.mData.get() };
-
         mRuntime.scheduleOp(Op::BitwiseAnd, io);
+        return ret;
+    }
 
+    sInt sInt::ifelse(const sInt & ifTrue, const sInt & ifFalse)
+    {
+        if (mBitCount != 1)
+            throw std::runtime_error(LOCATION);
 
+        sInt ret(mRuntime, ifTrue.mBitCount);
+        std::array<RuntimeData*, 4> io{ ifTrue.mData.get(), ifFalse.mData.get(), mData.get(), ret.mData.get() };
+        mRuntime.scheduleOp(Op::IfElse, io);
         return ret;
     }
 
@@ -87,6 +121,16 @@ namespace osuCrypto
         std::array<RuntimeData*, 3> io{ mData.get(), in2.mData.get(), ret.mData.get() };
 
         mRuntime.scheduleOp(Op::Multiply, io);
+
+        return std::move(ret);
+    }
+
+    sInt sInt::operator/(const sInt & in2)
+    {
+        sInt ret(mRuntime, std::max(mBitCount, in2.mBitCount));
+        std::array<RuntimeData*, 3> io{ mData.get(), in2.mData.get(), ret.mData.get() };
+
+        mRuntime.scheduleOp(Op::Divide, io);
 
         return std::move(ret);
     }

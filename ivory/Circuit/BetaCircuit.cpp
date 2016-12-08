@@ -216,6 +216,8 @@ namespace osuCrypto
         while (d != dest.mWires.end())
         {
             ++i;
+            mWireFlags[*d] = mWireFlags[*s];
+
             u64 rem = (dd - d);
             u64 len = 1;
             while (len < rem && *i == *(i - 1) + 1)
@@ -260,12 +262,12 @@ namespace osuCrypto
 
     void osuCrypto::BetaCircuit::addPrint(BetaWire wire)
     {
-        mPrints.emplace_back(mGates.size(), wire, "");
+        mPrints.emplace_back(mGates.size(), wire, "", isInvert(wire));
     }
 
     void osuCrypto::BetaCircuit::addPrint(std::string str)
     {
-        mPrints.emplace_back(mGates.size(), -1, str);
+        mPrints.emplace_back(mGates.size(), -1, str, false);
     }
     void BetaCircuit::evaluate(ArrayView<BitVector> input, ArrayView<BitVector> output, bool print)
     {
@@ -294,9 +296,10 @@ namespace osuCrypto
             {
                 auto wireIdx = std::get<1>(*iter);
                 auto str = std::get<2>(*iter);
+                auto invert = std::get<3>(*iter);
 
                 if (wireIdx != -1)
-                    std::cout << (u64)(mem[wireIdx] ^ (isInvert(wireIdx) ? 1 : 0));
+                    std::cout << (u64)(mem[wireIdx] ^ (invert ? 1 : 0));
                 if (str.size())
                     std::cout << str;
 
@@ -314,6 +317,13 @@ namespace osuCrypto
             }
             else
             {
+                if (mGates[i].mType == GateType::a ||
+                    mGates[i].mType == GateType::b ||
+                    mGates[i].mType == GateType::na ||
+                    mGates[i].mType == GateType::nb ||
+                    mGates[i].mType == GateType::One ||
+                    mGates[i].mType == GateType::Zero)
+                    throw std::runtime_error(LOCATION);
 
                 u64 idx0 = mGates[i].mInput[0];
                 u64 idx1 = mGates[i].mInput[1];
@@ -330,9 +340,10 @@ namespace osuCrypto
         {
             auto wireIdx = std::get<1>(*iter);
             auto str = std::get<2>(*iter);
+            auto invert = std::get<3>(*iter);
 
             if (wireIdx != -1)
-                std::cout << (u64)(mem[wireIdx] ^ (isInvert(wireIdx) ? 1 : 0));
+                std::cout << (u64)(mem[wireIdx] ^ (invert ? 1 : 0));
             if (str.size())
                 std::cout << str;
 

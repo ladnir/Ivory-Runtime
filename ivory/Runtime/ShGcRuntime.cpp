@@ -98,7 +98,16 @@ namespace osuCrypto
             item.mInputBundleCount = 2;
             break;
         case osuCrypto::Op::Divide:
-            throw std::runtime_error(LOCATION);
+            item.mCircuit = mLibrary.int_int_div(sizes[0], sizes[1], sizes[2]);
+            item.mInputBundleCount = 2;
+            break;
+        case osuCrypto::Op::LT:
+            item.mCircuit = mLibrary.int_int_lt(sizes[0], sizes[1]);
+            item.mInputBundleCount = 2;
+            break;
+        case osuCrypto::Op::GTEq:
+            item.mCircuit = mLibrary.int_int_gteq(sizes[0], sizes[1]);
+            item.mInputBundleCount = 2;
             break;
         case osuCrypto::Op::Mod:
             throw std::runtime_error(LOCATION);
@@ -118,6 +127,10 @@ namespace osuCrypto
             break;
         case osuCrypto::Op::BitWiseOr:
             throw std::runtime_error(LOCATION);
+            break;
+        case osuCrypto::Op::IfElse:
+            item.mCircuit = mLibrary.int_int_multiplex(sizes[0]);
+            item.mInputBundleCount = 3;
             break;
         default:
             throw std::runtime_error(LOCATION);
@@ -603,7 +616,16 @@ namespace osuCrypto
                 auto& c = wires[gate.mOutput];
                 auto& gt = gate.mType;
 
-                if (gt == GateType::Xor || gt == GateType::Nxor)
+                if (gt == GateType::a)
+                {
+                    u64 src = gate.mInput[0];
+                    u64 len = gate.mInput[1];
+                    u64 dest = gate.mOutput;
+
+                    memcpy(&*(wires.begin() + dest), &*(wires.begin() + src), len * sizeof(block));
+
+                }
+                else if (gt == GateType::Xor || gt == GateType::Nxor)
                 {
                     c = a ^ b;
                 }
@@ -660,7 +682,7 @@ namespace osuCrypto
         std::array<block, 2>& tweaks,
         ArrayView<GarbledGate<2>> gates)
     {
-        auto gateIter = gates.data();
+        auto gateIter = gates.begin();
         //std::cout  << IoStream::lock;
         //u64 i = 0;
 
@@ -842,13 +864,31 @@ namespace osuCrypto
                 auto& c = wires[gate.mOutput];
                 auto& gt = gate.mType;
 
+                if (gt == GateType::a)
+                {
+                    u64 src =  gate.mInput[0];
+                    u64 len =  gate.mInput[1];
+                    u64 dest = gate.mOutput;
 
-                if (gt == GateType::Xor || gt == GateType::Nxor)
+                    memcpy(&*(wires.begin() + dest), &*(wires.begin() + src), len * sizeof(block));
+
+                }
+                else if (gt == GateType::Xor || gt == GateType::Nxor)
                 {
                     c = a ^ b ^ mZeroAndGlobalOffset[(u8)gt & 1];
                 }
                 else
                 {
+#ifndef  NDEBUG
+                    if (gt == GateType::a ||
+                        gt == GateType::b ||
+                        gt == GateType::na ||
+                        gt == GateType::nb ||
+                        gt == GateType::One ||
+                        gt == GateType::Zero)
+                        throw std::runtime_error(LOCATION);
+#endif // ! NDEBUG
+
                     // compute the gate modifier variables
                     auto& aAlpha = gate.mAAlpha;
                     auto& bAlpha = gate.mBAlpha;

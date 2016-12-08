@@ -42,7 +42,7 @@ void multTest()
 
             if (c != ((a * b) & (1 << bitCount)))
             {
-                std::cout  << "bad " << c << "  " << (a*b) << "  " << a << " " << b << std::endl;
+                std::cout << "bad " << c << "  " << (a*b) << "  " << a << " " << b << std::endl;
                 return;
             }
         }
@@ -69,29 +69,50 @@ i32 program(std::array<Party, 2> parties, i64 myInput)
 
 
     // perform some computation
-    auto out = input1 + input0;
+    auto add = input1 + input0;
+    auto sub = input1 - input0;
+    auto mul = input1 * input0;
+    auto div = input1 / input0;
+
+
+    auto gteq = input1 >= input0;
+    auto lt = input1 < input0;
+
+
+    auto max = gteq.ifelse(input1, input0);
 
 
     // reveal this output to party 0 and then party 1.
-    parties[0].reveal(out);
-    parties[1].reveal(out);
+    parties[0].reveal(add );
+    parties[0].reveal(sub );
+    parties[0].reveal(mul );
+    parties[0].reveal(div );
+    parties[0].reveal(gteq);
+    parties[0].reveal(lt  );
+    parties[0].reveal(max);
 
 
 
-    i32 result = out.getValue();
-
-    std::cout  << result << std::endl;
-
+    if (parties[0].isLocalParty())
+    {
+        std::cout << "add  " << add.getValue() << std::endl;
+        std::cout << "sub  " << sub.getValue() << std::endl;
+        std::cout << "mul  " << mul.getValue() << std::endl;
+        std::cout << "div  " << div.getValue() << std::endl;
+        std::cout << "gteq " << gteq.getValue() << std::endl;
+        std::cout << "lt   " << lt.getValue() << std::endl;
+        std::cout << "max  " << max.getValue() << std::endl;
+    }
 
     // Get the value what was just revealed to us.
-    return result;
+    return 0;
 }
 
 int main(int argc, char**argv)
 {
     //multTest();
     //return 0;
-
+    u64 tries(100);
     PRNG prng(OneBlock);
 
 
@@ -115,12 +136,13 @@ int main(int argc, char**argv)
         rt1.init(chl1, prng.get<block>(), ShGcRuntime::Evaluator, 1);
 
 
-        std::array<Party, 2> parties {
+        std::array<Party, 2> parties{
             Party(rt1, 0),
             Party(rt1, 1)
         };
 
-        program(parties, 44);
+        for (u64 i = 0; i < tries; ++i)
+            program(parties, 44);
 
         chl1.close();
         ep1.stop();
@@ -144,7 +166,8 @@ int main(int argc, char**argv)
         Party(rt0, 1)
     };
 
-    program(parties, 23);
+    for(u64 i =0; i < tries; ++i)
+        program(parties, 23);
 
 
 

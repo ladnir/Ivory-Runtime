@@ -26,15 +26,23 @@ namespace osuCrypto
         sInt operator+(const sInt&);
         sInt operator-(const sInt&);
         sInt operator*(const sInt&);
-        //sInt operator/(const sInt&);
+        sInt operator/(const sInt&);
         
         void operator+=(const sInt&);
         //sInt operator-=(const sInt&);
         //sInt operator*=(const sInt&);
         //sInt operator/=(const sInt&);
 
+        sInt operator>=(const sInt&);
+        sInt operator>(const sInt&);
+        sInt operator<=(const sInt&);
+        sInt operator<(const sInt&);
 
-        sInt operator&(sInt&);
+
+        sInt operator&(const sInt&);
+
+        sInt ifelse(const sInt&, const sInt&);
+
 
         ValueType getValue();
 

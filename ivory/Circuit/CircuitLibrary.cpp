@@ -951,10 +951,18 @@ namespace osuCrypto
 
         uint_uint_div_rem_build(cd, a1, a2, quotient, remainder);
 
+        //cd.addPrint("add quo sign ");
+        //cd.addPrint(sign);
+        //cd.addPrint("   ");
+        //cd.addPrint(quotient);
 
 
         int_addSign_build(cd, quotient, sign, quotient, temp);
         //std::cout << "addSign    " << cd.mNonXorGateCount << std::endl;
+        //cd.addPrint(" ->  ");
+        //cd.addPrint(quotient);
+
+        //cd.addPrint("\n\n");
 
         if (rem.mWires.size())
         {
@@ -1022,9 +1030,8 @@ namespace osuCrypto
             //cd.addPrint("\n");
 
 
-            //quotient.mWires.insert(quotient.mWires.begin(), doSubtract.mWires[0]);
 
-            prev = cd.mNonXorGateCount;
+            //prev = cd.mNonXorGateCount;
 
             BetaBundle sub;
             sub.mWires.insert(sub.mWires.begin(), ssub.mWires.begin(), ssub.mWires.begin() + std::min(a2.mWires.size(), remainder.mWires.size()));
@@ -1034,16 +1041,12 @@ namespace osuCrypto
                 cd.addGate(a2.mWires[j], doSubtract.mWires[0], GateType::And, sub.mWires[j]);
 
 
-            //std::cout << "iter[" << i << "]  and  " << cd.mNonXorGateCount << "  (+" << (cd.mNonXorGateCount - prev) << ")  " << remTemp.mWires.size() << std::endl;
 
             //cd.addPrint(" ( rem[" + ToString(i) + "] = ");
             //cd.addPrint(remainder);
             //cd.addPrint(") - (sub[" + ToString(i) + "] = ");
             //cd.addPrint(sub);
 
-
-
-            //partialSubs.push_back(sub);
 
             //if (cd.mDivPrint)
             //{
@@ -1056,7 +1059,7 @@ namespace osuCrypto
             //remainder = remainder - sub;
             //std::cout << "iter[" << i << "]'   " << cd.mNonXorGateCount << "  " << remTemp.mWires.size() << std::endl;
 
-            prev = cd.mNonXorGateCount;
+            //prev = cd.mNonXorGateCount;
 
             uint_uint_subtract_build(cd, remainder, sub, remTemp, temp);
 
@@ -1069,11 +1072,11 @@ namespace osuCrypto
             //if (cd.mDivPrint)
             //{
 
-            //    cd.addPrint(") =: ");
-            //    cd.addPrint(remainder);
-            //    cd.addPrint("     quo " );
-            //    cd.addPrint(quotient);
-            //    cd.addPrint("\n\n");
+                //cd.addPrint(") =: ");
+                //cd.addPrint(remainder);
+                //cd.addPrint("     quo " );
+                //cd.addPrint(quotient);
+                //cd.addPrint("\n\n");
             //}
 
 
@@ -1146,8 +1149,7 @@ namespace osuCrypto
         uint_uint_lt_build(cd, a1, a2, out);
 
         // invert the output
-        GateType gt = GateType((~(u8)cd.mGates.back().mType) & 15);
-        cd.mGates.back().setType(gt);
+        cd.addInvert(out.mWires[0]);
     }
 
 
@@ -1175,9 +1177,9 @@ namespace osuCrypto
         BetaBundle & temp)
     {
         //auto ret = -a1;
-        //cd.addPrint("add sign ");
+        //cd.addPrint("\nadd sign ");
         //cd.addPrint(sign);
-        //cd.addPrint("  ");
+        //cd.addPrint("  (");
         //cd.addPrint(a1);
 
         BetaBundle neg(a1.mWires.size());
@@ -1185,11 +1187,9 @@ namespace osuCrypto
 
         int_negate_build(cd, a1, neg, temp);
 
-        //cd.addPrint("  ");
-        //cd.addPrint(a1);
-        //cd.addPrint("  -> ");
-        //cd.addPrint(ret);
-        //cd.addPrint(" -> ");
+        //cd.addPrint(", ");
+        //cd.addPrint(neg);
+        //cd.addPrint(")  -> ");
 
         int_int_multiplex_build(cd, neg, a1, sign, ret, temp);
 
@@ -1224,21 +1224,20 @@ namespace osuCrypto
 
         int_bitInvert_build(cd, a1, invert);
 
-        //cd.addPrint(" ~a1 ");
+        //cd.addPrint("   a1 ");
+        //cd.addPrint(a1);
+        //cd.addPrint("\n ~a1 ");
         //cd.addPrint(invert);
-        //cd.addPrint(" ");
 
         BetaBundle one(2);
         BitVector oo(2);
         oo[0] = 1;
         cd.addConstBundle(one, oo);
 
-        //cd.addPrint(" a1 ");
-        //cd.addPrint(a1);
-        //cd.addPrint(" ");
+
         int_int_add_build(cd, invert, one, out, temp);
-        //cd.addPrint("a1 ");
-        //cd.addPrint(a1);
+        //cd.addPrint("   ~a1+1 ");
+        //cd.addPrint(out);
         //cd.addPrint(" ");
     }
 

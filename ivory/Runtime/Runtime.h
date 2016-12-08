@@ -18,12 +18,15 @@ namespace osuCrypto
         Subtract,
         Multiply,
         Divide,
+        LT,
+        GTEq,
         Mod,
         And,
         Or,
         Not,
         BitwiseAnd,
-        BitWiseOr
+        BitWiseOr,
+        IfElse
     };
 
     class Runtime
