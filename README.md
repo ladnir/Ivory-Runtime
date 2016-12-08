@@ -14,7 +14,7 @@ Instead of requiring the user provide the circuit to be computed, the runtime pr
 
 While at of this push, only semi-honest garbled circuit is supported, eventually other paradigms will be supported in a generic way. That is, you will be able to write a program that builds on Ivory's generic MPC API and then select the desired protocol to run in the background. E.g. semi-honest, malicious, garbled circuit, lego, mascot, etc...
 
-Consider the following code snippet. It takes 64 bit input from two parties, multiplies them together and returns the result both parties. 
+Consider the following code snippet. It takes 64 bit input from two parties and adds, subtracts, multiplies, etc them together. Each party is then revealed a different set of the computation.
 
 ```c++
 void program(std::array<Party, 2> parties, i64 myInput)
