@@ -50,5 +50,8 @@
     <ClCompile Include="ClassicGarbledCircuit_Tests_VS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ShGcRuntime_TestsVs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

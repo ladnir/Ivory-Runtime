@@ -86,6 +86,7 @@
     <ClInclude Include="OTOracleReceiver.h" />
     <ClInclude Include="OTOracleSender.h" />
     <ClInclude Include="OT_Tests.h" />
+    <ClInclude Include="ShGcRuntime_tests.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AES_Tests.cpp" />
@@ -99,6 +100,7 @@
     <ClCompile Include="OTOracleReceiver.cpp" />
     <ClCompile Include="OTOracleSender.cpp" />
     <ClCompile Include="OT_Tests.cpp" />
+    <ClCompile Include="ShGcRuntime_tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />

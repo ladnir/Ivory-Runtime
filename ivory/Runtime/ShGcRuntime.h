@@ -52,7 +52,7 @@ namespace osuCrypto
         void scheduleOutput(RuntimeData* labels, u64 partyIdx)override;
         void scheduleOutput(RuntimeData* labels, std::future<BitVector>& value)override;
 
-        void processesQueue() override {}
+        void processesQueue() override;
 
         u64 getPartyIdx() override { return mPartyIdx; }
 
@@ -112,7 +112,6 @@ namespace osuCrypto
             std::shared_ptr<ShGcLabelVec> mLabels;
         };
 
-        void process();
 
         void garblerOutput();
         void garblerCircuit();

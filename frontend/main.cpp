@@ -83,14 +83,13 @@ i32 program(std::array<Party, 2> parties, i64 myInput)
 
 
     // reveal this output to party 0 and then party 1.
-    parties[0].reveal(add );
-    parties[0].reveal(sub );
-    parties[0].reveal(mul );
-    parties[0].reveal(div );
+    parties[0].reveal(add);
+    parties[0].reveal(sub);
+    parties[0].reveal(mul);
+    parties[0].reveal(div);
     parties[0].reveal(gteq);
-    parties[0].reveal(lt  );
+    parties[0].reveal(lt);
     parties[0].reveal(max);
-
 
 
     if (parties[0].isLocalParty())
@@ -104,6 +103,8 @@ i32 program(std::array<Party, 2> parties, i64 myInput)
         std::cout << "max  " << max.getValue() << std::endl;
     }
 
+    parties[0].getRuntime().processesQueue();
+
     // Get the value what was just revealed to us.
     return 0;
 }
@@ -112,7 +113,7 @@ int main(int argc, char**argv)
 {
     //multTest();
     //return 0;
-    u64 tries(100);
+    u64 tries(2);
     PRNG prng(OneBlock);
 
 
@@ -142,7 +143,12 @@ int main(int argc, char**argv)
         };
 
         for (u64 i = 0; i < tries; ++i)
+        {
             program(parties, 44);
+
+        }
+            rt1.processesQueue();
+
 
         chl1.close();
         ep1.stop();
@@ -166,8 +172,11 @@ int main(int argc, char**argv)
         Party(rt0, 1)
     };
 
-    for(u64 i =0; i < tries; ++i)
+    for (u64 i = 0; i < tries; ++i)
+    {
         program(parties, 23);
+    }
+        rt0.processesQueue();
 
 
 

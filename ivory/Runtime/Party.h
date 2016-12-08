@@ -24,6 +24,11 @@ namespace osuCrypto
 
         bool isLocalParty() { return mPartyIdx == mRuntime.getPartyIdx(); }
 
+        Runtime& getRuntime()
+        {
+            return mRuntime;
+        }
+
     private:
         Runtime& mRuntime;
         u64 mPartyIdx;

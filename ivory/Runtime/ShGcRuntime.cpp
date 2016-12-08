@@ -128,6 +128,10 @@ namespace osuCrypto
         case osuCrypto::Op::BitWiseOr:
             throw std::runtime_error(LOCATION);
             break;
+        case osuCrypto::Op::BitwiseNot:
+            item.mCircuit = mLibrary.int_bitInvert(sizes[0]);
+            item.mInputBundleCount = 1;
+            break;
         case osuCrypto::Op::IfElse:
             item.mCircuit = mLibrary.int_int_multiplex(sizes[0]);
             item.mInputBundleCount = 3;
@@ -138,7 +142,7 @@ namespace osuCrypto
         }
 
 
-        process();
+        //process();
 
     }
 
@@ -160,7 +164,7 @@ namespace osuCrypto
         item.mInputVal = value;
         item.mLabels = enc;
 
-        process();
+        //process();
 
     }
 
@@ -180,7 +184,7 @@ namespace osuCrypto
 
         item.mLabels = input.mLabels;
 
-        process();
+        //process();
 
     }
 
@@ -195,7 +199,7 @@ namespace osuCrypto
         item.mLabels = input.mLabels;
         item.mOutputVal = nullptr;
 
-        process();
+        //process();
 
     }
 
@@ -213,11 +217,12 @@ namespace osuCrypto
 
         future = item.mOutputVal->get_future();
 
-        process();
+        //process();
     }
 
-    void ShGcRuntime::process()
+    void ShGcRuntime::processesQueue() 
     {
+    
         // TODO: add logic to decide when to process the queue 
         // and when to simply queue things up. For now,
         // always keep the queue at size 1 or less.
@@ -408,7 +413,9 @@ namespace osuCrypto
 
             sharedGates.resize(item.mCircuit->mNonXorGateCount);
 
-            mChannel->recv(sharedGates.data(), sharedGates.size() * sizeof(GarbledGate<2>));
+
+            if(item.mCircuit->mNonXorGateCount)
+                mChannel->recv(sharedGates.data(), sharedGates.size() * sizeof(GarbledGate<2>));
 
 
             evaluate(*item.mCircuit, sharedMem, mTweaks, sharedGates);

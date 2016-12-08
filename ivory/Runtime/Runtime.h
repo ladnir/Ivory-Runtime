@@ -26,6 +26,7 @@ namespace osuCrypto
         Not,
         BitwiseAnd,
         BitWiseOr,
+        BitwiseNot,
         IfElse
     };
 

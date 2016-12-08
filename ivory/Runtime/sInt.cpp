@@ -37,15 +37,20 @@ namespace osuCrypto
         return *this;
     }
 
+    sInt sInt::operator~()
+    {
+        sInt ret(mRuntime, mBitCount);
+        std::array<RuntimeData*, 2> io{ mData.get(), ret.mData.get() };
+        mRuntime.scheduleOp(Op::BitwiseNot, io);
+
+        return ret;
+    }
+
     sInt sInt::operator+(const sInt& in2)
     {
-
         sInt ret(mRuntime, std::max(mBitCount, in2.mBitCount));
-
         std::array<RuntimeData*, 3> io{ mData.get(), in2.mData.get(), ret.mData.get()};
-
         mRuntime.scheduleOp(Op::Add, io);
-
 
         return ret;
     }
@@ -139,6 +144,7 @@ namespace osuCrypto
 
     sInt::ValueType sInt::getValue()
     {
+        mRuntime.processesQueue();
         if (mValFut)
         {
             mVal = std::move(mValFut->get());
