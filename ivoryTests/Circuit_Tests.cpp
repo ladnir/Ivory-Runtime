@@ -56,6 +56,75 @@ i64 signExtend(i64 v, u64 b, bool print = false)
     }
 }
 
+void Circuit_SequentialOp_Test()
+{
+
+    setThreadName("CP_Test_Thread");
+
+
+    CircuitLibrary lib;
+
+
+    PRNG prng(ZeroBlock);
+    u64 tries = 10;
+
+
+    for (u64 i = 0; i < tries; ++i)
+    {
+
+        u64 aSize = prng.get<u32>() % 24 + 1,
+            bSize = prng.get<u32>() % 24 + 1,
+            cSize = std::min<u64>(prng.get<u32>() % 24 + 1, std::max(aSize, bSize) + 1);
+
+        auto* cirAdd = lib.int_int_add(aSize, bSize, cSize);
+        //auto* cirNeg = lib.int_negate(aSize);
+        auto* cirInv = lib.int_bitInvert(aSize);
+
+
+        i64 a = signExtend(prng.get<i64>(), aSize);
+        i64 b = signExtend(prng.get<i64>(), bSize);
+        i64 c = signExtend((~a + b), cSize);
+
+        std::vector<BitVector> invInputs(1), invOutput(1);
+        invInputs[0].append((u8*)&a, aSize);
+        invOutput[0].resize(aSize);
+
+        cirInv->evaluate(invInputs, invOutput);
+
+
+        std::vector<BitVector> addInputs(2), addOutput(1);
+        addInputs[0] = invOutput[0];
+        addInputs[1].append((u8*)&b, bSize);
+        addOutput[0].resize(cSize);
+
+
+
+        cirAdd->evaluate(addInputs, addOutput);
+
+        i64 cc = 0;
+        memcpy(&cc, addOutput[0].data(), addOutput[0].sizeBytes());
+
+        cc = signExtend(cc, cSize);
+
+        if (cc != c)
+        {
+            std::cout << "i " << i << std::endl;
+
+            BitVector cExp;
+            cExp.append((u8*)&c, cSize);
+            std::cout << "a  : " << invInputs[0] << std::endl;
+            std::cout << "~a : " << addInputs[0] << std::endl;
+            std::cout << "b  : " << addInputs[1] << std::endl;
+            std::cout << "exp: " << cExp << std::endl;
+            std::cout << "act: " << addOutput[0] << std::endl;
+
+            throw UnitTestFail();
+        }
+
+    }
+
+}
+
 void Circuit_int_Adder_Test()
 {
     setThreadName("CP_Test_Thread");

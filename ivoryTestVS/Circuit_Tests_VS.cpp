@@ -12,11 +12,18 @@ namespace libBDXTests
 	{
 	public:
 
-		TEST_METHOD(Circuit_int_Adder)
-		{
+        TEST_METHOD(Circuit_SequentialOp)
+        {
+            InitDebugPrinting();
+            Circuit_SequentialOp_Test();
+        }
+
+
+        TEST_METHOD(Circuit_int_Adder)
+        {
             InitDebugPrinting();
             Circuit_int_Adder_Test();
-		}
+        }
 
         TEST_METHOD(Circuit_uint_Adder)
         {

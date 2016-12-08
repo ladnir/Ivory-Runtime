@@ -109,9 +109,9 @@ void ShGcRuntime_basicArith_Test()
         parties[0].reveal(sub);
         parties[0].reveal(mul);
         parties[0].reveal(div);
-        parties[0].reveal(gteq);
-        parties[0].reveal(lt);
-        parties[0].reveal(max);
+        parties[1].reveal(gteq);
+        parties[1].reveal(lt);
+        parties[1].reveal(max);
 
 
         if (parties[0].isLocalParty())
@@ -120,6 +120,7 @@ void ShGcRuntime_basicArith_Test()
             subResult = sub.getValue();
             mulResult = mul.getValue();
             divResult = div.getValue();
+        }else{
             gteResult = gteq.getValue();
             lstResult = lt.getValue();
             maxresult =  max.getValue() ;
@@ -136,7 +137,7 @@ void ShGcRuntime_basicArith_Test()
     if (divResult != inputVal1 / inputVal0) throw UnitTestFail();
     if (gteResult != inputVal1 >=inputVal0) throw UnitTestFail();
     if (lstResult != inputVal1 < inputVal0) throw UnitTestFail();
-    //if (maxresult != std::max(inputVal0, inputVal1)) throw UnitTestFail();
+    if (maxresult != std::max(inputVal0, inputVal1)) throw UnitTestFail();
 
 }
 

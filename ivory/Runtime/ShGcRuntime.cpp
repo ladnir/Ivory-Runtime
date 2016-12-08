@@ -948,6 +948,19 @@ namespace osuCrypto
 
             }
         }
+
+        for (u64 i = 0; i < cir.mOutputs.size(); ++i)
+        {
+            auto& out = cir.mOutputs[i].mWires;
+
+            for (u64 j = 0; j < out.size(); ++j)
+            {
+                if (cir.mWireFlags[out[j]] == BetaWireFlag::InvWire)
+                {
+                    wires[out[j]] = wires[out[j]] ^ mGlobalOffset;
+                }
+            }
+        }
         //std::cout  << IoStream::unlock;
 
     }

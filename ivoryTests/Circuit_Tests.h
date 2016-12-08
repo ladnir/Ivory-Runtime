@@ -2,6 +2,7 @@
 
 
 
+void Circuit_SequentialOp_Test();
 void Circuit_int_Adder_Test();
 void Circuit_int_Adder_const_Test();
 void Circuit_int_Subtractor_Test();
