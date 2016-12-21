@@ -43,7 +43,7 @@ void program(std::array<Party, 2> parties, i64 myInput)
 
 
     // mark these values as being revealed to party 0
-    // at some point in the future (asychronous).
+    // at some point in the future (asynchronous).
     parties[0].reveal(add);
     parties[0].reveal(sub);
     parties[0].reveal(mul);

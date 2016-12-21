@@ -629,7 +629,7 @@ namespace osuCrypto
                     u64 len = gate.mInput[1];
                     u64 dest = gate.mOutput;
 
-                    memcpy(&*(wires.begin() + dest), &*(wires.begin() + src), len * sizeof(block));
+                    memcpy(&*(wires.begin() + dest), &*(wires.begin() + src),i32( len * sizeof(block)));
 
                 }
                 else if (gt == GateType::Xor || gt == GateType::Nxor)
@@ -877,7 +877,7 @@ namespace osuCrypto
                     u64 len =  gate.mInput[1];
                     u64 dest = gate.mOutput;
 
-                    memcpy(&*(wires.begin() + dest), &*(wires.begin() + src), len * sizeof(block));
+                    memcpy(&*(wires.begin() + dest), &*(wires.begin() + src), u32(len * sizeof(block)));
 
                 }
                 else if (gt == GateType::Xor || gt == GateType::Nxor)

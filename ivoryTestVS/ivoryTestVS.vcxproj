@@ -66,7 +66,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutputPath);$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories);$(libOTeDir)\x64\$(Configuration);C:\libs;C:\libs\cryptopp\x64\Output\$(Configuration);C:\libs\boost\stage\lib\;C:\libs\NTL\x64\$(Configuration);C:\libs\miracl\x64\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libOTe.lib;cryptoTools.lib;Miracl.lib;NTL.lib;cryptlib.lib;ivoryTests.lib;ivory.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SPDZ.lib;libOTe.lib;cryptoTools.lib;Miracl.lib;NTL.lib;cryptlib.lib;ivoryTests.lib;ivory.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -87,7 +87,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutputPath);$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories);$(libOTeDir)\x64\$(Configuration);C:\libs;C:\libs\cryptopp\x64\Output\$(Configuration);C:\libs\boost\stage\lib\;C:\libs\NTL\x64\$(Configuration);C:\libs\miracl\x64\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libOTe.lib;cryptoTools.lib;Miracl.lib;NTL.lib;cryptlib.lib;ivoryTests.lib;ivory.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SPDZ.lib;libOTe.lib;cryptoTools.lib;Miracl.lib;NTL.lib;cryptlib.lib;ivoryTests.lib;ivory.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -100,6 +100,7 @@
     <ClCompile Include="BtChannel_TestsVS.cpp" />
     <ClCompile Include="Circuit_Tests_VS.cpp" />
     <ClCompile Include="ClassicGarbledCircuit_Tests_VS.cpp" />
+    <ClCompile Include="Cope_TestsVS.cpp" />
     <ClCompile Include="HalfGtGarbledCircuit_Tests_VS.cpp" />
     <ClCompile Include="KProbe_Tests_VS.cpp" />
     <ClCompile Include="OT_TestsVS.cpp" />
@@ -108,6 +109,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ZpNumber_TestVS.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

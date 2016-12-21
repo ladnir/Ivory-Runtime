@@ -112,7 +112,7 @@ namespace osuCrypto
         {
             if (constA && constB)
             {
-                u8 val = GateEval(gt, constVal(aIdx), constVal(bIdx));
+                u8 val = GateEval(gt, constVal(aIdx) != 0, constVal(bIdx) != 0);
                 addConst(out, val);
             }
             else
@@ -227,7 +227,7 @@ namespace osuCrypto
                 ++len;
             }
 
-            mGates.emplace_back(*s, len, GateType::a, *d);
+            mGates.emplace_back(*s, u32(len), GateType::a, *d);
             d += len;
             s += len;
         }

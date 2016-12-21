@@ -602,7 +602,7 @@ void Circuit_int_LessThan_Test()
         i64 cc = 0;
         memcpy(&cc, output[0].data(), output[0].sizeBytes());
 
-        if (cc != c)
+        if ((bool)cc != c)
         {
             std::cout << "i " << i << std::endl;
             std::cout << " a : " << inputs[0] << "  " << a << std::endl;

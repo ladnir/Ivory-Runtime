@@ -15,48 +15,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
+    <ClInclude Include="CopeOtExtSender.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
+    <ClInclude Include="CopeOtExtDefines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\ZpField.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CopeOtExtReceiver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="CopeOtExtSender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BtChannel_TestsVS.cpp">
+    <ClCompile Include="Math\ZpField.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OT_TestsVS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AES_TestsVS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BaseOT_TestsVS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HalfGtGarbledCircuit_Tests_VS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="KProbe_Tests_VS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Circuit_Tests_VS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ClassicGarbledCircuit_Tests_VS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ShGcRuntime_TestsVs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ZpNumber_TestVS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Cope_TestsVS.cpp">
+    <ClCompile Include="CopeOtExtReceiver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
