@@ -79,7 +79,7 @@ To build the library, [libOTe](https://github.com/osu-crypto/libOTe) must be bui
 [libOTe setup]
 git clone https://github.com/ladnir/Ivory-Runtime.git
 cd Ivory-Runtime/thirdparty/linux
-./NTL.get
+bash ./ntl.get
 cd ../..
 cmake -G"Unix Makefiles"
 make
