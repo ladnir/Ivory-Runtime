@@ -85,6 +85,10 @@ cmake -G"Unix Makefiles"
 make
 ```
 
+
 This will produce produce several libraries which will need to be linked. In the libOTe directory, the `bin` folder will contain `liblibOTe.a` and `libcryptoTools.a`. In addition to these libraries, the other third party libraries need to be linked. Namely miracl located at `/libOTe/cryptoTools/thirdparty/linux/miracl/miracl/source/libmiracl.a` and boost libraries folder at `libOTe/cryptoTools/thirdparty/linux/boost/stage/lib/`. Finally, the ivory library at `Ivory-Runtime/bin` should also be linked. 
 
 With regards to includes folders, the boost and miracl folders should be included. The  top level of `libOTe` and `libOTe/cryptoTools` must be included and finally `Ivory-Runtime/ivory` should also be included.
+
+
+Similar instruction on windows can be followed with the exception that visual studio solutions are provided in lue of cmake.
