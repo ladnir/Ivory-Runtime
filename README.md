@@ -75,3 +75,12 @@ void program(std::array<Party, 2> parties, i64 myInput)
 ## Building
 
 To build the library, [libOTe](https://github.com/osu-crypto/libOTe) must be built. Follow the instructions on the associated readme. Once build, ensure that Ivory-Runtime and libOTe are contained in the same parent directory.
+```
+[libOTe setup]
+git clone https://github.com/ladnir/Ivory-Runtime.git
+cd Ivory-Runtime/thirdparty/linux
+./NTL.get
+cd ../..
+cmake -G"Unix Makefiles"
+make
+```
