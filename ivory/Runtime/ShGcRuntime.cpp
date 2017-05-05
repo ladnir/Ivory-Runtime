@@ -1,7 +1,7 @@
 #include "ShGcRuntime.h"
-#include "Common/ByteStream.h"
-#include "Base/naor-pinkas.h"
-#include "Common/Log.h"
+#include "cryptoTools/Common/ByteStream.h"
+#include "libOTe/Base/naor-pinkas.h"
+#include "cryptoTools/Common/Log.h"
 namespace osuCrypto
 {
 
@@ -29,9 +29,14 @@ namespace osuCrypto
 
     void ShGcRuntime::copyVar(std::unique_ptr<RuntimeData>& data, RuntimeData * copy)
     {
-        if (data) throw std::runtime_error(LOCATION);
-
-        data.reset(new ShGcRuntimeData(static_cast<ShGcRuntimeData*>(copy)->mLabels->size()));
+        if (data == nullptr)
+        {
+            data.reset(new ShGcRuntimeData(static_cast<ShGcRuntimeData*>(copy)->mLabels->size()));
+        }
+        else if(static_cast<ShGcRuntimeData*>(data.get())->mLabels->size() != static_cast<ShGcRuntimeData*>(copy)->mLabels->size())
+        {
+            throw std::runtime_error("unsupported uperation of assignment with different bit lengths." LOCATION);
+        }
 
         static_cast<ShGcRuntimeData*>(data.get())->mLabels = static_cast<ShGcRuntimeData*>(copy)->mLabels;
     }
@@ -133,6 +138,11 @@ namespace osuCrypto
             item.mInputBundleCount = 1;
             break;
         case osuCrypto::Op::IfElse:
+            if(sizes[0] != sizes[1] || sizes[0] != sizes[3])
+                throw std::runtime_error("IfElse must be performed with variables of the same bit length. " LOCATION);
+            if (sizes[2] != 1)
+                throw std::runtime_error(LOCATION);
+
             item.mCircuit = mLibrary.int_int_multiplex(sizes[0]);
             item.mInputBundleCount = 3;
             break;

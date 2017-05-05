@@ -1,7 +1,7 @@
 #include "HalfGtGarbledCircuit.h"
-#include "Network/Channel.h"
-#include "Common/ByteStream.h"
-#include "Common/Log.h"
+#include "cryptoTools/Network/Channel.h"
+#include "cryptoTools/Common/ByteStream.h"
+#include "cryptoTools/Common/Log.h"
 #include <cassert>
 
 namespace osuCrypto 

@@ -1,6 +1,6 @@
 #include "Circuit.h"
 #include "Gate.h"
-#include "Common/Log.h"
+#include "cryptoTools/Common/Log.h"
 #include <sstream>
 #include <unordered_map>
 #include <set>
@@ -203,13 +203,13 @@ namespace osuCrypto {
 	{
 		return ArrayView<u64>(mOutputs.begin(), mOutputs.end());
 	}
-	ArrayView<u64> Circuit::getInputIndices()
+    std::vector<u64> Circuit::getInputIndices()
 	{
-		auto begin = new u64[mInputs[0] + mInputs[1]];
+		auto begin = std::vector<u64>(mInputs[0] + mInputs[1]);
 		for (u64 i = 0; i < mInputs[0] + mInputs[1]; ++i)
 			begin[i] = i;
 
-		return ArrayView<u64>(begin, begin + mInputs[0] + mInputs[1], true);
+        return begin;
 		//return ArrayView<u64>(mInputs.begin(), mInputs.end());
 	}
 	u64 Circuit::getInternalWireBuffSize() const

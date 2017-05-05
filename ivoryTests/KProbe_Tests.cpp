@@ -1,9 +1,9 @@
 #include "KProbe_Tests.h"
 
 #include "Common.h"
-#include "Common/Defines.h"
+#include "cryptoTools/Common/Defines.h"
 #include "GarbledCircuit/KProbeResistant.h"
-#include "Common/Log.h"
+#include "cryptoTools/Common/Log.h"
 #include <fstream>
 
 #include "Circuit/Gate.h"

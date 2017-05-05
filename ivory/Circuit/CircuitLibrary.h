@@ -1,8 +1,8 @@
 #pragma once
 #include "BetaCircuit.h"
-#include "Common/Defines.h"
+#include "cryptoTools/Common/Defines.h"
 #include <unordered_map>
-#include "Common/BitVector.h"
+#include "cryptoTools/Common/BitVector.h"
 
 namespace osuCrypto
 {

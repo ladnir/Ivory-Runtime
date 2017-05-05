@@ -1,7 +1,7 @@
 #pragma once
 #include "Runtime/Runtime.h"
-#include "Network/Channel.h"
-#include "Common/BitVector.h"
+#include "cryptoTools/Network/Channel.h"
+#include "cryptoTools/Common/BitVector.h"
 
 namespace osuCrypto
 {

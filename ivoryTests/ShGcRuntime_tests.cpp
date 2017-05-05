@@ -2,9 +2,9 @@
 #include "Runtime/Party.h"
 #include "Runtime/sInt.h"
 #include <functional>
-#include "Network/BtIOService.h"
-#include "Network/BtEndpoint.h"
-#include  "Common/Log.h"
+#include "cryptoTools/Network/IOService.h"
+#include "cryptoTools/Network/Endpoint.h"
+#include "cryptoTools/Common/Log.h"
 
 #include "Common.h"
 
@@ -14,14 +14,14 @@ void runProgram(std::function<void(Runtime&)>  program)
 {
     PRNG prng(OneBlock);
 
-    BtIOService ios(0);
+    IOService ios(0);
 
 
     std::thread thrd([&]() {
         setThreadName("party1");
 
-        BtEndpoint ep1(ios, "127.0.0.1:1212", false, "n");
-        Channel& chl1 = ep1.addChannel("n");
+        Endpoint ep1(ios, "127.0.0.1:1212", EpMode::Client, "n");
+        Channel chl1 = ep1.addChannel("n");
         PRNG prng(ZeroBlock);
 
         ShGcRuntime rt1;
@@ -37,8 +37,8 @@ void runProgram(std::function<void(Runtime&)>  program)
     });
 
     setThreadName("party0");
-    BtEndpoint ep0(ios, "127.0.0.1:1212", true, "n");
-    Channel& chl0 = ep0.addChannel("n");
+    Endpoint ep0(ios, "127.0.0.1:1212", EpMode::Server, "n");
+    Channel chl0 = ep0.addChannel("n");
     ShGcRuntime rt0;
     rt0.init(chl0, prng.get<block>(), ShGcRuntime::Garbler, 0);
 

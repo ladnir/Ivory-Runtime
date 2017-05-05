@@ -23,35 +23,35 @@ set(CMAKE_CXX_FLAGS  "${CMAKE_C_FLAGS}  -std=c++14")
 
 # default location for libOTe
 set(libOTe_Dirs "${CMAKE_SOURCE_DIR}/../libOTe/")
-include_directories("${libOTe_Dirs}/libOTe/") 
-link_directories("${libOTe_Dirs}/lib/")
+#include_directories("${libOTe_Dirs}/libOTe/") 
+#link_directories("${libOTe_Dirs}/lib/")
 
 # default location for miracl
-set(Miracl_Dirs "${CMAKE_SOURCE_DIR}/thirdparty/linux/miracl/")
-include_directories("${Miracl_Dirs}") 
-link_directories("${Miracl_Dirs}/miracl/source/")
+#set(Miracl_Dirs "${CMAKE_SOURCE_DIR}/thirdparty/linux/miracl/")
+#include_directories("${Miracl_Dirs}") 
+#link_directories("${Miracl_Dirs}/miracl/source/")
 
 # default location for NTL
 set(NTL_Dirs "${CMAKE_SOURCE_DIR}/thirdparty/linux/ntl/")
-include_directories("${NTL_Dirs}/include/")
-link_directories("${NTL_Dirs}/src/") 
+#include_directories("${NTL_Dirs}/include/")
+#link_directories("${NTL_Dirs}/src/") 
 
 # default location for Boost
-set(BOOST_ROOT "${CMAKE_SOURCE_DIR}/thirdparty/linux/boost/")
+#set(BOOST_ROOT "${CMAKE_SOURCE_DIR}/thirdparty/linux/boost/")
 
 
 #############################################
 #            Build cryptoTools              #
 #############################################
-add_subdirectory(cryptoTools)
-include_directories(cryptoTools)
+#add_subdirectory(../libOTe)
+#include_directories(cryptoTools)
 
 
 #############################################
 #               Build ivory                 #
 #############################################
 add_subdirectory(ivory)
-include_directories(ivory)
+#include_directories(ivory)
 
 
 #############################################
@@ -67,11 +67,6 @@ include_directories(ivoryTests)
 #add_subdirectory(frontend)
 file(GLOB_RECURSE SRC_FRONTEND ${CMAKE_SOURCE_DIR}/frontend/*.cpp)
 add_executable(frontend.exe  ${SRC_FRONTEND})
-
-
-#############################################
-#            Link our libraries             #
-#############################################
 target_link_libraries(frontend.exe ivoryTests)
 target_link_libraries(frontend.exe ivory)
 

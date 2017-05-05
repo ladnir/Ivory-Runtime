@@ -1,8 +1,8 @@
 #pragma once
-#include "TwoChooseOne/OTExtInterface.h"
-#include "Common/Defines.h"
+#include "libOTe/TwoChooseOne/OTExtInterface.h"
+#include "cryptoTools/Common/Defines.h"
 #include <unordered_map> 
-#include "Crypto/PRNG.h"
+#include "cryptoTools/Crypto/PRNG.h"
 
 using namespace osuCrypto;
 

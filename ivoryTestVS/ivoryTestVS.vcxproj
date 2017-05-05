@@ -57,7 +57,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)/cryptoTools;$(SolutionDir)ivoryTests;$(SolutionDir)ivory;$(VCInstallDir)UnitTest\include;C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(libOTeDir)/cryptoTools;$(ProjectDir)/../ivoryTests;$(ProjectDir)/../ivory;$(VCInstallDir)UnitTest\include;C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SOLUTION_DIR=R"**($(SolutionDir))**";_WIN32_WINNT=0x0501;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -65,8 +65,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OutputPath);$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories);$(libOTeDir)\x64\$(Configuration);C:\libs;C:\libs\cryptopp\x64\Output\$(Configuration);C:\libs\boost\stage\lib\;C:\libs\NTL\x64\$(Configuration);C:\libs\miracl\x64\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SPDZ.lib;libOTe.lib;cryptoTools.lib;Miracl.lib;NTL.lib;cryptlib.lib;ivoryTests.lib;ivory.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutputPath);$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories);$(libOTeDir)\x64\$(Configuration);C:\libs;C:\libs\cryptopp\x64\Output\$(Configuration);C:\libs\boost\stage\lib\;$(ProjectDir)/../thirdparty/win/NTL/x64/$(Configuration);C:\libs\NTL\x64\$(Configuration);C:\libs\miracl\x64\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SPDZ.lib;libOTe.lib;cryptoTools.lib;Miracl.lib;NTL.lib;ivoryTests.lib;ivory.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -76,7 +76,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir)/cryptoTools;$(SolutionDir)ivoryTests;$(SolutionDir)ivory;$(VCInstallDir)UnitTest\include;C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(libOTeDir)/cryptoTools;$(ProjectDir)/../ivoryTests;$(ProjectDir)/../ivory;$(VCInstallDir)UnitTest\include;C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SOLUTION_DIR=R"**($(SolutionDir))**";_WIN32_WINNT=0x0501;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -86,8 +86,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OutputPath);$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories);$(libOTeDir)\x64\$(Configuration);C:\libs;C:\libs\cryptopp\x64\Output\$(Configuration);C:\libs\boost\stage\lib\;C:\libs\NTL\x64\$(Configuration);C:\libs\miracl\x64\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SPDZ.lib;libOTe.lib;cryptoTools.lib;Miracl.lib;NTL.lib;cryptlib.lib;ivoryTests.lib;ivory.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutputPath);$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories);$(libOTeDir)\x64\$(Configuration);C:\libs;C:\libs\cryptopp\x64\Output\$(Configuration);C:\libs\boost\stage\lib\;$(ProjectDir)/../thirdparty/win/NTL/x64/$(Configuration);C:\libs\NTL\x64\$(Configuration);C:\libs\miracl\x64\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SPDZ.lib;libOTe.lib;cryptoTools.lib;Miracl.lib;NTL.lib;ivoryTests.lib;ivory.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -95,15 +95,11 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AES_TestsVS.cpp" />
-    <ClCompile Include="BaseOT_TestsVS.cpp" />
-    <ClCompile Include="BtChannel_TestsVS.cpp" />
     <ClCompile Include="Circuit_Tests_VS.cpp" />
     <ClCompile Include="ClassicGarbledCircuit_Tests_VS.cpp" />
     <ClCompile Include="Cope_TestsVS.cpp" />
     <ClCompile Include="HalfGtGarbledCircuit_Tests_VS.cpp" />
     <ClCompile Include="KProbe_Tests_VS.cpp" />
-    <ClCompile Include="OT_TestsVS.cpp" />
     <ClCompile Include="ShGcRuntime_TestsVs.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

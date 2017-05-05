@@ -1,9 +1,9 @@
 #pragma once
 #include "GarbledCircuit.h"
 #include <unordered_map>
-#include "Common/Defines.h"
-#include "Crypto/AES.h"
-#include "Common/BitVector.h"
+#include "cryptoTools/Common/Defines.h"
+#include "cryptoTools/Crypto/AES.h"
+#include "cryptoTools/Common/BitVector.h"
 #include "Circuit/Circuit.h"
 //#include "Runtime/AlphaCircuit.h"
 

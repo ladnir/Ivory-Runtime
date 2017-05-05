@@ -1,9 +1,9 @@
 #include "OTOracleReceiver.h"
-#include "Common/Exceptions.h"
-#include "Common/Log.h"
-#include "Common/ArrayView.h"
-#include "Common/BitVector.h"
-#include "Network/Channel.h"
+#include "cryptoTools/Common/Exceptions.h"
+#include "cryptoTools/Common/Log.h"
+#include "cryptoTools/Common/ArrayView.h"
+#include "cryptoTools/Common/BitVector.h"
+#include "cryptoTools/Network/Channel.h"
 using namespace osuCrypto;
 
 

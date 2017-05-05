@@ -1,7 +1,7 @@
 #include "HalfGtGarbledCircuit_Tests.h"
 
-#include "Network/BtChannel.h"
-#include "Network/BtEndpoint.h"
+#include "cryptoTools/Network/Channel.h"
+#include "cryptoTools/Network/Endpoint.h"
 
 #include "GarbledCircuit/GarbledCircuit.h"
 #include "GarbledCircuit/HalfGtGarbledCircuit.h"
@@ -11,8 +11,8 @@
 #include "Common.h"
 #include <array>
 #include "DebugCircuits.h"
-#include "Crypto/PRNG.h"
-#include "Common/Log.h"
+#include "cryptoTools/Crypto/PRNG.h"
+#include "cryptoTools/Common/Log.h"
 
 
 using namespace osuCrypto;
@@ -176,11 +176,11 @@ void HalfGtGC_Stream_BitAdder_Test_Impl()
 	block seed = _mm_set_epi32(4253465, 3434565, 234435, 23987045);
 	Circuit cd = AdderCircuit(bits);
 
-	BtIOService ios(0);
-	BtEndpoint ep0(ios, "127.0.0.1", 1212, true, "ep");
-	BtEndpoint ep1(ios, "127.0.0.1", 1212, false, "ep");
-	Channel& senderChannel = ep1.addChannel("chl", "chl");
-	Channel& recvChannel = ep0.addChannel("chl", "chl");
+	IOService ios(0);
+	Endpoint ep0(ios, "127.0.0.1", 1212, EpMode::Server, "ep");
+	Endpoint ep1(ios, "127.0.0.1", 1212, EpMode::Client, "ep");
+	Channel senderChannel = ep1.addChannel("chl", "chl");
+	Channel recvChannel = ep0.addChannel("chl", "chl");
 
 	std::vector<block> wireBuff(cd.WireCount());
 

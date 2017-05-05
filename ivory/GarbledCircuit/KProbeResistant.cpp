@@ -1,7 +1,7 @@
-#include "Common/BitVector.h"
+#include "cryptoTools/Common/BitVector.h"
 #include "KProbeResistant.h"
 #include <fstream>
-#include "Common/Log.h"
+#include "cryptoTools/Common/Log.h"
 
 #include "NTL/GF2.h"
 #include "NTL/GF2X.h"

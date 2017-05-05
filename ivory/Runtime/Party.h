@@ -1,6 +1,6 @@
 #pragma once
 #include "Runtime/Runtime.h"
-#include "Common/Defines.h"
+#include "cryptoTools/Common/Defines.h"
 #include <future>
 
 namespace osuCrypto

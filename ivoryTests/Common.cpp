@@ -1,7 +1,7 @@
 #include "Common.h"
 #include <fstream>
 #include <cassert>
-#include "Common/Log.h"
+#include "cryptoTools/Common/Log.h"
 
 using namespace osuCrypto;
 

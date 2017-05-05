@@ -1,7 +1,7 @@
 #include "BetaCircuit.h"
 #include <vector>
 #include <unordered_map>
-#include "Common/BitVector.h"
+#include "cryptoTools/Common/BitVector.h"
 namespace osuCrypto
 {
 
@@ -50,7 +50,7 @@ namespace osuCrypto
         mOutputs.push_back(out);
     }
 
-    void BetaCircuit::addConstBundle(BetaBundle & in, BitVector& val)
+    void BetaCircuit::addConstBundle(BetaBundle & in, const BitVector& val)
     {
         mWireFlags.resize(mWireCount + in.mWires.size(), BetaWireFlag::Wire);
 

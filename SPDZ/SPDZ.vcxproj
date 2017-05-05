@@ -49,7 +49,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)/cryptoTools;$(libOTeDir)/libOTe;$(ProjectDir);$(SolutionDir)thirdparty/win/boost;$(SolutionDir)thirdparty/win/;C:/libs/boost;C:\Program Files (x86)\Visual Leak Detector\include;$(SolutionDir)/thirdparty/win/miracl;C:/libs/miracl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(libOTeDir)/cryptoTools;$(libOTeDir);$(ProjectDir);$(libOTeDir)/cryptoTools/thirdparty/win/boost;$(libOTeDir)/cryptoTools/thirdparty/win/;$(libOTeDir)/cryptoTools/thirdparty/win/miracl;C:/libs/boost;C:/libs/miracl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -60,7 +60,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)/cryptoTools;$(libOTeDir)/libOTe;$(ProjectDir);$(SolutionDir)thirdparty/win/boost;$(SolutionDir)thirdparty/win/;C:/libs/boost;C:\Program Files (x86)\Visual Leak Detector\include;$(SolutionDir)/thirdparty/win/miracl;C:/libs/miracl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(libOTeDir)/cryptoTools;$(libOTeDir);$(ProjectDir);$(libOTeDir)/cryptoTools/thirdparty/win/boost;$(libOTeDir)/cryptoTools/thirdparty/win/;$(libOTeDir)/cryptoTools/thirdparty/win/miracl;C:/libs/boost;C:/libs/miracl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>

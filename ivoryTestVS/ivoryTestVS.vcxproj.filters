@@ -26,18 +26,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BtChannel_TestsVS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OT_TestsVS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AES_TestsVS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BaseOT_TestsVS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="HalfGtGarbledCircuit_Tests_VS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

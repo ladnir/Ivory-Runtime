@@ -3,8 +3,8 @@
 #include <iostream>
 #include <vector>
 #include "Gate.h"
-#include "Common/Defines.h"
-#include "Common/BitVector.h"
+#include "cryptoTools/Common/Defines.h"
+#include "cryptoTools/Common/BitVector.h"
 //#include "Circuit/CircuitStream.h"
 
 namespace osuCrypto {
@@ -75,7 +75,7 @@ namespace osuCrypto {
 		bool hasMoreGates() ;
 		ArrayView<Gate> getMoreGates() ;
 		ArrayView<u64> getOutputIndices() ;
-		ArrayView<u64> getInputIndices() ;
+		std::vector<u64> getInputIndices() ;
 
 		u64 getInternalWireBuffSize() const ;
 		u64 getInputWireBuffSize() const ;

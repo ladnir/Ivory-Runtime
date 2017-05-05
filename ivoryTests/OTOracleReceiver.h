@@ -1,5 +1,5 @@
 #pragma once
-#include "TwoChooseOne/OTExtInterface.h"
+#include "libOTe/TwoChooseOne/OTExtInterface.h"
 #include <unordered_set>
 #include "OTOracleSender.h"
 

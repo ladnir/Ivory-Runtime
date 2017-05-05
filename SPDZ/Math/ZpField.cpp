@@ -185,12 +185,13 @@ namespace osuCrypto
         return *this;
     }
 
-    ZpNumber & ZpNumber::powEq(int pow)
+    ZpNumber & ZpNumber::powEq(int p)
     {
         //ZpNumber v(*mField, pow);
-        big v= mirvar(mField->mMiracl, 0);
-        convert(mField->mMiracl, pow, v);
-        nres_powmod(mField->mMiracl, mVal, v, mVal);
+        *this = pow(p);
+        //big v= mirvar(mField->mMiracl, 0);
+        //convert(mField->mMiracl, pow, v);
+        //nres_powmod(mField->mMiracl, mVal, v, mVal);
         return *this;
     }
 

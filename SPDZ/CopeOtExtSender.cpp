@@ -1,11 +1,11 @@
 #include "CopeOtExtSender.h"
 
 #include "CopeOtExtDefines.h"
-#include  "Crypto/Commit.h"
-#include "Tools/Tools.h"
+#include "cryptoTools/Crypto/Commit.h"
+#include "libOTe/Tools/Tools.h"
 #include "Math/ZpField.h"
 
-#include "Common/Log.h"
+#include "cryptoTools/Common/Log.h"
 namespace osuCrypto
 {
 

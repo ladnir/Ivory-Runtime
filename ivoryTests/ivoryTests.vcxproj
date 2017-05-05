@@ -49,7 +49,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(libOTeDir)/libOTe;$(SolutionDir)\cryptoTools;$(SolutionDir)/SPDZ;$(SolutionDir)/ivory;$(ProjectDir);C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(libOTeDir);$(libOTeDir)/cryptoTools;$(ProjectDir)/../SPDZ;$(ProjectDir)/../ivory;$(ProjectDir);C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SOLUTION_DIR=R"**($(SolutionDir))**";_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -64,7 +64,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(libOTeDir)/libOTe;$(SolutionDir)\cryptoTools;$(SolutionDir)/SPDZ;$(SolutionDir)/ivory;$(ProjectDir);C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(libOTeDir);$(libOTeDir)/cryptoTools;$(ProjectDir)/../SPDZ;$(ProjectDir)/../ivory;$(ProjectDir);C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SOLUTION_DIR=R"**($(SolutionDir))**";_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -75,9 +75,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AES_Tests.h" />
-    <ClInclude Include="BaseOT_Tests.h" />
-    <ClInclude Include="BtChannel_Tests.h" />
     <ClInclude Include="Circuit_Tests.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Cope_Tests.h" />
@@ -86,14 +83,10 @@
     <ClInclude Include="KProbe_Tests.h" />
     <ClInclude Include="OTOracleReceiver.h" />
     <ClInclude Include="OTOracleSender.h" />
-    <ClInclude Include="OT_Tests.h" />
     <ClInclude Include="ShGcRuntime_tests.h" />
     <ClInclude Include="ZpNumber_Tests.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AES_Tests.cpp" />
-    <ClCompile Include="BaseOT_Tests.cpp" />
-    <ClCompile Include="BtChannel_Tests.cpp" />
     <ClCompile Include="Circuit_Tests.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Cope_Tests.cpp" />
@@ -102,7 +95,6 @@
     <ClCompile Include="KProbe_Tests.cpp" />
     <ClCompile Include="OTOracleReceiver.cpp" />
     <ClCompile Include="OTOracleSender.cpp" />
-    <ClCompile Include="OT_Tests.cpp" />
     <ClCompile Include="ShGcRuntime_tests.cpp" />
     <ClCompile Include="ZpNumber_Tests.cpp" />
   </ItemGroup>

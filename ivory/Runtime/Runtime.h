@@ -1,6 +1,6 @@
 #pragma once
-#include "Common/Defines.h"
-#include "Common/ArrayView.h"
+#include "cryptoTools/Common/Defines.h"
+#include "cryptoTools/Common/ArrayView.h"
 #include <future>
 #include <memory>
 

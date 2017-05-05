@@ -1,71 +1,39 @@
-#include "Network/BtIOService.h"
-#include "Network/BtEndpoint.h"
+#include "cryptoTools/Network/IOService.h"
+#include "cryptoTools/Network/Endpoint.h"
 
 #include <fstream>
 #include <iostream>
-#include "Common/Log.h"
-#include "Common/Timer.h"
+#include "cryptoTools/Common/Log.h"
+#include "cryptoTools/Common/Timer.h"
 #include "Runtime/ShGcRuntime.h"
 #include "Runtime/ClearRuntime.h"
 #include "Runtime/sInt.h"
 #include "Runtime/Party.h"
 
 #include <string>
-#include "Crypto/PRNG.h"
+#include "cryptoTools/Crypto/PRNG.h"
 
 using namespace osuCrypto;
-
-
-void multTest()
-{
-    CircuitLibrary lib;
-    u64 bitCount = 32;
-
-    auto cir = lib.int_int_mult(bitCount, bitCount, bitCount);
-
-    for (i32 a = 0; a < 100; ++a)
-    {
-        for (i32 b = 0; b < 100; ++b)
-        {
-            std::vector<BitVector> input(2);
-            std::vector<BitVector> output(1);
-
-            input[0].append((u8*)&a, bitCount);
-            input[1].append((u8*)&b, bitCount);
-
-            output[0] = BitVector(bitCount);
-
-            cir->evaluate(input, output);
-
-            output[0].reserve(32);
-            i32 c = *(u32*)output[0].data();
-
-            if (c != ((a * b) & (1 << bitCount)))
-            {
-                std::cout << "bad " << c << "  " << (a*b) << "  " << a << " " << b << std::endl;
-                return;
-            }
-        }
-    }
-}
-
 
 i32 program(std::array<Party, 2> parties, i64 myInput)
 {
     // choose how large the arithmetic should be.
-    u64 bitCount0 = 16;
-    u64 bitCount1 = 32;
+    u64 bitCount = 16;
 
-    // get the two input variables. If this party is
-    // the local party, then lets use our input value.
-    // Otherwise the remote party will provide the value.
+    // get the two input variables. If this party is the local party, then 
+    // lets use our input value. Otherwise the remote party will provide the value.
+    // In addition, the bitCount parameter means a value with that many bits
+    // will fit into this secure variable. However, the runtime reserver the right
+    // to increase the bits or to use something like a prime feild, in which case
+    // the exact wrap around point is undefined. However, the binary circuit base runtimes
+    // will always use exactly that many bits.
     auto input0 = parties[0].isLocalParty() ?
-        parties[0].input<sInt>(myInput, bitCount0) :
-        parties[0].input<sInt>(bitCount0);
+        parties[0].input<sInt>(myInput, bitCount) :
+        parties[0].input<sInt>(bitCount);
 
     auto input1 = parties[1].isLocalParty() ?
-        parties[1].input<sInt>(myInput, bitCount1) :
-        parties[1].input<sInt>(bitCount1);
+        parties[1].input<sInt>(myInput, bitCount) :
+        parties[1].input<sInt>(bitCount);
 
 
     // perform some computation
@@ -81,8 +49,10 @@ i32 program(std::array<Party, 2> parties, i64 myInput)
 
     auto max = gteq.ifelse(input1, input0);
 
+    input0 = input0 + input1;
 
-    // reveal this output to party 0 and then party 1.
+
+    // reveal this output to party 0.
     parties[0].reveal(add);
     parties[0].reveal(sub);
     parties[0].reveal(mul);
@@ -103,87 +73,92 @@ i32 program(std::array<Party, 2> parties, i64 myInput)
         std::cout << "max  " << max.getValue() << std::endl;
     }
 
-    parties[0].getRuntime().processesQueue();
+    // operations can get queued up in the background. Eventually this call should not
+    // be required but in the mean time, if one party does not call getValue(), then
+    // processesQueue() should be called.
+    parties[1].getRuntime().processesQueue();
 
-    // Get the value what was just revealed to us.
+
     return 0;
 }
 
 int main(int argc, char**argv)
 {
-    //multTest();
-    //return 0;
     u64 tries(2);
     PRNG prng(OneBlock);
 
+    // IOSerive will perform the networking operations in the background
+    IOService ios;
 
-
-    BtIOService ios(0);
-
-
+    // We need each party to be in its own thread.
     std::thread thrd([&]() {
 
+        // Endpoint represents one end of a connection. It facilitates the
+        // create of sockets that all bind to this port. First we pas it the 
+        // IOSerive and then the server's IP:port number. Next we state that 
+        // this endpoint should act as a server (listens to the provided port)
+        // Finally, to identify who is connecting, a name for this connect is 
+        // given, in this case it is called "n". For any given server, the name
+        // of the endpoint must be unique.
+        Endpoint ep1(ios, "127.0.0.1:1212", EpMode::Server, "n");
 
-        setThreadName("party1");
+        // We can now create a socket. This is done with addChannel. This operation 
+        // is asynchronous. If additional connections are needed between the 
+        // two parties, call addChannel again but with a different channel name.
+        Channel chl1 = ep1.addChannel("n");
 
+        // this is an opertional call that blocks until the socket has successfully 
+        // been set up.
+        chl1.waitForConnection();
 
-
-        BtEndpoint ep1(ios, "127.0.0.1:1212", false, "n");
-        Channel& chl1 = ep1.addChannel("n");
-
+        // We will need a random number generator. Should pas it a real seed.
         PRNG prng(ZeroBlock);
 
+        // In this example, we will use the semi-honest Garbled Circuit
+        // runtime. Once constructed, init should be called. We need to
+        // provide the runtime the channel that it will use to communicate 
+        // with the other party, a seed, what mode it should run in, and 
+        // the local party index. 
         ShGcRuntime rt1;
         rt1.init(chl1, prng.get<block>(), ShGcRuntime::Evaluator, 1);
 
-
+        // We can then instantiate the parties that will be running the protocol.
         std::array<Party, 2> parties{
             Party(rt1, 0),
             Party(rt1, 1)
         };
 
+        // Next, lets call the main "program" several times.
         for (u64 i = 0; i < tries; ++i)
         {
+            // the prgram take the parties that are participating and the input
+            // of the local party, in this case its 44.
             program(parties, 44);
-
         }
-            rt1.processesQueue();
-
-
-        chl1.close();
-        ep1.stop();
-
     });
 
-    setThreadName("party0");
 
+    // set up networking. See above for details
+    Endpoint ep0(ios, "127.0.0.1:1212", EpMode::Client, "n");
+    Channel chl0 = ep0.addChannel("n");
 
-
-    BtEndpoint ep0(ios, "127.0.0.1:1212", true, "n");
-    Channel& chl0 = ep0.addChannel("n");
-
-
+    // set up the runtime, see above for details
     ShGcRuntime rt0;
     rt0.init(chl0, prng.get<block>(), ShGcRuntime::Garbler, 0);
 
-
+    // instantiate the parties
     std::array<Party, 2> parties{
         Party(rt0, 0),
         Party(rt0, 1)
     };
 
+    // run the program serveral time, with time with 23 as the input value
     for (u64 i = 0; i < tries; ++i)
     {
         program(parties, 23);
     }
-        rt0.processesQueue();
-
-
 
     thrd.join();
-    chl0.close();
-    ep0.stop();
-    ios.stop();
     return 0;
 }
 

@@ -1,7 +1,7 @@
 #pragma once
-#include "TwoChooseOne/OTExtInterface.h"
-#include  "Common/BitVector.h"
-#include "Crypto/PRNG.h"
+#include "libOTe/TwoChooseOne/OTExtInterface.h"
+#include "cryptoTools/Common/BitVector.h"
+#include "cryptoTools/Crypto/PRNG.h"
 #include "Math/ZpField.h"
 
 

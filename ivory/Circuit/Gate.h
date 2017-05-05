@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "Common/Defines.h"
+#include "cryptoTools/Common/Defines.h"
 #include <array>
 
 namespace osuCrypto {

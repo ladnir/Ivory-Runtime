@@ -2,9 +2,9 @@
 
 
 #include "Circuit/Gate.h"
-#include "Common/Defines.h"
+#include "cryptoTools/Common/Defines.h"
 #include <array>
-#include  "Common/ArrayView.h"
+#include "cryptoTools/Common/ArrayView.h"
 
 namespace osuCrypto
 {
@@ -80,7 +80,7 @@ namespace osuCrypto
 		void addTempWireBundle(BetaBundle& in);
 		void addInputBundle(BetaBundle& in);
         void addOutputBundle(BetaBundle& in);
-        void addConstBundle(BetaBundle& in, BitVector& val);
+        void addConstBundle(BetaBundle& in, const BitVector& val);
 
 		void addGate(BetaWire in0, BetaWire in2, GateType gt, BetaWire out);
         void addConst(BetaWire wire, u8 val);

@@ -1,7 +1,7 @@
 #pragma once
-#include "Common/Defines.h"
-#include "Common/BitVector.h"
-#include "Crypto/PRNG.h"
+#include "cryptoTools/Common/Defines.h"
+#include "cryptoTools/Common/BitVector.h"
+#include "cryptoTools/Crypto/PRNG.h"
 #include <vector>
 
 #define ENCODABLE_KPROBE

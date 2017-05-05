@@ -2,12 +2,12 @@
 #include "Runtime/Runtime.h"
 #include "Circuit/Circuit.h"
 #include "Circuit/BetaCircuit.h"
-#include "Common/ArrayView.h"
+#include "cryptoTools/Common/ArrayView.h"
 //#include "boost/lockfree/spsc_queue.hpp"
 #include <queue>
-#include "TwoChooseOne/IknpOtExtSender.h"
-#include "Common/ByteStream.h"
-#include "TwoChooseOne/IknpOtExtReceiver.h"
+#include "libOTe/TwoChooseOne/IknpOtExtSender.h"
+#include "libOTe/TwoChooseOne/IknpOtExtReceiver.h"
+#include "cryptoTools/Common/ByteStream.h"
 #include "Circuit/CircuitLibrary.h"
 
 

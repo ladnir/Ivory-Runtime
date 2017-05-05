@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "Common/Defines.h"
+#include "cryptoTools/Common/Defines.h"
 
 void InitDebugPrinting(std::string file = SOLUTION_DIR"/unitTest.txt");
  
