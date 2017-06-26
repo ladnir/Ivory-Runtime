@@ -1,6 +1,6 @@
 #pragma once
 #include "cryptoTools/Common/Defines.h"
-#include "Circuit/Circuit.h"
+#include "ivory/Circuit/Circuit.h"
 #include <istream>
 #include <ostream>
 #include <functional>

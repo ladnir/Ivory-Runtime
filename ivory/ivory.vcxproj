@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -19,13 +19,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -49,7 +49,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(libOTeDir);$(libOTeDir)/cryptoTools;$(ProjectDir)/../thirdparty/win/NTL/include;C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../;$(libOTeDir);$(libOTeDir)/cryptoTools;$(ProjectDir)/../thirdparty/win/NTL/include;C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -61,7 +61,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(libOTeDir);$(libOTeDir)/cryptoTools;$(ProjectDir)/../thirdparty/win/NTL/include;C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../;$(libOTeDir);$(libOTeDir)/cryptoTools;$(ProjectDir)/../thirdparty/win/NTL/include;C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -74,12 +74,12 @@
     <ClCompile Include="Circuit\BetaCircuit.cpp" />
     <ClCompile Include="Circuit\Circuit.cpp" />
     <ClCompile Include="Circuit\CircuitLibrary.cpp" />
-    <ClCompile Include="GarbledCircuit\HalfGtGarbledCircuit.cpp" />
-    <ClCompile Include="GarbledCircuit\KProbeResistant.cpp" />
-    <ClCompile Include="Runtime\ClearRuntime.cpp" />
     <ClCompile Include="Runtime\Party.cpp" />
+    <ClCompile Include="Runtime\Public\PublicInt.cpp" />
+    <ClCompile Include="Runtime\ShGc\ShGcInt.cpp" />
+    <ClCompile Include="Runtime\ShGc\utils.cpp" />
     <ClCompile Include="Runtime\sInt.cpp" />
-    <ClCompile Include="Runtime\ShGcRuntime.cpp" />
+    <ClCompile Include="Runtime\ShGc\ShGcRuntime.cpp" />
     <ClCompile Include="Runtime\Runtime.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -87,13 +87,12 @@
     <ClInclude Include="Circuit\Circuit.h" />
     <ClInclude Include="Circuit\CircuitLibrary.h" />
     <ClInclude Include="Circuit\Gate.h" />
-    <ClInclude Include="GarbledCircuit\GarbledCircuit.h" />
-    <ClInclude Include="GarbledCircuit\HalfGtGarbledCircuit.h" />
-    <ClInclude Include="GarbledCircuit\KProbeResistant.h" />
-    <ClInclude Include="Runtime\ClearRuntime.h" />
     <ClInclude Include="Runtime\Party.h" />
+    <ClInclude Include="Runtime\Public\PublicInt.h" />
+    <ClInclude Include="Runtime\ShGc\ShGcInt.h" />
+    <ClInclude Include="Runtime\ShGc\utils.h" />
     <ClInclude Include="Runtime\sInt.h" />
-    <ClInclude Include="Runtime\ShGcRuntime.h" />
+    <ClInclude Include="Runtime\ShGc\ShGcRuntime.h" />
     <ClInclude Include="Runtime\Runtime.h" />
   </ItemGroup>
   <ItemGroup>

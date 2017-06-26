@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "Circuit/Gate.h"
+#include "ivory/Circuit/Gate.h"
 #include "cryptoTools/Common/Defines.h"
 #include <array>
 #include "cryptoTools/Common/ArrayView.h"

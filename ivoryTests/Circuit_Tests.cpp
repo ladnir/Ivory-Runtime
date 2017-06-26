@@ -1,6 +1,6 @@
 #include "Circuit_Tests.h"
 
-#include "Circuit/CircuitLibrary.h"
+#include "ivory/Circuit/CircuitLibrary.h"
 
 #include <fstream>
 #include "Common.h"

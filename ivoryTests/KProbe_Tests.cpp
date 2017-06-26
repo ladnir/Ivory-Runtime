@@ -2,11 +2,11 @@
 
 #include "Common.h"
 #include "cryptoTools/Common/Defines.h"
-#include "GarbledCircuit/KProbeResistant.h"
+#include "ivory/GarbledCircuit/KProbeResistant.h"
 #include "cryptoTools/Common/Log.h"
 #include <fstream>
 
-#include "Circuit/Gate.h"
+#include "ivory/Circuit/Gate.h"
 
 #include <array>
 

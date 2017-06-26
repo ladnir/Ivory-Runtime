@@ -26,16 +26,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HalfGtGarbledCircuit_Tests_VS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="KProbe_Tests_VS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Circuit_Tests_VS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ClassicGarbledCircuit_Tests_VS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ShGcRuntime_TestsVs.cpp">

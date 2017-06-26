@@ -3,9 +3,9 @@
 #include "cryptoTools/Network/Channel.h"
 #include "cryptoTools/Network/Endpoint.h"
 
-#include "GarbledCircuit/GarbledCircuit.h"
-#include "GarbledCircuit/HalfGtGarbledCircuit.h"
-#include "Circuit/Circuit.h"
+#include "ivory/GarbledCircuit/GarbledCircuit.h"
+#include "ivory/GarbledCircuit/HalfGtGarbledCircuit.h"
+#include "ivory/Circuit/Circuit.h"
 //#include "MyAssert.h"
 #include <fstream>
 #include "Common.h"

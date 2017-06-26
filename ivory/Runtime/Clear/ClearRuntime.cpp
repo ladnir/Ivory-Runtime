@@ -68,7 +68,7 @@ namespace osuCrypto
     }
 
 
-    void ClearRuntime::scheduleOp(Op op, ArrayView<RuntimeData*> io)
+    void ClearRuntime::scheduleOp(Op op, ArrayView<RtData*> io)
     {
 
 

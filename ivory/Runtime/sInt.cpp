@@ -1,176 +1,109 @@
 #include "sInt.h"
-
+#include <ivory/Runtime/Runtime.h>
 namespace osuCrypto
 {
 
+    sInt::sInt(const i64 & val)
+        : mData(Runtime::getPublicInt(val, 64))
+    { }
 
+    sInt::sInt(const i32 & val)
+        : mData(Runtime::getPublicInt(val, 32))
+    { }
 
-    sInt::sInt(Runtime& runtime, u64 bitCount)
-        : mRuntime(runtime)
-        , mBitCount(bitCount)
-    {
-        mRuntime.initVar(mData, bitCount);
+    sInt::sInt(const i16 & val)
+        : mData(Runtime::getPublicInt(val, 16))
+    { }
 
-    }
-
-    sInt::sInt(const sInt & v)
-        : mRuntime(v.mRuntime)
-        , mBitCount(v.mBitCount)
-    {
-        mRuntime.copyVar(mData, v.mData.get());
-    }
-
-    sInt::sInt(sInt &&v)
-        : mRuntime(v.mRuntime)
-        , mBitCount(v.mBitCount)
-        , mData(std::move(v.mData))
-    {
-    }
+    sInt::sInt(const i8 & val)
+        : mData(Runtime::getPublicInt(val, 8))
+    { }
 
     sInt::~sInt()
+    { }
+
+    sInt& sInt::operator=(const sInt & c)
     {
+        sIntBasePtr& s = (sIntBasePtr&)c.mData;
+        mData->copy(s);
+        return *this;
     }
 
-    sInt& sInt::operator=(const sInt & copy)
+    sInt & sInt::operator=(sInt && mv)
     {
-        mRuntime.copyVar(mData, copy.mData.get());
+        mData = std::move(mv.mData);
         return *this;
     }
 
     sInt sInt::operator~()
     {
-        sInt ret(mRuntime, mBitCount);
-        std::array<RuntimeData*, 2> io{ mData.get(), ret.mData.get() };
-        mRuntime.scheduleOp(Op::BitwiseNot, io);
-
-        return ret;
+        return mData->bitwiseInvert();
     }
 
-    sInt sInt::operator+(const sInt& in2)
+    sInt sInt::operator+(const sInt& in2) const
     {
-        sInt ret(mRuntime, std::max(mBitCount, in2.mBitCount));
-        std::array<RuntimeData*, 3> io{ mData.get(), in2.mData.get(), ret.mData.get()};
-        mRuntime.scheduleOp(Op::Add, io);
-
-        return ret;
+        return mData->add((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
     }
 
-    sInt sInt::operator-(const sInt & in2)
+    sInt sInt::operator-(const sInt & in2) const
     {
-        sInt ret(mRuntime, std::max(mBitCount, in2.mBitCount));
-        std::array<RuntimeData*, 3> io{ mData.get(), in2.mData.get(), ret.mData.get() };
-        mRuntime.scheduleOp(Op::Subtract, io);
-        return ret;
+        return mData->subtract((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
     }
 
     sInt sInt::operator>=(const sInt & in2)
     {
-        sInt ret(mRuntime, 1);
-        std::array<RuntimeData*, 3> io{ mData.get(), in2.mData.get(), ret.mData.get() };
-        mRuntime.scheduleOp(Op::GTEq, io);
-        return ret;
+        return mData->gteq((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
     }
 
     sInt sInt::operator>(const sInt &in2)
     {
-        sInt ret(mRuntime, 1);
-        std::array<RuntimeData*, 3> io{ in2.mData.get(),mData.get(), ret.mData.get() };
-        mRuntime.scheduleOp(Op::LT, io);
-        return ret;
+        return mData->gt((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
     }
 
     sInt sInt::operator<=(const sInt &in2)
     {
-        sInt ret(mRuntime, 1);
-        std::array<RuntimeData*, 3> io{ in2.mData.get(), mData.get(), ret.mData.get() };
-        mRuntime.scheduleOp(Op::GTEq, io);
-        return ret;
+        return in2.mData->gteq((sIntBasePtr&)in2.mData, (sIntBasePtr&)mData);
     }
 
     sInt sInt::operator<(const sInt & in2)
     {
-        sInt ret(mRuntime, 1);
-        std::array<RuntimeData*, 3> io{ mData.get(), in2.mData.get(), ret.mData.get() };
-        mRuntime.scheduleOp(Op::LT, io);
-        return ret;
+        return in2.mData->gt((sIntBasePtr&)in2.mData, mData);
     }
 
     sInt sInt::operator&(const sInt &in2)
     {
-        sInt ret(mRuntime, std::max(mBitCount, in2.mBitCount));
-        std::array<RuntimeData*, 3> io{ mData.get(), in2.mData.get(), ret.mData.get() };
-        mRuntime.scheduleOp(Op::BitwiseAnd, io);
-        return ret;
+        return mData->bitwiseAnd((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
     }
 
     sInt sInt::ifelse(const sInt & ifTrue, const sInt & ifFalse)
     {
-        if (mBitCount != 1)
-            throw std::runtime_error(LOCATION);
-
-        sInt ret(mRuntime, ifTrue.mBitCount);
-        std::array<RuntimeData*, 4> io{ ifTrue.mData.get(), ifFalse.mData.get(), mData.get(), ret.mData.get() };
-        mRuntime.scheduleOp(Op::IfElse, io);
-        return ret;
+        return mData->ifelse((sIntBasePtr&)mData, (sIntBasePtr&)ifTrue.mData, (sIntBasePtr&)ifFalse.mData);
     }
 
-    void sInt::operator+=(const sInt& in2)
+    sInt& sInt::operator+=(const sInt& in2)
     {
-        std::array<RuntimeData*, 3> io{ mData.get(), in2.mData.get(),  mData.get() };
-        mRuntime.scheduleOp(Op::Add, io);
+        mData = mData->add((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
+        return *this;
     }
 
-    sInt sInt::operator*(const sInt& in2)
+    sInt sInt::operator*(const sInt& in2) const
     {
-        sInt ret(mRuntime, std::max(mBitCount, in2.mBitCount));
-        std::array<RuntimeData*, 3> io{ mData.get(), in2.mData.get(), ret.mData.get() };
-
-        mRuntime.scheduleOp(Op::Multiply, io);
-
-        return std::move(ret);
+        return mData->multiply((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
     }
 
-    sInt sInt::operator/(const sInt & in2)
+    sInt sInt::operator/(const sInt & in2) const
     {
-        sInt ret(mRuntime, std::max(mBitCount, in2.mBitCount));
-        std::array<RuntimeData*, 3> io{ mData.get(), in2.mData.get(), ret.mData.get() };
-
-        mRuntime.scheduleOp(Op::Divide, io);
-
-        return std::move(ret);
+        return mData->divide((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
     }
-
-
 
     sInt::ValueType sInt::getValue()
     {
-        mRuntime.processesQueue();
-        if (mValFut)
-        {
-            mVal = std::move(mValFut->get());
-            mValFut.reset();
-        }
-        return valueFromBV(mVal);
+        return mData->getValue();
     }
 
     void sInt::reveal(ArrayView<u64> partyIdxs)
     {
-        mValFut.reset(new std::future<BitVector>());
-        mRuntime.scheduleOutput(mData.get(), *mValFut.get());
+        mData->reveal(partyIdxs);
     }
 
-    BitVector sInt::valueToBV(const ValueType & val)
-    {
-        return BitVector((u8*)&val, mBitCount);
-    }
-
-    sInt::ValueType sInt::valueFromBV(const BitVector & val)
-    {
-        if (val.size() != mBitCount)throw std::runtime_error("");
-
-        ValueType ret = 0;
-        memcpy(&ret, val.data(), val.sizeBytes());
-
-        return ret;
-    }
 }

@@ -1,11 +1,11 @@
 #pragma once
-#include "Runtime/Runtime.h"
+#include "ivory/Runtime/Runtime.h"
 #include "cryptoTools/Network/Channel.h"
 #include "cryptoTools/Common/BitVector.h"
 
 namespace osuCrypto
 {
-    struct ClearIntRuntimeData : public RuntimeData
+    struct ClearIntRuntimeData //: public RuntimeData
     {
 
         ClearIntRuntimeData(u64 bitCount)
@@ -26,11 +26,10 @@ namespace osuCrypto
         void initVar(std::unique_ptr<RuntimeData>& data, u64 bitCount) override;
         void copyVar(std::unique_ptr<RuntimeData>& data, RuntimeData* copy) override;
 
-
         void init(Channel& chl, block seed, u64 partyIdx);
 
-        void scheduleInput(RuntimeData* data, const BitVector& value)override;
-        void scheduleInput(RuntimeData* data, u64 pIdx)override;
+        void scheduleInput(ClearIntRuntimeData* data, const BitVector& value)override;
+        void scheduleInput(ClearIntRuntimeData* data, u64 pIdx)override;
 
 
         void scheduleOp(Op op, ArrayView<RuntimeData*> io)override;

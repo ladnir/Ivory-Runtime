@@ -1,12 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ivory", "ivory\ivory.vcxproj", "{8C3AF3C3-2ABF-43A7-8B72-C674E64BD0D6}"
 	ProjectSection(ProjectDependencies) = postProject
 		{242D233A-6862-4767-8247-80AE3FDACB09} = {242D233A-6862-4767-8247-80AE3FDACB09}
-		{4B3D93AF-B008-452D-B1BC-CACC67C3DC27} = {4B3D93AF-B008-452D-B1BC-CACC67C3DC27}
+		{D159E2F9-226C-4B19-905E-CC1EA0EB013F} = {D159E2F9-226C-4B19-905E-CC1EA0EB013F}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ivoryTests", "ivoryTests\ivoryTests.vcxproj", "{D3E2E0BC-D52A-494F-8C7A-C204C164EFD0}"
@@ -33,7 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOTe", "..\libOTe\libOTe\libOTe.vcxproj.vcxproj", "{4B3D93AF-B008-452D-B1BC-CACC67C3DC27}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOTe", "..\libOTe\libOTe\libOTe.vcxproj.vcxproj", "{D159E2F9-226C-4B19-905E-CC1EA0EB013F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPDZ", "SPDZ\SPDZ.vcxproj", "{242D233A-6862-4767-8247-80AE3FDACB09}"
 EndProject
@@ -59,10 +59,10 @@ Global
 		{CC0F3170-6E61-488D-8C74-FC423E9B2D1A}.Debug|x64.Build.0 = Debug|x64
 		{CC0F3170-6E61-488D-8C74-FC423E9B2D1A}.Release|x64.ActiveCfg = Release|x64
 		{CC0F3170-6E61-488D-8C74-FC423E9B2D1A}.Release|x64.Build.0 = Release|x64
-		{4B3D93AF-B008-452D-B1BC-CACC67C3DC27}.Debug|x64.ActiveCfg = Debug|x64
-		{4B3D93AF-B008-452D-B1BC-CACC67C3DC27}.Debug|x64.Build.0 = Debug|x64
-		{4B3D93AF-B008-452D-B1BC-CACC67C3DC27}.Release|x64.ActiveCfg = Release|x64
-		{4B3D93AF-B008-452D-B1BC-CACC67C3DC27}.Release|x64.Build.0 = Release|x64
+		{D159E2F9-226C-4B19-905E-CC1EA0EB013F}.Debug|x64.ActiveCfg = Debug|x64
+		{D159E2F9-226C-4B19-905E-CC1EA0EB013F}.Debug|x64.Build.0 = Debug|x64
+		{D159E2F9-226C-4B19-905E-CC1EA0EB013F}.Release|x64.ActiveCfg = Release|x64
+		{D159E2F9-226C-4B19-905E-CC1EA0EB013F}.Release|x64.Build.0 = Release|x64
 		{242D233A-6862-4767-8247-80AE3FDACB09}.Debug|x64.ActiveCfg = Debug|x64
 		{242D233A-6862-4767-8247-80AE3FDACB09}.Debug|x64.Build.0 = Debug|x64
 		{242D233A-6862-4767-8247-80AE3FDACB09}.Release|x64.ActiveCfg = Release|x64

@@ -1,4 +1,5 @@
 #include "CircuitLibrary.h"
+#include "Gate.h"
 
 namespace osuCrypto
 {
@@ -72,12 +73,12 @@ namespace osuCrypto
     }
 
     BetaCircuit * CircuitLibrary::int_intConst_add(
-        u64 aSize, 
-        u64 bSize, 
-        i64 bVal, 
+        u64 aSize,
+        u64 bSize,
+        i64 bVal,
         u64 cSize)
     {
-        auto key = "add" + ToString(aSize) + "xConst" + ToString(bSize) + "v" + ToString(bVal)+ "x" + ToString(cSize);
+        auto key = "add" + ToString(aSize) + "xConst" + ToString(bSize) + "v" + ToString(bVal) + "x" + ToString(cSize);
 
         auto iter = mCirMap.find(key);
 
@@ -91,7 +92,7 @@ namespace osuCrypto
             BetaBundle t(3);
 
             cd->addInputBundle(a);
-            
+
             BitVector bb((u8*)&bVal, bSize);
             cd->addConstBundle(b, bb);
 
@@ -309,6 +310,33 @@ namespace osuCrypto
         return iter->second;
     }
 
+    BetaCircuit * CircuitLibrary::int_int_bitwiseOr(u64 aSize, u64 bSize, u64 cSize)
+    {
+        auto key = "bitwiseOr" + ToString(aSize) + "x" + ToString(bSize) + "x" + ToString(cSize);
+
+        auto iter = mCirMap.find(key);
+
+        if (iter == mCirMap.end())
+        {
+            auto* cd = new BetaCircuit;
+
+            BetaBundle a(aSize);
+            BetaBundle b(bSize);
+            BetaBundle c(cSize);
+
+            cd->addInputBundle(a);
+            cd->addInputBundle(b);
+
+            cd->addOutputBundle(c);
+
+            int_int_bitwiseOr_build(*cd, a, b, c);
+
+            iter = mCirMap.insert(std::make_pair(key, cd)).first;
+        }
+
+        return iter->second;
+    }
+
     BetaCircuit * CircuitLibrary::int_int_lt(u64 aSize, u64 bSize)
     {
         auto key = "lessThan" + ToString(aSize) + "x" + ToString(bSize);
@@ -484,7 +512,7 @@ namespace osuCrypto
             cd->addOutputBundle(c);
             cd->addTempWireBundle(temp);
 
-            int_addSign_build(*cd, a, sign,c, temp);
+            int_addSign_build(*cd, a, sign, c, temp);
 
             iter = mCirMap.insert(std::make_pair(key, cd)).first;
         }
@@ -535,7 +563,7 @@ namespace osuCrypto
         BetaWire& aXorC = temps.mWires[1];
         BetaWire& temp = temps.mWires[2];
 
-        if (!areDistint(a2, sum) || ! areDistint(a1, sum))
+        if (!areDistint(a2, sum) || !areDistint(a1, sum))
             throw std::runtime_error("must be distinct" LOCATION);
 
         u64 a1Size = a1.mWires.size();
@@ -593,10 +621,10 @@ namespace osuCrypto
     }
 
     void CircuitLibrary::uint_uint_add_build(
-        BetaCircuit & cd, 
-        BetaBundle & a1, 
-        BetaBundle & a2, 
-        BetaBundle & sum, 
+        BetaCircuit & cd,
+        BetaBundle & a1,
+        BetaBundle & a2,
+        BetaBundle & sum,
         BetaBundle & temps)
     {
         if (sum.mWires.size() > std::max<u64>(a1.mWires.size(), a2.mWires.size()) + 1)
@@ -689,9 +717,9 @@ namespace osuCrypto
 
     void CircuitLibrary::uint_uint_subtract_build(
         BetaCircuit & cd,
-        BetaBundle & a1, 
-        BetaBundle & a2, 
-        BetaBundle & diff, 
+        BetaBundle & a1,
+        BetaBundle & a2,
+        BetaBundle & diff,
         BetaBundle & temps)
     {
 
@@ -902,9 +930,9 @@ namespace osuCrypto
         cd.levelize();
     }
     void CircuitLibrary::int_int_div_rem_build(
-        BetaCircuit & cd, 
-        BetaBundle & signedA1, 
-        BetaBundle & signedA2, 
+        BetaCircuit & cd,
+        BetaBundle & signedA1,
+        BetaBundle & signedA2,
         BetaBundle & quotient,
         BetaBundle & rem
         //,BetaBundle & divByZero,
@@ -915,12 +943,12 @@ namespace osuCrypto
             throw std::runtime_error(LOCATION);
 
         // we are computing a1 / a2 = quot  with optional remainder rem
-        BetaBundle 
-            a1Sign(1), 
-            a2Sign(1), 
+        BetaBundle
+            a1Sign(1),
+            a2Sign(1),
             sign(1),
             temp(3),
-            a1(signedA1.mWires.size()), 
+            a1(signedA1.mWires.size()),
             a2(signedA2.mWires.size());
 
         a1Sign.mWires[0] = signedA1.mWires.back();
@@ -966,7 +994,7 @@ namespace osuCrypto
 
         if (rem.mWires.size())
         {
-            int_addSign_build(cd , remainder, a1Sign, rem, temp);
+            int_addSign_build(cd, remainder, a1Sign, rem, temp);
             //std::cout << "addSign    " << cd.mNonXorGateCount << std::endl;
         }
         //cd.print(" = ", remainder);
@@ -974,9 +1002,9 @@ namespace osuCrypto
     }
 
     void CircuitLibrary::uint_uint_div_rem_build(
-        BetaCircuit & cd, 
-        BetaBundle & a1, 
-        BetaBundle & a2, 
+        BetaCircuit & cd,
+        BetaBundle & a1,
+        BetaBundle & a2,
         BetaBundle & quotient,
         BetaBundle & rem)
     {
@@ -1065,8 +1093,8 @@ namespace osuCrypto
 
 
             //std::cout << "iter[" << i << "]  sub  " << cd.mNonXorGateCount << "  (+" << (cd.mNonXorGateCount-prev)<<")  "<< remTemp .mWires.size()<< std::endl;
-            
-            
+
+
             std::swap(remTemp.mWires, remainder.mWires);
 
             //if (cd.mDivPrint)
@@ -1084,9 +1112,9 @@ namespace osuCrypto
     }
 
     void CircuitLibrary::int_int_lt_build(
-        BetaCircuit & cd, 
-        BetaBundle & a1, 
-        BetaBundle & a2, 
+        BetaCircuit & cd,
+        BetaBundle & a1,
+        BetaBundle & a2,
         BetaBundle & out)
     {
 
@@ -1106,22 +1134,22 @@ namespace osuCrypto
 
 
     void CircuitLibrary::int_int_gteq_build(
-        BetaCircuit & cd, 
-        BetaBundle & a1, 
-        BetaBundle & a2, 
+        BetaCircuit & cd,
+        BetaBundle & a1,
+        BetaBundle & a2,
         BetaBundle & out)
     {
         int_int_lt_build(cd, a1, a2, out);
 
         // invert the output
-        GateType gt = GateType((~(u8)cd.mGates.back().mType) &  15);
+        GateType gt = GateType((~(u8)cd.mGates.back().mType) & 15);
         cd.mGates.back().setType(gt);
     }
 
     void CircuitLibrary::uint_uint_lt_build(
-        BetaCircuit & cd, 
-        BetaBundle & a1, 
-        BetaBundle & a2, 
+        BetaCircuit & cd,
+        BetaBundle & a1,
+        BetaBundle & a2,
         BetaBundle & out)
     {
 
@@ -1141,9 +1169,9 @@ namespace osuCrypto
     }
 
     void CircuitLibrary::uint_uint_gteq_build(
-        BetaCircuit & cd, 
-        BetaBundle & a1, 
-        BetaBundle & a2, 
+        BetaCircuit & cd,
+        BetaBundle & a1,
+        BetaBundle & a2,
         BetaBundle & out)
     {
         uint_uint_lt_build(cd, a1, a2, out);
@@ -1154,8 +1182,8 @@ namespace osuCrypto
 
 
     void CircuitLibrary::int_removeSign_build(
-        BetaCircuit & cd, 
-        BetaBundle & a1, 
+        BetaCircuit & cd,
+        BetaBundle & a1,
         BetaBundle & ret,
         BetaBundle & temp)
     {
@@ -1170,9 +1198,9 @@ namespace osuCrypto
     }
 
     void CircuitLibrary::int_addSign_build(
-        BetaCircuit & cd, 
-        BetaBundle & a1, 
-        BetaBundle & sign, 
+        BetaCircuit & cd,
+        BetaBundle & a1,
+        BetaBundle & sign,
         BetaBundle & ret,
         BetaBundle & temp)
     {
@@ -1198,8 +1226,8 @@ namespace osuCrypto
     }
 
     void CircuitLibrary::int_bitInvert_build(
-        BetaCircuit & cd, 
-        BetaBundle & a1, 
+        BetaCircuit & cd,
+        BetaBundle & a1,
         BetaBundle & out)
     {
         cd.addCopy(a1, out);
@@ -1211,8 +1239,8 @@ namespace osuCrypto
     }
 
     void CircuitLibrary::int_negate_build(
-        BetaCircuit & cd, 
-        BetaBundle & a1, 
+        BetaCircuit & cd,
+        BetaBundle & a1,
         BetaBundle & out,
         BetaBundle & temp)
     {
@@ -1242,11 +1270,14 @@ namespace osuCrypto
     }
 
     void CircuitLibrary::int_int_bitwiseAnd_build(
-        BetaCircuit & cd, 
-        BetaBundle & a1, 
-        BetaBundle & a2, 
+        BetaCircuit & cd,
+        BetaBundle & a1,
+        BetaBundle & a2,
         BetaBundle & out)
     {
+        if (a1.mWires.size() != a2.mWires.size())throw std::runtime_error(LOCATION);
+        if (out.mWires.size() > a1.mWires.size())throw std::runtime_error(LOCATION);
+
         for (u64 j = 0; j < out.mWires.size(); ++j)
         {
             cd.addGate(
@@ -1258,10 +1289,25 @@ namespace osuCrypto
 
     }
 
+    void CircuitLibrary::int_int_bitwiseOr_build(BetaCircuit & cd, BetaBundle & a1, BetaBundle & a2, BetaBundle & out)
+    {
+        if (a1.mWires.size() != a2.mWires.size())throw std::runtime_error(LOCATION);
+        if (out.mWires.size() > a1.mWires.size())throw std::runtime_error(LOCATION);
+
+        for (u64 j = 0; j < out.mWires.size(); ++j)
+        {
+            cd.addGate(
+                a1.mWires[j],
+                a2.mWires[j],
+                GateType::Or,
+                out.mWires[j]);
+        }
+    }
+
 
     void CircuitLibrary::int_int_multiplex_build(
-        BetaCircuit & cd, 
-        BetaBundle & a1, 
+        BetaCircuit & cd,
+        BetaBundle & a1,
         BetaBundle & a2,
         BetaBundle & choice,
         BetaBundle & out,

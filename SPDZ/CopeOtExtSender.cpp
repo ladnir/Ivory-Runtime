@@ -45,7 +45,7 @@ namespace osuCrypto
     {
         auto fieldSize = messages[0].mField->bitCount();
 
-        // round up 
+        // round up
         u64 numOtExt = roundUpTo(messages.size() * fieldSize, 128);
         u64 numSuperBlocks = (numOtExt / 128 + copeSuperBlkSize - 1) / copeSuperBlkSize;
         //u64 numBlocks = numSuperBlocks * copeSuperBlkSize;
@@ -102,7 +102,7 @@ namespace osuCrypto
             if (uIter == uEnd)
             {
                 u64 step = std::min<u64>(numSuperBlocks - superBlkIdx, (u64)copeCommStepSize);
-                chl.recv(u.data(), step * copeSuperBlkSize * 128 * sizeof(block));
+                chl.recv((u8*)u.data(), step * copeSuperBlkSize * 128 * sizeof(block));
                 uIter = (block*)u.data();
             }
 

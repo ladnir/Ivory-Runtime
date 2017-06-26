@@ -39,6 +39,7 @@ namespace osuCrypto
 
         BetaCircuit* int_bitInvert(u64 aSize);
         BetaCircuit* int_int_bitwiseAnd(u64 aSize, u64 bSize, u64 cSize);
+        BetaCircuit* int_int_bitwiseOr(u64 aSize, u64 bSize, u64 cSize);
         
         void int_int_add_build(
             BetaCircuit& cd,
@@ -143,6 +144,12 @@ namespace osuCrypto
             BetaBundle & temp);
 
         void int_int_bitwiseAnd_build(
+            BetaCircuit& cd,
+            BetaBundle & a1,
+            BetaBundle & a2,
+            BetaBundle & out);
+
+        void int_int_bitwiseOr_build(
             BetaCircuit& cd,
             BetaBundle & a1,
             BetaBundle & a2,

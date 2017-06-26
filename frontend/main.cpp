@@ -5,10 +5,10 @@
 #include <iostream>
 #include "cryptoTools/Common/Log.h"
 #include "cryptoTools/Common/Timer.h"
-#include "Runtime/ShGcRuntime.h"
-#include "Runtime/ClearRuntime.h"
-#include "Runtime/sInt.h"
-#include "Runtime/Party.h"
+#include "ivory/Runtime/ShGc/ShGcRuntime.h"
+//#include "ivory/Runtime/ClearRuntime.h"
+#include "ivory/Runtime/sInt.h"
+#include "ivory/Runtime/Party.h"
 
 #include <string>
 #include "cryptoTools/Crypto/PRNG.h"
@@ -36,12 +36,15 @@ i32 program(std::array<Party, 2> parties, i64 myInput)
         parties[1].input<sInt>(bitCount);
 
 
+    
+
     // perform some computation
     auto add = input1 + input0;
     auto sub = input1 - input0;
     auto mul = input1 * input0;
     auto div = input1 / input0;
 
+    auto pubAdd = add + 22;
 
     auto gteq = input1 >= input0;
     auto lt = input1 < input0;
