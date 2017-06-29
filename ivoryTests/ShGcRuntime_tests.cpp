@@ -203,7 +203,7 @@ void ShGcRuntime_basicArith_Test()
         auto div = input1 / input0;
 
 
-        auto gt  = input1 > input0;
+        auto gt = input1 > input0;
         parties[0].getRuntime().processesQueue();
         auto gt2 = input0 > input1;
         parties[0].getRuntime().processesQueue();
@@ -349,12 +349,17 @@ void ShGcRuntime_SequentialOp_Test()
 
 
 
-void evaluate(BetaCircuit& cir, const span<std::vector<u8>>& input, const span<std::vector<u8>>& output)
+void evaluate(
+    BetaCircuit& cir,
+    const span<std::vector<u8>>& input,
+    const span<std::vector<u8>>& publicFlag,
+    const span<std::vector<u8>>& output)
 {
 
-    PRNG prng(ZeroBlock);
+    PRNG prng(toBlock(234543));
     std::vector<block> memG(cir.mWireCount), memE(cir.mWireCount);
-    std::array<block, 2> tweaksE{ ZeroBlock, ZeroBlock }, tweaksG{ ZeroBlock, ZeroBlock }, zeroAndXorOffset{ ZeroBlock, CCBlock | OneBlock };
+    std::array<block, 2> tweaksE{ ZeroBlock, toBlock(1,0) }, tweaksG{ ZeroBlock, toBlock(1,0) },
+        zeroAndXorOffset{ ZeroBlock, prng.get<block>() | OneBlock };
     auto& xorOffset = zeroAndXorOffset[1];
 
     std::vector<GarbledGate<2>> garbledGates;
@@ -388,38 +393,85 @@ void evaluate(BetaCircuit& cir, const span<std::vector<u8>>& input, const span<s
             if (input[i][j])
                 inLabelsE[i][j] = inLabelsE[i][j] ^ xorOffset;
 
+            if (publicFlag[i][j])
+            {
+                inLabelsG[i][j] = inLabelsE[i][j] = ShGcRuntime::mPublicLabels[input[i][j]];
+            }
+
             *iterG++ = inLabelsG[i][j];
             *iterE++ = inLabelsE[i][j];
         }
     }
 
-    ShGcRuntime::garble(cir, memG, tweaksG, garbledGates, zeroAndXorOffset);
-    ShGcRuntime::evaluate(cir, memE, tweaksE, garbledGates);
+    std::vector<block> garbledMem(cir.mGates.size()), evalMem(cir.mGates.size());
+	std::vector<u8> auxBits;
+
+    ShGcRuntime::garble(cir, memG, tweaksG, garbledGates, zeroAndXorOffset, auxBits, garbledMem.data());
+
+	ShGcRuntime::evaluate(cir, memE, tweaksE, garbledGates, [iter = auxBits.begin()]() mutable {return (bool)*iter++; }, evalMem.data());
+
+    for (u64 i = 0; i < garbledMem.size(); ++i)
+    {
+        if (ShGcRuntime::isConstLabel(garbledMem[i])) {
+			if (neq(evalMem[i], garbledMem[i]))
+			{
+				ShGcRuntime::garble(cir, memG, tweaksG, garbledGates, zeroAndXorOffset, auxBits, garbledMem.data());
+				ShGcRuntime::evaluate(cir, memE, tweaksE, garbledGates, [iter = auxBits.begin()]() mutable {return (bool)*iter++; }, evalMem.data());
+                throw std::runtime_error(LOCATION);
+			}
+        }
+        else {
+            if (neq(evalMem[i], garbledMem[i]) &&
+                neq(evalMem[i], garbledMem[i] ^ xorOffset))
+                throw std::runtime_error(LOCATION);
+        }
+    }
 
     for (u64 i = 0; i < output.size(); ++i) {
         for (u64 j = 0; j < output[i].size(); ++j) {
 
             block e = *iterE++, g = *iterG++;
 
-            output[i][j] = PermuteBit(e^g);
-            if (neq(e, g ^ (output[i][j] ? xorOffset : ZeroBlock))) {
-                std::cout << "bad label @ " << j << ", val = " << output[i][j] << " -> " << e << " != " << g << std::endl;
-                throw UnitTestFail(LOCATION);
+            if (ShGcRuntime::isConstLabel(e))
+            {
+                output[i][j] = eq(ShGcRuntime::mPublicLabels[1], e);
+
+                if (neq(e, g)) {
+                    std::cout << "mixed Pub label @ " << j << ", val = " << output[i][j] << " -> " << e << " != " << g << std::endl;
+                    throw UnitTestFail(LOCATION);
+                }
             }
+            else
+            {
 
-            if (output2[i][j] != output[i][j]) {
-                std::cout << "bad value @ " << j << ", val = " << (int)output[i][j] << " != exp = " << output2[i][j] << std::endl;
-                throw UnitTestFail(LOCATION);
+                output[i][j] = PermuteBit(e^g);
+                if (neq(e, g ^ (output[i][j] ? xorOffset : ZeroBlock))) {
+                    std::cout << "bad label @ " << j << ", val = " << (int)output[i][j] << " -> " << e << " != " << g << " " << (g ^ xorOffset) << std::endl;
+                    throw UnitTestFail(LOCATION);
+                }
 
+                if (output2[i][j] != output[i][j]) {
+                    std::cout << "bad value @ " << j << ", val = " << (int)output[i][j] << " != exp = " << output2[i][j] << std::endl;
+                    throw UnitTestFail(LOCATION);
+                }
             }
         }
     }
 }
 
-
-void evaluate(BetaCircuit* cir, PRNG& prng)
+enum class InputType
 {
-    std::vector<std::vector<u8>> inputs(cir->mInputs.size()), outputs(cir->mOutputs.size());
+    Private,
+    Mixed,
+    Public
+};
+
+void evaluate(BetaCircuit* cir, PRNG& prng, InputType type)
+{
+    std::vector<std::vector<u8>>
+        inputs(cir->mInputs.size()),
+        pubVal(cir->mInputs.size()),
+        outputs(cir->mOutputs.size());
 
     for (u64 i = 0; i < outputs.size(); ++i)
     {
@@ -428,12 +480,30 @@ void evaluate(BetaCircuit* cir, PRNG& prng)
 
     for (u64 i = 0; i < inputs.size(); ++i)
     {
+        pubVal[i].resize(cir->mInputs[i].mWires.size());
         inputs[i].resize(cir->mInputs[i].mWires.size());
         for (u64 j = 0; j < inputs[i].size(); ++j)
+        {
             inputs[i][j] = prng.get<bool>();
+
+            switch (type)
+            {
+            case InputType::Private:
+                pubVal[i][j] = 0;
+                break;
+            case InputType::Mixed:
+                pubVal[i][j] = prng.get<bool>();
+                break;
+            case InputType::Public:
+                pubVal[i][j] = 1;
+                break;
+            default:
+                break;
+            }
+        }
     }
 
-    evaluate(*cir, inputs, outputs);
+    evaluate(*cir, inputs, pubVal, outputs);
 }
 
 void ShGcRuntime_CircuitInvert_Test()
@@ -443,14 +513,15 @@ void ShGcRuntime_CircuitInvert_Test()
     auto cir = lib.int_bitInvert(aSize);
     PRNG prng(ZeroBlock);
 
-    std::vector<std::vector<u8>> inputs(1), outputs(1);
+    std::vector<std::vector<u8>> inputs(1), pubVal(1), outputs(1);
     inputs[0].resize(aSize);
+    pubVal[0].resize(aSize);
     outputs[0].resize(aSize);
 
     for (u64 i = 0; i < aSize; ++i)
         inputs[0][i] = prng.get<bool>();
 
-    evaluate(*cir, inputs, outputs);
+    evaluate(*cir, inputs, pubVal, outputs);
 
     for (u64 j = 0; j < aSize; ++j) {
         if (inputs[0][j] == outputs[0][j]) {
@@ -490,9 +561,11 @@ void ShGcRuntime_CircuitAdd_Test()
     auto trials = 100;
     PRNG prng(ZeroBlock);
 
-    std::vector<std::vector<u8>> inputs(2), outputs(1);
+    std::vector<std::vector<u8>> inputs(2), pubVal(2), outputs(1);
     inputs[0].resize(size);
     inputs[1].resize(size);
+    pubVal[0].resize(size);
+    pubVal[1].resize(size);
     outputs[0].resize(size);
 
     for (u64 i = 0; i < trials; ++i)
@@ -502,7 +575,7 @@ void ShGcRuntime_CircuitAdd_Test()
         u32 c = a + b;
         BitVector cc((u8*)&c, size);
 
-        evaluate(*cir, inputs, outputs);
+        evaluate(*cir, inputs, pubVal, outputs);
 
         for (u64 j = 0; j < size; ++j) {
             if (cc[j] != outputs[0][j]) {
@@ -523,9 +596,11 @@ void ShGcRuntime_CircuitMult_Test()
     auto trials = 100;
     PRNG prng(ZeroBlock);
 
-    std::vector<std::vector<u8>> inputs(2), outputs(1);
+    std::vector<std::vector<u8>> inputs(2), pubVal(2), outputs(1);
     inputs[0].resize(size);
     inputs[1].resize(size);
+    pubVal[0].resize(size);
+    pubVal[1].resize(size);
     outputs[0].resize(size);
 
     for (u64 i = 0; i < trials; ++i)
@@ -535,7 +610,7 @@ void ShGcRuntime_CircuitMult_Test()
         u32 c = a * b;
         BitVector cc((u8*)&c, size);
 
-        evaluate(*cir, inputs, outputs);
+        evaluate(*cir, inputs, pubVal, outputs);
 
         for (u64 j = 0; j < size; ++j) {
             if (cc[j] != outputs[0][j]) {
@@ -556,7 +631,9 @@ void shGcRuntime_CircuitEval_Test()
 
     CircuitLibrary lib;
     auto sizeA(13), sizeB(10), sizeC(11);
-    std::vector<BetaCircuit*> cirs {
+    std::vector<BetaCircuit*> cirs{
+        lib.int_int_gteq(sizeA, sizeA),
+        lib.int_int_gteq(sizeA, sizeB),
         lib.int_int_add(sizeA, sizeA, sizeA),
         lib.int_int_add(sizeA, sizeB, sizeC),
         lib.int_int_subtract(sizeA, sizeA, sizeA),
@@ -565,8 +642,6 @@ void shGcRuntime_CircuitEval_Test()
         lib.int_int_mult(sizeA, sizeB, sizeC),
         lib.int_int_div(sizeA, sizeA, sizeA),
         lib.int_int_div(sizeA, sizeB, sizeA),
-        lib.int_int_gteq(sizeA, sizeA),
-        lib.int_int_gteq(sizeA, sizeB),
         lib.int_int_lt(sizeA, sizeA),
         lib.int_int_lt(sizeA, sizeB),
         lib.int_bitInvert(sizeA),
@@ -585,7 +660,10 @@ void shGcRuntime_CircuitEval_Test()
     {
         for (auto i = 0; i < trials; ++i)
         {
-            evaluate(cir, prng);
+            for (auto type : { InputType::Public, InputType::Mixed, InputType::Private })
+            {
+                evaluate(cir, prng, type);
+            }
         }
     }
 }

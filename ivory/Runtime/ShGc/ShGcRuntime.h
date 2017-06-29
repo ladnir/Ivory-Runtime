@@ -72,7 +72,8 @@ namespace osuCrypto
         IknpOtExtSender mOtExtSender;
 
         std::vector<block> sharedMem;
-        std::vector<GarbledGate<2>> sharedGates;
+        //std::vector<GarbledGate<2>> sharedGates;
+		std::vector<u8> shareAuxBits;
         ByteStream sharedBuff;
         std::array<block, 2>mTweaks;
 
@@ -106,20 +107,24 @@ namespace osuCrypto
         static block ShGcRuntime::evaluateConstGate(bool constA, bool constB, const std::array<block, 2>& in, const GateType& gt);
         static block ShGcRuntime::garbleConstGate(bool constA, bool constB, const std::array<block, 2>& in, const GateType& gt, const block& xorOffset);
 
-
+		std::function<bool()> mRecvBit;
         static void evaluate(
-            BetaCircuit& cir,
-            ArrayView<block> memory,
+            const BetaCircuit& cir,
+            const ArrayView<block>& memory,
             std::array<block, 2>& tweaks,
-            ArrayView<GarbledGate<2>> garbledGates);
+            const ArrayView<GarbledGate<2>>& garbledGates,
+			const std::function<bool()>& getAuxilaryBit,
+            block* DEBUG_labels = nullptr);
 
 
         static void garble(
-            BetaCircuit& cir,
-            ArrayView<block> memory,
+            const BetaCircuit& cir,
+            const ArrayView<block>& memory,
             std::array<block, 2>& tweaks,
-            ArrayView<GarbledGate<2>>  garbledGateIter,
-            const std::array<block,2>& zeroAndGlobalOffset
+            const ArrayView<GarbledGate<2>>&  garbledGateIter,
+            const std::array<block,2>& zeroAndGlobalOffset,
+			std::vector<u8>& auxilaryBits,
+            block* DEBUG_labels = nullptr
         );
 
     };
