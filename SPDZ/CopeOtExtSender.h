@@ -28,12 +28,12 @@ namespace osuCrypto
         std::unique_ptr<CopeOtExtSender> split();
 
         void setBaseOts(
-            ArrayView<block> baseRecvOts,
+            span<block> baseRecvOts,
             const BitVector& choices);
 
 
         void send(
-            ArrayView<ZpNumber> messages,
+            span<ZpNumber> messages,
             Channel& chl);
 
     };

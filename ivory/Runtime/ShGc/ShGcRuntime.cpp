@@ -95,7 +95,7 @@ namespace osuCrypto
 
 	//void ShGcRuntime::scheduleOp(
 	//    Op op,
-	//    ArrayView<RuntimeData*> io)
+	//    span<RuntimeData*> io)
 	//{
 	//    mCrtQueue.emplace();
 	//    CircuitItem& item = mCrtQueue.back();
@@ -281,7 +281,7 @@ namespace osuCrypto
 		mOutputQueue.emplace(std::move(item));
 	}
 
-	void ShGcRuntime::processesQueue()
+	void ShGcRuntime::processQueue()
 	{
 
 		// TODO: add logic to decide when to process the queue
@@ -332,7 +332,7 @@ namespace osuCrypto
 				mInputIdx += item.mLabels->size();
 
 				std::unique_ptr<ByteStream> buff(new ByteStream(item.mLabels->size() * sizeof(block)));
-				auto view = buff->getArrayView<block>();
+				auto view = buff->getspan<block>();
 
 				for (u64 i = 0; i < item.mLabels->size(); ++i)
 				{
@@ -343,7 +343,7 @@ namespace osuCrypto
 			else
 			{
 				std::unique_ptr<ByteStream> buff(new ByteStream(item.mLabels->size() * sizeof(block)));
-				auto view = buff->getArrayView<block>();
+				auto view = buff->getspan<block>();
 				for (u64 i = 0; i < item.mLabels->size(); ++i, ++iter)
 				{
 					(*item.mLabels)[i] = (*iter)[0];
@@ -367,7 +367,7 @@ namespace osuCrypto
 				sharedMem.resize(mOtCount);
 
 			//sharedMem.resize(mOtCount);
-			ArrayView<block> view(sharedMem.begin(), sharedMem.begin() + mOtCount);
+			span<block> view(sharedMem.begin(), sharedMem.begin() + mOtCount);
 
 			mOtExtRecver.receive(mOtChoices, sharedMem, mPrng, *mChannel);
 
@@ -386,7 +386,7 @@ namespace osuCrypto
 			if (item.mInputVal.size())
 			{
 				mChannel->recv(sharedBuff);
-				auto view = sharedBuff.getArrayView<block>();
+				auto view = sharedBuff.getspan<block>();
 
 				for (u64 i = 0; i < item.mLabels->size(); ++i)
 				{
@@ -540,7 +540,7 @@ namespace osuCrypto
 					mChannel->recv(sharedBuff);
 					Expects(sharedBuff.size() == item.mCircuit->mNonXorGateCount * sizeof(GarbledGate<2>));
 				}
-				auto gates = sharedBuff.getArrayView<GarbledGate<2>>();
+				auto gates = sharedBuff.getspan<GarbledGate<2>>();
 
 				evaluate(*item.mCircuit, sharedMem, mTweaks, gates, mRecvBit);
 
@@ -887,9 +887,9 @@ namespace osuCrypto
 
 	void ShGcRuntime::garble(
 		const BetaCircuit& cir,
-		const ArrayView<block>& wires,
+		const span<block>& wires,
 		std::array<block, 2>& tweaks,
-		const ArrayView<GarbledGate<2>>& gates,
+		const span<GarbledGate<2>>& gates,
 		const std::array<block, 2>& mZeroAndGlobalOffset,
 		std::vector<u8>& auxilaryBits,
 		block* DEBUG_labels)

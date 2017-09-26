@@ -1,8 +1,6 @@
 #pragma once
 //#include "Runtime/CrtModulal.h"
-
-#include "ivory/Circuit/Circuit.h"
-
+#include "cryptoTools/Common/Defines.h"
 
 namespace osuCrypto
 {
@@ -60,7 +58,8 @@ namespace osuCrypto
 
         virtual sIntBasePtr bitwiseInvert() = 0;
         virtual sIntBasePtr bitwiseAnd(sIntBasePtr& a, sIntBasePtr& b) = 0;
-        virtual sIntBasePtr bitwiseOr(sIntBasePtr& a, sIntBasePtr& b) = 0;
+		virtual sIntBasePtr bitwiseOr(sIntBasePtr& a, sIntBasePtr& b) = 0;
+		virtual sIntBasePtr bitwiseXor(sIntBasePtr& a, sIntBasePtr& b) = 0;
 
         virtual sIntBasePtr ifelse(sIntBasePtr& selectBit, sIntBasePtr& ifTrue, sIntBasePtr& ifFalse) = 0;
 
@@ -75,8 +74,6 @@ namespace osuCrypto
     {
     public:
         typedef sIntBase::ValueType ValueType;
-
-        //sInt(Runtime& rt, const BitCount& bitCount);
 
         sInt() = default;
         sInt(const sInt&) = default;
@@ -94,56 +91,35 @@ namespace osuCrypto
         sInt& operator=(sInt&&);
 
 
-        sInt operator~();
+		sInt operator~();
+		sInt operator-();
 
         sInt operator+(const sInt&) const;
         sInt operator-(const sInt&) const;
         sInt operator*(const sInt&) const;
         sInt operator/(const sInt&) const;
 
-
-        //sInt operator+(const i64&);
-        //sInt operator-(const i64&);
-        //sInt operator*(const i64&);
-        //sInt operator/(const i64&);
-        //friend sInt operator+(const sInt&, const i64&);
-        //friend sInt operator-(const sInt&, const i64&);
-        //friend sInt operator*(const sInt&, const i64&);
-        //friend sInt operator/(const sInt&, const i64&);
-
         sInt& operator+=(const sInt&);
-        //sInt operator-=(const sInt&);
-        //sInt operator*=(const sInt&);
-        //sInt operator/=(const sInt&);
+        sInt& operator-=(const sInt&);
+        sInt& operator*=(const sInt&);
+        sInt& operator/=(const sInt&);
 
         sInt operator>=(const sInt&);
         sInt operator>(const sInt&);
         sInt operator<=(const sInt&);
         sInt operator<(const sInt&);
 
-
-        sInt operator&(const sInt&);
+		sInt operator&(const sInt&);
+		sInt operator^(const sInt&);
+		sInt operator|(const sInt&);
 
         sInt ifelse(const sInt&, const sInt&);
 
 
         ValueType getValue();
-
-
-        void reveal(ArrayView<u64> partyIdxs);
-
-        //BitVector valueToBV(const ValueType& val);
-        //ValueType valueFromBV(const BitVector& val);
-        
-
+        void reveal(span<u64> partyIdxs);
 
         sIntBasePtr mData;
-        //Runtime& mRuntime;
-        //GUI mGUI;
-        //u64 mBitCount;
-        //std::unique_ptr<RuntimeData> mData;
-        //std::unique_ptr<std::future<BitVector>> mValFut;
-        //BitVector mVal;
     };
 
 

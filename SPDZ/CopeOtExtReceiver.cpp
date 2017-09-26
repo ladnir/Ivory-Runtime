@@ -11,7 +11,7 @@ using namespace std;
 
 namespace osuCrypto
 {
-    void CopeOtExtReceiver::setBaseOts(ArrayView<std::array<block, 2>> baseOTs)
+    void CopeOtExtReceiver::setBaseOts(span<std::array<block, 2>> baseOTs)
     {
         if (baseOTs.size() != gOtExtBaseOtCount)
             throw std::runtime_error(LOCATION);
@@ -44,8 +44,8 @@ namespace osuCrypto
 
 
     void CopeOtExtReceiver::receive(
-        ArrayView<ZpNumber> inVal,
-        ArrayView<ZpNumber> share,
+        span<ZpNumber> inVal,
+        span<ZpNumber> share,
         PRNG& prng,
         Channel& chl)
     {

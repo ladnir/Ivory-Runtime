@@ -26,7 +26,7 @@ namespace osuCrypto
         return std::move(ret);
     }
 
-    void CopeOtExtSender::setBaseOts(ArrayView<block> baseRecvOts, const BitVector & choices)
+    void CopeOtExtSender::setBaseOts(span<block> baseRecvOts, const BitVector & choices)
     {
         if (baseRecvOts.size() != gOtExtBaseOtCount || choices.size() != gOtExtBaseOtCount)
             throw std::runtime_error("not supported/implemented");
@@ -40,7 +40,7 @@ namespace osuCrypto
     }
 
     void CopeOtExtSender::send(
-        ArrayView<ZpNumber> messages,
+        span<ZpNumber> messages,
         Channel& chl)
     {
         auto fieldSize = messages[0].mField->bitCount();

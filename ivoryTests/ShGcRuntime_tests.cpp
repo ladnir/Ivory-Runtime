@@ -200,7 +200,8 @@ void ShGcRuntime_basicArith_Test()
         auto add = input1 + input0;
         auto sub = input1 - input0;
         auto mul = input1 * input0;
-        auto div = input1 / input0;
+		auto div = input1 / input0;
+		auto div2 = input1 / 2;
 
 
         auto gt = input1 > input0;
@@ -508,7 +509,7 @@ void evaluate(BetaCircuit* cir, PRNG& prng, InputType type)
 
 void ShGcRuntime_CircuitInvert_Test()
 {
-    CircuitLibrary lib;
+    BetaLibrary lib;
     u64 aSize(10);
     auto cir = lib.int_bitInvert(aSize);
     PRNG prng(ZeroBlock);
@@ -555,7 +556,7 @@ i64 get(const std::vector<u8>& src)
 
 void ShGcRuntime_CircuitAdd_Test()
 {
-    CircuitLibrary lib;
+    BetaLibrary lib;
     u64 size(5);
     auto cir = lib.int_int_add(size, size, size);
     auto trials = 100;
@@ -590,7 +591,7 @@ void ShGcRuntime_CircuitAdd_Test()
 
 void ShGcRuntime_CircuitMult_Test()
 {
-    CircuitLibrary lib;
+    BetaLibrary lib;
     u64 size(5);
     auto cir = lib.int_int_mult(size, size, size);
     auto trials = 100;
@@ -629,7 +630,7 @@ void shGcRuntime_CircuitEval_Test()
     auto trials(10);
     PRNG prng(ZeroBlock);
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
     auto sizeA(13), sizeB(10), sizeC(11);
     std::vector<BetaCircuit*> cirs{
         lib.int_int_gteq(sizeA, sizeA),

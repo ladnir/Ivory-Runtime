@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Circuit_Tests.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -45,6 +42,9 @@
     <ClInclude Include="Cope_Tests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BetaCircuit_Tests.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common.cpp">
@@ -57,9 +57,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="KProbe_Tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Circuit_Tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OTOracleReceiver.cpp">
@@ -75,6 +72,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Cope_Tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BetaCircuit_Tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -26,9 +26,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Circuit_Tests_VS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ShGcRuntime_TestsVs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -36,6 +33,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Cope_TestsVS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BetaCircuit_Tests_VS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
