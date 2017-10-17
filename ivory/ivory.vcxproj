@@ -71,24 +71,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Circuit\AlphaCircuit.cpp" />
-    <ClCompile Include="Circuit\AlphaLibrary.cpp" />
     <ClCompile Include="Circuit\BetaCircuit.cpp" />
-    <ClCompile Include="Circuit\BetaLibrary.cpp" />
+    <ClCompile Include="Circuit\Circuit.cpp" />
+    <ClCompile Include="Circuit\CircuitLibrary.cpp" />
     <ClCompile Include="Runtime\Party.cpp" />
     <ClCompile Include="Runtime\Public\PublicInt.cpp" />
     <ClCompile Include="Runtime\ShGc\ShGcInt.cpp" />
+    <ClCompile Include="Runtime\ShGc\utils.cpp" />
     <ClCompile Include="Runtime\sInt.cpp" />
     <ClCompile Include="Runtime\ShGc\ShGcRuntime.cpp" />
     <ClCompile Include="Runtime\Runtime.cpp" />
-    <ClCompile Include="Runtime\Thunder\ThunderInt.cpp" />
-    <ClCompile Include="Runtime\Thunder\ThunderRuntime.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Circuit\AlphaCircuit.h" />
-    <ClInclude Include="Circuit\AlphaLibrary.h" />
     <ClInclude Include="Circuit\BetaCircuit.h" />
-    <ClInclude Include="Circuit\BetaLibrary.h" />
+    <ClInclude Include="Circuit\Circuit.h" />
+    <ClInclude Include="Circuit\CircuitLibrary.h" />
     <ClInclude Include="Circuit\Gate.h" />
     <ClInclude Include="Runtime\Party.h" />
     <ClInclude Include="Runtime\Public\PublicInt.h" />
@@ -97,9 +94,6 @@
     <ClInclude Include="Runtime\sInt.h" />
     <ClInclude Include="Runtime\ShGc\ShGcRuntime.h" />
     <ClInclude Include="Runtime\Runtime.h" />
-    <ClInclude Include="Runtime\Thunder\ThunderInt.h" />
-    <ClInclude Include="Runtime\Thunder\ThunderRuntime.h" />
-    <ClInclude Include="Runtime\Thunder\util.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />

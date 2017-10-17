@@ -269,7 +269,7 @@ namespace osuCrypto
     {
         mPrints.emplace_back(mGates.size(), -1, str, false);
     }
-    void BetaCircuit::evaluate(span<BitVector> input, span<BitVector> output, bool print)
+    void BetaCircuit::evaluate(ArrayView<BitVector> input, ArrayView<BitVector> output, bool print)
     {
         std::vector<u8> mem(mWireCount);
 

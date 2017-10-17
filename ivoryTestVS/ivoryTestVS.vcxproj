@@ -95,7 +95,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BetaCircuit_Tests_VS.cpp" />
+    <ClCompile Include="Circuit_Tests_VS.cpp" />
     <ClCompile Include="Cope_TestsVS.cpp" />
     <ClCompile Include="ShGcRuntime_TestsVs.cpp" />
     <ClCompile Include="stdafx.cpp">

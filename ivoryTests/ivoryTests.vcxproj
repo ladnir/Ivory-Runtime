@@ -75,7 +75,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="BetaCircuit_Tests.h" />
+    <ClInclude Include="Circuit_Tests.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Cope_Tests.h" />
     <ClInclude Include="DebugCircuits.h" />
@@ -87,7 +87,7 @@
     <ClInclude Include="ZpNumber_Tests.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BetaCircuit_Tests.cpp" />
+    <ClCompile Include="Circuit_Tests.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Cope_Tests.cpp" />
     <ClCompile Include="DebugCircuits.cpp" />

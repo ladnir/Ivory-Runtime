@@ -20,7 +20,7 @@ public:
 	bool hasBaseOts() const override { return true; }
 
 	void setBaseOts(
-		span<block> baseRecvOts,
+		ArrayView<block> baseRecvOts,
 		const BitVector& choices) override {};
 
 	std::unique_ptr<OtExtSender> split() override
@@ -30,7 +30,7 @@ public:
 	}
 
 	void send(
-		span<std::array<block,2>> messages,
+		ArrayView<std::array<block,2>> messages,
 		PRNG& prng,
 		Channel& chl) override;
 };

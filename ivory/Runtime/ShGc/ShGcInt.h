@@ -38,8 +38,7 @@ namespace osuCrypto
 
         sIntBasePtr bitwiseInvert()override;
         sIntBasePtr bitwiseAnd(sIntBasePtr& a, sIntBasePtr& b)override;
-		sIntBasePtr bitwiseOr(sIntBasePtr& a, sIntBasePtr& b)override;
-		sIntBasePtr bitwiseXor(sIntBasePtr& a, sIntBasePtr& b)override;
+        sIntBasePtr bitwiseOr(sIntBasePtr& a, sIntBasePtr& b)override;
 
         sIntBasePtr ifelse(sIntBasePtr& a, sIntBasePtr& ifTrue, sIntBasePtr& ifFalse)override;
 

@@ -1,9 +1,10 @@
 #pragma once
 #include "ivory/Runtime/Runtime.h"
+#include "ivory/Circuit/Circuit.h"
 #include "ivory/Circuit/BetaCircuit.h"
-#include "ivory/Circuit/BetaLibrary.h"
+#include "ivory/Circuit/CircuitLibrary.h"
 
-#include "cryptoTools/Common/Defines.h"
+#include "cryptoTools/Common/ArrayView.h"
 #include "cryptoTools/Common/ByteStream.h"
 
 #include "libOTe/TwoChooseOne/IknpOtExtSender.h"
@@ -52,7 +53,7 @@ namespace osuCrypto
 
         u64 getPartyIdx() override { return mPartyIdx; }
 
-        BetaLibrary mLibrary;
+        CircuitLibrary mLibrary;
 
 
 
@@ -81,7 +82,7 @@ namespace osuCrypto
         void enqueue(ShGc::InputItem&& item);
         void enqueue(ShGc::CircuitItem&& item);
         void enqueue(ShGc::OutputItem&& item);
-        void processQueue() override;
+        void processesQueue() override;
 
         void garblerOutput();
         void garblerCircuit();
@@ -109,18 +110,18 @@ namespace osuCrypto
 		std::function<bool()> mRecvBit;
         static void evaluate(
             const BetaCircuit& cir,
-            const span<block>& memory,
+            const ArrayView<block>& memory,
             std::array<block, 2>& tweaks,
-            const span<GarbledGate<2>>& garbledGates,
+            const ArrayView<GarbledGate<2>>& garbledGates,
 			const std::function<bool()>& getAuxilaryBit,
             block* DEBUG_labels = nullptr);
 
 
         static void garble(
             const BetaCircuit& cir,
-            const span<block>& memory,
+            const ArrayView<block>& memory,
             std::array<block, 2>& tweaks,
-            const span<GarbledGate<2>>&  garbledGateIter,
+            const ArrayView<GarbledGate<2>>&  garbledGateIter,
             const std::array<block,2>& zeroAndGlobalOffset,
 			std::vector<u8>& auxilaryBits,
             block* DEBUG_labels = nullptr

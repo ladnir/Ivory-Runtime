@@ -40,11 +40,6 @@ namespace osuCrypto
         return mData->bitwiseInvert();
     }
 
-	sInt sInt::operator-()
-	{
-		return mData->negate();
-	}
-
     sInt sInt::operator+(const sInt& in2) const
     {
         return mData->add((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
@@ -80,16 +75,6 @@ namespace osuCrypto
         return mData->bitwiseAnd((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
     }
 
-	sInt sInt::operator^(const sInt &in2)
-	{
-		return mData->bitwiseXor((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
-	}
-
-	sInt sInt::operator|(const sInt &in2)
-	{
-		return mData->bitwiseOr((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
-	}
-
     sInt sInt::ifelse(const sInt & ifTrue, const sInt & ifFalse)
     {
         return mData->ifelse((sIntBasePtr&)mData, (sIntBasePtr&)ifTrue.mData, (sIntBasePtr&)ifFalse.mData);
@@ -100,24 +85,6 @@ namespace osuCrypto
         mData = mData->add((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
         return *this;
     }
-
-	sInt & sInt::operator-=(const sInt &in2)
-	{
-		mData = mData->subtract((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
-		return *this;
-	}
-
-	sInt & sInt::operator*=(const sInt &in2)
-	{
-		mData = mData->multiply((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
-		return *this;
-	}
-
-	sInt & sInt::operator/=(const sInt &in2)
-	{
-		mData = mData->divide((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
-		return *this;
-	}
 
     sInt sInt::operator*(const sInt& in2) const
     {
@@ -134,7 +101,7 @@ namespace osuCrypto
         return mData->getValue();
     }
 
-    void sInt::reveal(span<u64> partyIdxs)
+    void sInt::reveal(ArrayView<u64> partyIdxs)
     {
         mData->reveal(partyIdxs);
     }

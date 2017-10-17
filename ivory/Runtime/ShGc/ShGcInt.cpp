@@ -22,21 +22,15 @@ namespace osuCrypto
         w.mLabels[0] = cc->mLabels;
         w.mLabels[1] = mLabels;
 
-		mRt.enqueue(std::move(w));
+
+        //mLabels = ShGcGarbledMem(new std::vector<block>(*cc->mLabels));
+
+        //return sIntBasePtr(new ShGcInt(*this));
     }
 
     sIntBasePtr ShGcInt::copy()
     {
-		auto ret = new ShGcInt(mRt, mLabels->size());
-
-		ShGc::CircuitItem w;
-		w.mLabels.resize(2);
-		w.mLabels[0] = ret->mLabels;
-		w.mLabels[1] = mLabels;
-
-		mRt.enqueue(std::move(w));
-
-        return sIntBasePtr(ret);
+        return sIntBasePtr();
     }
 
     u64 ShGcInt::bitCount()
@@ -269,28 +263,6 @@ namespace osuCrypto
 
         return sIntBasePtr(ret);
     }
-	sIntBasePtr ShGcInt::bitwiseXor(sIntBasePtr& a, sIntBasePtr & b)
-	{
-		auto aa = getMemory(a);
-		auto bb = getMemory(b);
-		auto ret(new ShGcInt(mRt, 1));
-
-		ShGc::CircuitItem workItem;
-		workItem.mInputBundleCount = 2;
-		workItem.mLabels.resize(3);
-		workItem.mLabels[0] = aa;
-		workItem.mLabels[1] = bb;
-		workItem.mLabels[2] = ret->mLabels;
-
-		workItem.mCircuit = mRt.mLibrary.int_int_bitwiseXor(
-			workItem.mLabels[0]->size(),
-			workItem.mLabels[1]->size(),
-			workItem.mLabels[2]->size());
-
-		mRt.enqueue(std::move(workItem));
-
-		return sIntBasePtr(ret);
-	}
 
     sIntBasePtr ShGcInt::ifelse(sIntBasePtr& a, sIntBasePtr & ifTrue, sIntBasePtr & ifFalse)
     {
@@ -355,7 +327,7 @@ namespace osuCrypto
 
     ShGcInt::ValueType ShGcInt::getValue()
     {
-        mRt.processQueue();
+        mRt.processesQueue();
         auto bv = mFutr.get();
         ValueType v= 0;
         memcpy(&v, bv.data(), bv.sizeBytes());

@@ -27,6 +27,15 @@
     <ClCompile Include="Circuit\BetaCircuit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Circuit\Circuit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Circuit\CircuitLibrary.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\ShGc\utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Runtime\ShGc\ShGcInt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -34,21 +43,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\ShGc\ShGcRuntime.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Runtime\Thunder\ThunderRuntime.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Circuit\AlphaCircuit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Runtime\Thunder\ThunderInt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Circuit\BetaLibrary.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Circuit\AlphaLibrary.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,6 +59,12 @@
     <ClInclude Include="Circuit\BetaCircuit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Circuit\Circuit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Circuit\CircuitLibrary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Circuit\Gate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -78,24 +78,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\ShGc\ShGcRuntime.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Thunder\ThunderRuntime.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Circuit\AlphaCircuit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Thunder\ThunderInt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Thunder\util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Circuit\BetaLibrary.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Circuit\AlphaLibrary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

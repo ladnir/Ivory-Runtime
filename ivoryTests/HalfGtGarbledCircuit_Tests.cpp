@@ -214,7 +214,7 @@ void HalfGtGC_Stream_BitAdder_Test_Impl()
 			gcRecv.evaluateStream(cd, recvChannel, wireBuff, [&](u64 numInputs) {
 				//if (numInputs != labels.size()) 
 					//throw std::runtime_error("");
-				return span<block>(labels);
+				return ArrayView<block>(labels);
 			});
 
 			BitVector outputVec;
