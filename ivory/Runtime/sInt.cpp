@@ -101,7 +101,7 @@ namespace osuCrypto
         return mData->getValue();
     }
 
-    void sInt::reveal(ArrayView<u64> partyIdxs)
+    void sInt::reveal(span<u64> partyIdxs)
     {
         mData->reveal(partyIdxs);
     }

@@ -1,6 +1,6 @@
 #pragma once
 #include "cryptoTools/Common/Defines.h"
-#include "cryptoTools/Common/ArrayView.h"
+
 #include <future>
 #include <memory>
 #include <ivory/Runtime/sInt.h>
@@ -61,7 +61,7 @@ namespace osuCrypto
         //    The input variables of io should remain unchanged. This operation may be performed 
         //    asynchronously in that it may be performed at some later time but before the next 
         //    call to processesQueue() returns.
-        //virtual void scheduleOp(Op op, ArrayView<sIntBase*> io) = 0;
+        //virtual void scheduleOp(Op op, span<sIntBase*> io) = 0;
 
         // This scheduleOutput(...) marks the current state of data as being ready to 
         //    be revealed to party[pIdx]. 

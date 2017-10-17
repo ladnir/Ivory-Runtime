@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8C3AF3C3-2ABF-43A7-8B72-C674E64BD0D6}</ProjectGuid>
     <RootNamespace>ivory</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -76,11 +76,11 @@
     <ClCompile Include="Circuit\CircuitLibrary.cpp" />
     <ClCompile Include="Runtime\Party.cpp" />
     <ClCompile Include="Runtime\Public\PublicInt.cpp" />
+    <ClCompile Include="Runtime\Runtime.cpp" />
     <ClCompile Include="Runtime\ShGc\ShGcInt.cpp" />
+    <ClCompile Include="Runtime\ShGc\ShGcRuntime.cpp" />
     <ClCompile Include="Runtime\ShGc\utils.cpp" />
     <ClCompile Include="Runtime\sInt.cpp" />
-    <ClCompile Include="Runtime\ShGc\ShGcRuntime.cpp" />
-    <ClCompile Include="Runtime\Runtime.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Circuit\BetaCircuit.h" />
@@ -89,11 +89,11 @@
     <ClInclude Include="Circuit\Gate.h" />
     <ClInclude Include="Runtime\Party.h" />
     <ClInclude Include="Runtime\Public\PublicInt.h" />
+    <ClInclude Include="Runtime\Runtime.h" />
     <ClInclude Include="Runtime\ShGc\ShGcInt.h" />
+    <ClInclude Include="Runtime\ShGc\ShGcRuntime.h" />
     <ClInclude Include="Runtime\ShGc\utils.h" />
     <ClInclude Include="Runtime\sInt.h" />
-    <ClInclude Include="Runtime\ShGc\ShGcRuntime.h" />
-    <ClInclude Include="Runtime\Runtime.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />

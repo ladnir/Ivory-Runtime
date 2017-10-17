@@ -195,13 +195,13 @@ namespace osuCrypto {
 		return mHasMore++ & 1;
 	}
 
-	ArrayView<Gate> Circuit::getMoreGates()
+	span<Gate> Circuit::getMoreGates()
 	{
-		return ArrayView<Gate>(mGates.begin(), mGates.end());
+		return span<Gate>(mGates.begin(), mGates.end());
 	}
-	ArrayView<u64> Circuit::getOutputIndices()
+	span<u64> Circuit::getOutputIndices()
 	{
-		return ArrayView<u64>(mOutputs.begin(), mOutputs.end());
+		return span<u64>(mOutputs.begin(), mOutputs.end());
 	}
     std::vector<u64> Circuit::getInputIndices()
 	{
@@ -210,7 +210,7 @@ namespace osuCrypto {
 			begin[i] = i;
 
         return begin;
-		//return ArrayView<u64>(mInputs.begin(), mInputs.end());
+		//return span<u64>(mInputs.begin(), mInputs.end());
 	}
 	u64 Circuit::getInternalWireBuffSize() const
 	{

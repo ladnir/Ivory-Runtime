@@ -130,7 +130,7 @@ namespace osuCrypto
         ValueType getValue();
 
 
-        void reveal(ArrayView<u64> partyIdxs);
+        void reveal(span<u64> partyIdxs);
 
         //BitVector valueToBV(const ValueType& val);
         //ValueType valueFromBV(const BitVector& val);

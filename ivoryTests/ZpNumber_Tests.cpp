@@ -8,7 +8,7 @@
 #include "cryptoTools/Common/Defines.h"
 #include "ZpNumber_Tests.h"
 //#include "Math/ZpField.h"
-#include "cryptoTools/Common/ByteStream.h"
+
 
 #include "cryptoTools/Common/BitVector.h"
 

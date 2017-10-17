@@ -73,8 +73,8 @@ namespace osuCrypto {
 		// CircuitStream interface
 		u8 mHasMore;
 		bool hasMoreGates() ;
-		ArrayView<Gate> getMoreGates() ;
-		ArrayView<u64> getOutputIndices() ;
+		span<Gate> getMoreGates() ;
+		span<u64> getOutputIndices() ;
 		std::vector<u64> getInputIndices() ;
 
 		u64 getInternalWireBuffSize() const ;

@@ -15,15 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Runtime\sInt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Runtime\Party.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Runtime\Runtime.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Circuit\BetaCircuit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -33,29 +24,29 @@
     <ClCompile Include="Circuit\CircuitLibrary.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\ShGc\utils.cpp">
+    <ClCompile Include="Runtime\Public\PublicInt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Runtime\ShGc\ShGcInt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\Public\PublicInt.cpp">
+    <ClCompile Include="Runtime\ShGc\ShGcRuntime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Runtime\ShGc\ShGcRuntime.cpp">
+    <ClCompile Include="Runtime\ShGc\utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Party.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\Runtime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime\sInt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Runtime\sInt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Party.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime\Runtime.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Circuit\BetaCircuit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -68,16 +59,25 @@
     <ClInclude Include="Circuit\Gate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\ShGc\utils.h">
+    <ClInclude Include="Runtime\Public\PublicInt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime\ShGc\ShGcInt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\Public\PublicInt.h">
+    <ClInclude Include="Runtime\ShGc\ShGcRuntime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime\ShGc\ShGcRuntime.h">
+    <ClInclude Include="Runtime\ShGc\utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Party.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\Runtime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime\sInt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
