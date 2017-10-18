@@ -14,7 +14,7 @@
     <ProjectGuid>{5E8855B4-27DA-40EB-A9B5-B4BD6439315F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ivoryTestVS</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -66,7 +66,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutputPath);$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories);$(libOTeDir)\x64\$(Configuration);C:\libs;C:\libs\cryptopp\x64\Output\$(Configuration);C:\libs\boost\stage\lib\;$(ProjectDir)/../thirdparty/win/NTL/x64/$(Configuration);C:\libs\NTL\x64\$(Configuration);C:\libs\miracl\x64\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SPDZ.lib;libOTe.lib;cryptoTools.lib;Miracl.lib;NTL.lib;ivoryTests.lib;ivory.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libOTe.lib;cryptoTools.lib;Miracl.lib;NTL.lib;ivoryTests.lib;ivory.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -87,7 +87,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutputPath);$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories);$(libOTeDir)\x64\$(Configuration);C:\libs;C:\libs\cryptopp\x64\Output\$(Configuration);C:\libs\boost\stage\lib\;$(ProjectDir)/../thirdparty/win/NTL/x64/$(Configuration);C:\libs\NTL\x64\$(Configuration);C:\libs\miracl\x64\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SPDZ.lib;libOTe.lib;cryptoTools.lib;Miracl.lib;NTL.lib;ivoryTests.lib;ivory.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libOTe.lib;cryptoTools.lib;Miracl.lib;NTL.lib;ivoryTests.lib;ivory.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
