@@ -31,7 +31,7 @@ namespace osuCrypto
 		mPrng.SetSeed(seed);
 		mAes.setKey(mPrng.get<block>());
 		mChannel = &chl;
-		mGlobalOffset = mPrng.get<block>();
+		mGlobalOffset = mPrng.get<block>() | OneBlock;
 		mZeroAndGlobalOffset[1] = mGlobalOffset;
 		mRole = role;
 		mPartyIdx = partyIdx;
@@ -902,7 +902,7 @@ namespace osuCrypto
 		std::array<block, 2> in;
 		//u64 i = 0;
 		auto& mGlobalOffset = mZeroAndGlobalOffset[1];
-		std::cout << mZeroAndGlobalOffset[0] << " " << mZeroAndGlobalOffset[1] << std::endl;
+		//std::cout << mZeroAndGlobalOffset[0] << " " << mZeroAndGlobalOffset[1] << std::endl;
 
 		u8 aPermuteBit, bPermuteBit, bAlphaBPermute, cPermuteBit;
 		block hash[4], temp[4];
