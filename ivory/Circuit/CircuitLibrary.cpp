@@ -771,7 +771,7 @@ namespace osuCrypto
         {
 
             // this will hold the b[i] * a
-            rows[i].mWires.resize(std::min(c.mWires.size() - i, a.mWires.size()));
+            rows[i].mWires.resize(std::min(static_cast<size_t>(c.mWires.size() - i), static_cast<size_t>(a.mWires.size())));
 
             // initialize some unused wires, these will
             // hold intermediate sums.
@@ -799,7 +799,7 @@ namespace osuCrypto
                 rows[i].mWires[0] = c.mWires[i];
             }
 
-            const BetaWire& bi = b.mWires[std::min(i, b.mWires.size() - 1)];
+            const BetaWire& bi = b.mWires[std::min(static_cast<size_t>(i), static_cast<size_t>(b.mWires.size() - 1))];
 
             u64 prev = cd.mNonXorGateCount;
             // compute the AND between b[i] * a[j].
@@ -834,7 +834,7 @@ namespace osuCrypto
             // bit of the final product.
             for (u64 i = 1; i < rows.size(); i++)
             {
-                BetaBundle sum(std::min(rows[i].mWires.size() + 1, c.mWires.size() - i));
+                BetaBundle sum(std::min(static_cast<size_t>(rows[i].mWires.size() + 1), static_cast<size_t>(c.mWires.size() - i)));
 
 
                 //cd.addPrint("+");
