@@ -32,6 +32,7 @@ namespace osuCrypto
 		mAes.setKey(mPrng.get<block>());
 		mChannel = &chl;
 		mGlobalOffset = mPrng.get<block>() | OneBlock;
+		mZeroAndGlobalOffset[0] = ZeroBlock;
 		mZeroAndGlobalOffset[1] = mGlobalOffset;
 		mRole = role;
 		mPartyIdx = partyIdx;

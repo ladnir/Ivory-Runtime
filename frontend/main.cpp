@@ -1,5 +1,5 @@
 #include "cryptoTools/Network/IOService.h"
-#include "cryptoTools/Network/Endpoint.h"
+#include "cryptoTools/Network/Session.h"
 
 #include <fstream>
 #include <iostream>
@@ -96,14 +96,14 @@ int main(int argc, char**argv)
     // We need each party to be in its own thread.
     std::thread thrd([&]() {
 
-        // Endpoint represents one end of a connection. It facilitates the
+        // Session represents one end of a connection. It facilitates the
         // create of sockets that all bind to this port. First we pas it the 
         // IOSerive and then the server's IP:port number. Next we state that 
-        // this endpoint should act as a server (listens to the provided port)
+        // this Session should act as a server (listens to the provided port)
         // Finally, to identify who is connecting, a name for this connect is 
         // given, in this case it is called "n". For any given server, the name
-        // of the endpoint must be unique.
-        Endpoint ep1(ios, "127.0.0.1:1212", EpMode::Server, "n");
+        // of the Session must be unique.
+        Session ep1(ios, "127.0.0.1:1212", SessionMode::Server, "n");
 
         // We can now create a socket. This is done with addChannel. This operation 
         // is asynchronous. If additional connections are needed between the 
@@ -142,7 +142,7 @@ int main(int argc, char**argv)
 
 
     // set up networking. See above for details
-    Endpoint ep0(ios, "127.0.0.1:1212", EpMode::Client, "n");
+    Session ep0(ios, "127.0.0.1:1212", SessionMode::Client, "n");
     Channel chl0 = ep0.addChannel("n");
 
     // set up the runtime, see above for details

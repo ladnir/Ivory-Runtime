@@ -4,7 +4,7 @@
 #include "ivory/Runtime/ShGc/ShGcRuntime.h"
 #include <functional>
 #include "cryptoTools/Network/IOService.h"
-#include "cryptoTools/Network/Endpoint.h"
+#include "cryptoTools/Network/Session.h"
 #include "cryptoTools/Common/Log.h"
 
 #include "Common.h"
@@ -121,7 +121,7 @@ void runProgram(std::function<void(Runtime&)>  program)
     std::thread thrd([&]() {
         setThreadName("party1");
 
-        Endpoint ep1(ios, "127.0.0.1:1212", EpMode::Client, "n");
+        Session ep1(ios, "127.0.0.1:1212", SessionMode::Client, "n");
         Channel chl1 = ep1.addChannel("n");
         PRNG prng(ZeroBlock);
 
@@ -138,7 +138,7 @@ void runProgram(std::function<void(Runtime&)>  program)
     });
 
     setThreadName("party0");
-    Endpoint ep0(ios, "127.0.0.1:1212", EpMode::Server, "n");
+    Session ep0(ios, "127.0.0.1:1212", SessionMode::Server, "n");
     Channel chl0 = ep0.addChannel("n");
     ShGcRuntime rt0;
     rt0.init(chl0, prng.get<block>(), ShGcRuntime::Garbler, 0);
