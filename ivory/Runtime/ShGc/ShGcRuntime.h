@@ -4,8 +4,8 @@
 #include "ivory/Circuit/BetaCircuit.h"
 #include "ivory/Circuit/CircuitLibrary.h"
 
-#include "cryptoTools/Common/ArrayView.h"
-#include "cryptoTools/Common/ByteStream.h"
+
+
 
 #include "libOTe/TwoChooseOne/IknpOtExtSender.h"
 #include "libOTe/TwoChooseOne/IknpOtExtReceiver.h"
@@ -74,7 +74,7 @@ namespace osuCrypto
         std::vector<block> sharedMem;
         //std::vector<GarbledGate<2>> sharedGates;
 		std::vector<u8> shareAuxBits;
-        ByteStream sharedBuff;
+        std::vector<block> sharedBuff;
         std::array<block, 2>mTweaks;
 
         ShGc::GarbledMem getPublicGarbledMem(u8* data, u64 bitCount);
@@ -110,18 +110,18 @@ namespace osuCrypto
 		std::function<bool()> mRecvBit;
         static void evaluate(
             const BetaCircuit& cir,
-            const ArrayView<block>& memory,
+            const span<block>& memory,
             std::array<block, 2>& tweaks,
-            const ArrayView<GarbledGate<2>>& garbledGates,
+            const span<GarbledGate<2>>& garbledGates,
 			const std::function<bool()>& getAuxilaryBit,
             block* DEBUG_labels = nullptr);
 
 
         static void garble(
             const BetaCircuit& cir,
-            const ArrayView<block>& memory,
+            const span<block>& memory,
             std::array<block, 2>& tweaks,
-            const ArrayView<GarbledGate<2>>&  garbledGateIter,
+            const span<GarbledGate<2>>&  garbledGateIter,
             const std::array<block,2>& zeroAndGlobalOffset,
 			std::vector<u8>& auxilaryBits,
             block* DEBUG_labels = nullptr

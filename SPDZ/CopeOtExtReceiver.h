@@ -25,13 +25,13 @@ namespace osuCrypto
         std::array<std::array<PRNG, 2>, gOtExtBaseOtCount> mGens;
 
         void setBaseOts(
-            ArrayView<std::array<block, 2>> baseSendOts);
+            span<std::array<block, 2>> baseSendOts);
         std::unique_ptr<CopeOtExtReceiver> split() ;
 
 
         void receive(
-            ArrayView<ZpNumber> messages,
-            ArrayView<ZpNumber> share,
+            span<ZpNumber> messages,
+            span<ZpNumber> share,
             PRNG& prng,
             Channel& chl);
 

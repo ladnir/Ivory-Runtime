@@ -1,7 +1,7 @@
 #include "ShGcRuntime.h"
 #include "ivory/Runtime/ShGc/ShGcInt.h"
 
-#include "cryptoTools/Common/ByteStream.h"
+
 #include "cryptoTools/Common/Log.h"
 
 #include "libOTe/Base/naor-pinkas.h"
@@ -31,7 +31,7 @@ namespace osuCrypto
 		mPrng.SetSeed(seed);
 		mAes.setKey(mPrng.get<block>());
 		mChannel = &chl;
-		mGlobalOffset = mPrng.get<block>();
+		mGlobalOffset = mPrng.get<block>() | OneBlock;
 		mZeroAndGlobalOffset[1] = mGlobalOffset;
 		mRole = role;
 		mPartyIdx = partyIdx;
@@ -95,7 +95,7 @@ namespace osuCrypto
 
 	//void ShGcRuntime::scheduleOp(
 	//    Op op,
-	//    ArrayView<RuntimeData*> io)
+	//    span<RuntimeData*> io)
 	//{
 	//    mCrtQueue.emplace();
 	//    CircuitItem& item = mCrtQueue.back();
@@ -331,25 +331,23 @@ namespace osuCrypto
 				mAes.ecbEncCounterMode(mInputIdx, item.mLabels->size(), item.mLabels->data());
 				mInputIdx += item.mLabels->size();
 
-				std::unique_ptr<ByteStream> buff(new ByteStream(item.mLabels->size() * sizeof(block)));
-				auto view = buff->getArrayView<block>();
+				std::vector<block>view(item.mLabels->size());
 
 				for (u64 i = 0; i < item.mLabels->size(); ++i)
 				{
 					view[i] = (*item.mLabels)[i] ^ mZeroAndGlobalOffset[item.mInputVal[i]];
 				}
-				mChannel->asyncSend(std::move(buff));
+				mChannel->asyncSend(std::move(view));
 			}
 			else
 			{
-				std::unique_ptr<ByteStream> buff(new ByteStream(item.mLabels->size() * sizeof(block)));
-				auto view = buff->getArrayView<block>();
+				std::vector<block>view(item.mLabels->size());
 				for (u64 i = 0; i < item.mLabels->size(); ++i, ++iter)
 				{
 					(*item.mLabels)[i] = (*iter)[0];
 					view[i] = (*iter)[1] ^ (*iter)[0] ^ mGlobalOffset;
 				}
-				mChannel->asyncSend(std::move(buff));
+				mChannel->asyncSend(std::move(view));
 			}
 
 			mInputQueue.pop();
@@ -367,7 +365,7 @@ namespace osuCrypto
 				sharedMem.resize(mOtCount);
 
 			//sharedMem.resize(mOtCount);
-			ArrayView<block> view(sharedMem.begin(), sharedMem.begin() + mOtCount);
+			span<block> view(sharedMem.begin(), sharedMem.begin() + mOtCount);
 
 			mOtExtRecver.receive(mOtChoices, sharedMem, mPrng, *mChannel);
 
@@ -386,11 +384,10 @@ namespace osuCrypto
 			if (item.mInputVal.size())
 			{
 				mChannel->recv(sharedBuff);
-				auto view = sharedBuff.getArrayView<block>();
 
 				for (u64 i = 0; i < item.mLabels->size(); ++i)
 				{
-					(*item.mLabels)[i] = *iter++ ^ (zeroAndAllOnesBlk[item.mInputVal[i]] & view[i]);
+					(*item.mLabels)[i] = *iter++ ^ (zeroAndAllOnesBlk[item.mInputVal[i]] & sharedBuff[i]);
 				}
 			}
 			else
@@ -407,6 +404,7 @@ namespace osuCrypto
 		while (mCrtQueue.size())
 		{
 			auto& item = mCrtQueue.front();
+			item.mDebugFlag = true;
 
 			if (item.mCircuit)
 			{
@@ -518,6 +516,7 @@ namespace osuCrypto
 		while (mCrtQueue.size())
 		{
 			auto& item = mCrtQueue.front();
+			item.mDebugFlag = true;
 
 			if (item.mCircuit)
 			{
@@ -538,9 +537,11 @@ namespace osuCrypto
 				if (item.mCircuit->mNonXorGateCount)
 				{
 					mChannel->recv(sharedBuff);
-					Expects(sharedBuff.size() == item.mCircuit->mNonXorGateCount * sizeof(GarbledGate<2>));
+					Expects(sharedBuff.size() == item.mCircuit->mNonXorGateCount * 2);
 				}
-				auto gates = sharedBuff.getArrayView<GarbledGate<2>>();
+				auto gates = span<GarbledGate<2>>(
+					(GarbledGate<2>*) sharedBuff.data(), 
+					item.mCircuit->mNonXorGateCount);
 
 				evaluate(*item.mCircuit, sharedMem, mTweaks, gates, mRecvBit);
 
@@ -887,9 +888,9 @@ namespace osuCrypto
 
 	void ShGcRuntime::garble(
 		const BetaCircuit& cir,
-		const ArrayView<block>& wires,
+		const span<block>& wires,
 		std::array<block, 2>& tweaks,
-		const ArrayView<GarbledGate<2>>& gates,
+		const span<GarbledGate<2>>& gates,
 		const std::array<block, 2>& mZeroAndGlobalOffset,
 		std::vector<u8>& auxilaryBits,
 		block* DEBUG_labels)
@@ -901,7 +902,7 @@ namespace osuCrypto
 		std::array<block, 2> in;
 		//u64 i = 0;
 		auto& mGlobalOffset = mZeroAndGlobalOffset[1];
-		std::cout << mZeroAndGlobalOffset[0] << " " << mZeroAndGlobalOffset[1] << std::endl;
+		//std::cout << mZeroAndGlobalOffset[0] << " " << mZeroAndGlobalOffset[1] << std::endl;
 
 		u8 aPermuteBit, bPermuteBit, bAlphaBPermute, cPermuteBit;
 		block hash[4], temp[4];

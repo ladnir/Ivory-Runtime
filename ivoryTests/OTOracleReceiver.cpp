@@ -1,7 +1,6 @@
 #include "OTOracleReceiver.h"
-#include "cryptoTools/Common/Exceptions.h"
 #include "cryptoTools/Common/Log.h"
-#include "cryptoTools/Common/ArrayView.h"
+
 #include "cryptoTools/Common/BitVector.h"
 #include "cryptoTools/Network/Channel.h"
 using namespace osuCrypto;
@@ -21,7 +20,7 @@ OTOracleReceiver::~OTOracleReceiver()
 
 void OTOracleReceiver::receive(
 	const BitVector& choices,
-	ArrayView<block> messages,
+	span<block> messages,
 	PRNG& prng,
 	Channel& chl)
 {

@@ -24,12 +24,6 @@
     <ClInclude Include="DebugCircuits.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HalfGtGarbledCircuit_Tests.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="KProbe_Tests.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OTOracleReceiver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -51,12 +45,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DebugCircuits.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HalfGtGarbledCircuit_Tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="KProbe_Tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Circuit_Tests.cpp">

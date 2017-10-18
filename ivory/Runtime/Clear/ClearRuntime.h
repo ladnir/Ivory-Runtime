@@ -32,7 +32,7 @@ namespace osuCrypto
         void scheduleInput(ClearIntRuntimeData* data, u64 pIdx)override;
 
 
-        void scheduleOp(Op op, ArrayView<RuntimeData*> io)override;
+        void scheduleOp(Op op, span<RuntimeData*> io)override;
 
 
         void scheduleOutput(RuntimeData* labels, u64 partyIdx)override;

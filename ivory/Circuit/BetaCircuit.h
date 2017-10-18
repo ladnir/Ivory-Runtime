@@ -3,8 +3,9 @@
 
 #include "ivory/Circuit/Gate.h"
 #include "cryptoTools/Common/Defines.h"
+#include "cryptoTools/Common/BitVector.h"
 #include <array>
-#include "cryptoTools/Common/ArrayView.h"
+
 
 namespace osuCrypto
 {
@@ -98,7 +99,7 @@ namespace osuCrypto
 
         std::vector<BetaBundle> mInputs, mOutputs;
         
-        void evaluate(ArrayView<BitVector> input, ArrayView<BitVector> output, bool print = true);
+        void evaluate(span<BitVector> input, span<BitVector> output, bool print = true);
 
 		void levelize();
 	};

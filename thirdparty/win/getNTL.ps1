@@ -1,22 +1,35 @@
 ﻿
 # Update this if needed
-$MSBuild = 'C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe'
-#$cl = 'C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\cl.exe'
+$MSBuildLocations = 
+    'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC\14.11.25503\bin\HostX64\x64\cl.exe',
+    'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.11.25503\bin\HostX64\x64\cl.exe'
+
+$MSBuild = ''
 $git = 'git'
 
+$VSVersion = 2017
 
-
-if(!(Test-Path $MSBuild))
-{
-    Write-Host "Could not find MSBuild as"
-    Write-Host "     $MSBuild"
-    Write-Host ""
-    Write-Host "Please update its lication in the script"
-
-    exit
+foreach($path in $MSBuildLocations) {
+    if(Test-Path $path) {
+        $MSBuild = $path
+    }
 }
-$uri = 'http://www.shoup.net/ntl/WinNTL-9_9_0.zip'
-$zipFile = "$PWD/WinNTL-9_9_0.zip"
+
+if(!(Test-Path $MSBuild)) {
+    $MSBuild = 'C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe'
+    $VSVersion = 2015
+    
+    if(!(Test-Path $MSBuild)){
+        Write-Host "Could not find MSBuild as"
+        Write-Host "     $MSBuild"
+        Write-Host ""
+        Write-Host "Please update its location in the script"
+        exit
+    }
+}
+
+$uri = 'http://www.shoup.net/ntl/WinNTL-10_5_0.zip'
+$zipFile = "$PWD/WinNTL-10_5_0.zip"
 $startDir = $PWD
  
 $folder =  "$PWD\NTL"
@@ -41,7 +54,7 @@ if(!(Test-Path $folder))
     Add-Type -assembly “system.io.compression.filesystem”
     [io.compression.zipfile]::ExtractToDirectory($zipFile, $PWD)
 
-    mv "$PWD/WinNTL-9_9_0" $folder
+    mv "$PWD/WinNTL-10_5_0" $folder
 
     rm $zipFile
 }
@@ -55,10 +68,11 @@ else
 #echo ""
 #echo ""
 
-cp NTL_patch/* $folder -Force
+cp NTL_patch/* $folder -Force -recurse
 
 cd $folder
 
+cp "./visualStudio$VSVersion/*" ./
 
 
 & $MSBuild ntl.sln  /p:Configuration=Release /p:Platform=x64

@@ -79,8 +79,6 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="Cope_Tests.h" />
     <ClInclude Include="DebugCircuits.h" />
-    <ClInclude Include="HalfGtGarbledCircuit_Tests.h" />
-    <ClInclude Include="KProbe_Tests.h" />
     <ClInclude Include="OTOracleReceiver.h" />
     <ClInclude Include="OTOracleSender.h" />
     <ClInclude Include="ShGcRuntime_tests.h" />
@@ -91,8 +89,6 @@
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Cope_Tests.cpp" />
     <ClCompile Include="DebugCircuits.cpp" />
-    <ClCompile Include="HalfGtGarbledCircuit_Tests.cpp" />
-    <ClCompile Include="KProbe_Tests.cpp" />
     <ClCompile Include="OTOracleReceiver.cpp" />
     <ClCompile Include="OTOracleSender.cpp" />
     <ClCompile Include="ShGcRuntime_tests.cpp" />
