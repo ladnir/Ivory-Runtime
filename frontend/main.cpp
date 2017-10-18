@@ -98,7 +98,7 @@ int main(int argc, char**argv)
     std::thread thrd([&]() {
 
         // Session represents one end of a connection. It facilitates the
-        // create of sockets that all bind to this port. First we pass it the 
+        // creation of sockets that all bind to this port. First we pass it the 
         // IOSerive and then the server's IP:port number. Next we state that 
         // this Session should act as a server (listens to the provided port).
         Session ep1(ios, "127.0.0.1:1212", SessionMode::Server);
