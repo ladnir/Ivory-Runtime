@@ -1,5 +1,5 @@
 #include "Runtime.h"
-
+#include "ivory/Runtime/Public/PublicInt.h"
 //#include "Clear/"
 
 namespace osuCrypto
@@ -14,6 +14,6 @@ namespace osuCrypto
 	}
     sIntBasePtr Runtime::getPublicInt(i64 v, u64 size)
     {
-        return sIntBasePtr();
+        return sIntBasePtr(new PublicInt(v, size));
     }
 }

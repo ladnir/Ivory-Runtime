@@ -405,7 +405,6 @@ namespace osuCrypto
 		while (mCrtQueue.size())
 		{
 			auto& item = mCrtQueue.front();
-			item.mDebugFlag = true;
 
 			if (item.mCircuit)
 			{
@@ -446,7 +445,7 @@ namespace osuCrypto
 				///////////////////////////////////////////////////////////////////
 				//                             DEBUG                             //
 				///////////////////////////////////////////////////////////////////
-				if (item.mDebugFlag)
+				if (item.mDebugFlag || mDebugFlag)
 				{
 					std::vector<BitVector>
 						inputs(item.mInputBundleCount),
@@ -517,7 +516,6 @@ namespace osuCrypto
 		while (mCrtQueue.size())
 		{
 			auto& item = mCrtQueue.front();
-			item.mDebugFlag = true;
 
 			if (item.mCircuit)
 			{
@@ -557,7 +555,7 @@ namespace osuCrypto
 				//std::cout << IoStream::unlock;
 
 
-				if (item.mDebugFlag)
+				if (item.mDebugFlag || mDebugFlag)
 				{
 					for (u64 i = 0; i < item.mLabels.size(); ++i) {
 						mChannel->send((u8*)item.mLabels[i]->data(), item.mLabels[i]->size() * sizeof(block));

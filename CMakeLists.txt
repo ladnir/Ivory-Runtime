@@ -50,8 +50,9 @@ set(NTL_Dirs "${CMAKE_SOURCE_DIR}/thirdparty/linux/ntl/")
 #############################################
 #               Build ivory                 #
 #############################################
+
+include_directories(${CMAKE_SOURCE_DIR})
 add_subdirectory(ivory)
-#include_directories(ivory)
 
 
 #############################################

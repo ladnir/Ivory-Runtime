@@ -9,10 +9,11 @@ namespace osuCrypto
         : public sIntBase
     {
     public:
-        sInt::ValueType mValue;
-        u64 mBitCount;
+        sInt::ValueType mValue = 0;
+        u64 mBitCount = 0;
 
-        PublicInt() {}
+		PublicInt()  {}
+		PublicInt(sInt::ValueType v, u64 bits) : mValue(v), mBitCount(bits) {}
         ~PublicInt() override {}
 
         void copy(sIntBasePtr& c)override;

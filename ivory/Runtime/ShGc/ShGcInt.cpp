@@ -336,15 +336,14 @@ namespace osuCrypto
 
     ShGc::GarbledMem ShGcInt::getMemory(sIntBasePtr & a)
     {
-        auto shGcInt = static_cast<ShGcInt*>(a.get());
+        auto shGcInt = dynamic_cast<ShGcInt*>(a.get());
         if (shGcInt) return shGcInt->mLabels;
 
-        auto publicInt = static_cast<PublicInt*>(a.get());
+        auto publicInt = dynamic_cast<PublicInt*>(a.get());
+       if(publicInt) return mRt.getPublicGarbledMem((u8*)&publicInt->mValue, publicInt->mBitCount);
 
-        Expects(!publicInt);// input Int must with be ShGcInt or PublicInt
 
-        return mRt.getPublicGarbledMem((u8*)publicInt->mValue, publicInt->mBitCount);
-
+	   throw std::runtime_error("input Int must with be ShGcInt or PublicInt. "  LOCATION);
     }
 
 

@@ -59,6 +59,7 @@ namespace osuCrypto
 
         Role mRole;
         u64 mPartyIdx;
+		bool mDebugFlag = false;
 
         u64 mBytesSent;
         std::array<block,2> mZeroAndGlobalOffset;
@@ -104,8 +105,8 @@ namespace osuCrypto
         //std::queue<CircuitItem> mWorkQueue;
         //boost::lockfree::spsc_queue<CircuitItem*> mWorkQueue;
 
-        static block ShGcRuntime::evaluateConstGate(bool constA, bool constB, const std::array<block, 2>& in, const GateType& gt);
-        static block ShGcRuntime::garbleConstGate(bool constA, bool constB, const std::array<block, 2>& in, const GateType& gt, const block& xorOffset);
+        static block evaluateConstGate(bool constA, bool constB, const std::array<block, 2>& in, const GateType& gt);
+        static block garbleConstGate(bool constA, bool constB, const std::array<block, 2>& in, const GateType& gt, const block& xorOffset);
 
 		std::function<bool()> mRecvBit;
         static void evaluate(

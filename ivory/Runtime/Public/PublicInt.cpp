@@ -24,9 +24,7 @@ namespace osuCrypto
 
     sIntBasePtr PublicInt::copy()
     {
-        auto ret = new PublicInt();
-        ret->mValue = mValue;
-        ret->mBitCount = mBitCount;
+        auto ret = new PublicInt(mValue, mBitCount);
         return sIntBasePtr(ret);
     }
 

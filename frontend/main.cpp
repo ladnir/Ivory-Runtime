@@ -44,7 +44,7 @@ i32 program(std::array<Party, 2> parties, i64 myInput)
     auto mul = input1 * input0;
     auto div = input1 / input0;
 
-    auto pubAdd = add + 22;
+    //auto pubAdd = add + 22;
 
     auto gteq = input1 >= input0;
     auto lt = input1 < input0;
@@ -89,6 +89,7 @@ int main(int argc, char**argv)
 {
     u64 tries(2);
     PRNG prng(OneBlock);
+	bool debug = false;
 
     // IOSerive will perform the networking operations in the background
     IOService ios;
@@ -97,18 +98,15 @@ int main(int argc, char**argv)
     std::thread thrd([&]() {
 
         // Session represents one end of a connection. It facilitates the
-        // create of sockets that all bind to this port. First we pas it the 
+        // create of sockets that all bind to this port. First we pass it the 
         // IOSerive and then the server's IP:port number. Next we state that 
-        // this Session should act as a server (listens to the provided port)
-        // Finally, to identify who is connecting, a name for this connect is 
-        // given, in this case it is called "n". For any given server, the name
-        // of the Session must be unique.
-        Session ep1(ios, "127.0.0.1:1212", SessionMode::Server, "n");
+        // this Session should act as a server (listens to the provided port).
+        Session ep1(ios, "127.0.0.1:1212", SessionMode::Server);
 
         // We can now create a socket. This is done with addChannel. This operation 
         // is asynchronous. If additional connections are needed between the 
-        // two parties, call addChannel again but with a different channel name.
-        Channel chl1 = ep1.addChannel("n");
+        // two parties, call addChannel again.
+        Channel chl1 = ep1.addChannel();
 
         // this is an opertional call that blocks until the socket has successfully 
         // been set up.
@@ -123,6 +121,7 @@ int main(int argc, char**argv)
         // with the other party, a seed, what mode it should run in, and 
         // the local party index. 
         ShGcRuntime rt1;
+		rt1.mDebugFlag = debug;
         rt1.init(chl1, prng.get<block>(), ShGcRuntime::Evaluator, 1);
 
         // We can then instantiate the parties that will be running the protocol.
@@ -142,11 +141,12 @@ int main(int argc, char**argv)
 
 
     // set up networking. See above for details
-    Session ep0(ios, "127.0.0.1:1212", SessionMode::Client, "n");
-    Channel chl0 = ep0.addChannel("n");
+    Session ep0(ios, "127.0.0.1:1212", SessionMode::Client);
+    Channel chl0 = ep0.addChannel();
 
     // set up the runtime, see above for details
     ShGcRuntime rt0;
+	rt0.mDebugFlag = debug;
     rt0.init(chl0, prng.get<block>(), ShGcRuntime::Garbler, 0);
 
     // instantiate the parties
