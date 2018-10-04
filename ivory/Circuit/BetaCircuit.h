@@ -71,7 +71,7 @@ namespace osuCrypto
 
 
 
-		u64 mNonXorGateCount;
+		u64 mNonlinearGateCount;
         BetaWire mWireCount;
         std::vector<BetaGate> mGates;
         std::vector<std::tuple<u64, BetaWire, std::string, bool>> mPrints;

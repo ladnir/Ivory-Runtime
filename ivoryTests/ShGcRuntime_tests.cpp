@@ -377,7 +377,7 @@ void evaluate(
     }
     cir.evaluate(input2, output2);
 
-    garbledGates.resize(cir.mNonXorGateCount);
+    garbledGates.resize(cir.mNonlinearGateCount);
     auto iterG = memG.begin();
     auto iterE = memE.begin();
 

@@ -6,7 +6,7 @@ namespace osuCrypto
 {
 
     BetaCircuit::BetaCircuit()
-        :mNonXorGateCount(0),
+        :mNonlinearGateCount(0),
         mWireCount(0)
     {
     }
@@ -163,7 +163,7 @@ namespace osuCrypto
             if (isInvert(aIdx)) gt = invertInputWire(0, gt);
             if (isInvert(bIdx)) gt = invertInputWire(1, gt);
 
-            if (gt != GateType::Xor && gt != GateType::Nxor) ++mNonXorGateCount;
+            if (gt != GateType::Xor && gt != GateType::Nxor) ++mNonlinearGateCount;
             mGates.emplace_back(aIdx, bIdx, gt, out);
 
             mWireFlags[out] = BetaWireFlag::Wire;

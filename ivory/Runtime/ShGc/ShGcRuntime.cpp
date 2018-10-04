@@ -427,9 +427,9 @@ namespace osuCrypto
 					//    std::cout << "garb " << i << " " << j << " " << (*item.mLabels[i])[j] << " " << ((*item.mLabels[i])[j] ^ mGlobalOffset) << std::endl;
 				}
 
-				auto gates = std::vector<GarbledGate<2>>(item.mCircuit->mNonXorGateCount);
+				auto gates = std::vector<GarbledGate<2>>(item.mCircuit->mNonlinearGateCount);
 				garble(*item.mCircuit, sharedMem, mTweaks, gates, mZeroAndGlobalOffset, shareAuxBits);
-				if (item.mCircuit->mNonXorGateCount) mChannel->asyncSend(std::move(gates));
+				if (item.mCircuit->mNonlinearGateCount) mChannel->asyncSend(std::move(gates));
 				for (auto bit : shareAuxBits)
 					mChannel->asyncSendCopy(&bit,1);
 				shareAuxBits.clear();
@@ -533,14 +533,14 @@ namespace osuCrypto
 				}
 				//std::cout << IoStream::unlock;
 
-				if (item.mCircuit->mNonXorGateCount)
+				if (item.mCircuit->mNonlinearGateCount)
 				{
 					mChannel->recv(sharedBuff);
-					Expects(sharedBuff.size() == item.mCircuit->mNonXorGateCount * 2);
+					Expects(sharedBuff.size() == item.mCircuit->mNonlinearGateCount * 2);
 				}
 				auto gates = span<GarbledGate<2>>(
 					(GarbledGate<2>*) sharedBuff.data(), 
-					item.mCircuit->mNonXorGateCount);
+					item.mCircuit->mNonlinearGateCount);
 
 				evaluate(*item.mCircuit, sharedMem, mTweaks, gates, mRecvBit);
 

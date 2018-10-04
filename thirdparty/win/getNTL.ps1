@@ -71,7 +71,6 @@ else
 cp NTL_patch/* $folder -Force -recurse
 
 cd $folder
-
 cp "./visualStudio$VSVersion/*" ./
 
 

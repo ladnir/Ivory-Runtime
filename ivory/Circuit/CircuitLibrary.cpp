@@ -801,7 +801,7 @@ namespace osuCrypto
 
             const BetaWire& bi = b.mWires[std::min(static_cast<size_t>(i), static_cast<size_t>(b.mWires.size() - 1))];
 
-            u64 prev = cd.mNonXorGateCount;
+            u64 prev = cd.mNonlinearGateCount;
             // compute the AND between b[i] * a[j].
             for (u64 j = 0; j < rows[i].mWires.size(); ++j)
             {
@@ -856,7 +856,7 @@ namespace osuCrypto
                     }
                 }
 
-                u64 prev = cd.mNonXorGateCount;
+                u64 prev = cd.mNonlinearGateCount;
 
                 int_int_add_build(cd, rows[i - 1], rows[i], sum, additonTemp);
 
@@ -1040,7 +1040,7 @@ namespace osuCrypto
             //partialrem.push_back(remainder);
             //auto doSubtract = remainder >= a2;
             doSubtract.mWires[0] = quotient.mWires[i];
-            u64 prev = cd.mNonXorGateCount;
+            u64 prev = cd.mNonlinearGateCount;
 
             uint_uint_gteq_build(cd, remainder, a2, doSubtract);
 
