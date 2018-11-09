@@ -500,8 +500,7 @@ namespace osuCrypto
 			}
 			else
 			{
-				Expects(item.mLabels.size() == 2); // copy operation
-				*item.mLabels[1] = *item.mLabels[0];
+                copyOp(item);
 			}
 
 			mCrtQueue.pop();
@@ -509,6 +508,29 @@ namespace osuCrypto
 
 
 	}
+
+    void ShGcRuntime::copyOp(osuCrypto::ShGc::CircuitItem & item)
+    {
+        Expects(item.mLabels.size() == 2); // copy operation
+
+        item.mCopyEnd = std::min<u64>(item.mCopyEnd, item.mLabels[0]->size());
+
+        auto begin = item.mLabels[0]->begin() + item.mCopyBegin;
+        auto end = item.mLabels[0]->begin() + item.mCopyEnd;
+        auto size = end - begin;
+            
+        end -= std::max(item.mLeftShift, 0ll);
+
+        item.mLabels[1]->resize(size);
+        auto dest = item.mLabels[1]->begin();
+
+        // fill the bottom bits with const zero.
+        std::fill(dest, dest + item.mLeftShift, mPublicLabels[0]);
+        dest += item.mLeftShift;
+        
+        // copy the other bits over.
+        std::copy(begin, end, dest);
+    }
 
 
 	void ShGcRuntime::evaluatorCircuit()
@@ -564,8 +586,7 @@ namespace osuCrypto
 			}
 			else
 			{
-				Expects(item.mLabels.size() == 2);// copy operation;
-				*item.mLabels[1] = *item.mLabels[0];
+                copyOp(item);
 			}
 			//std::cout  << IoStream::lock;
 			//for (auto ii = 0; ii < item.mLabels[2]->size(); ++ii)

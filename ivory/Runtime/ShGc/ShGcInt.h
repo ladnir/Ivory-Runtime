@@ -21,8 +21,9 @@ namespace osuCrypto
 
         ~ShGcInt() override;
 
-        void copy(sIntBasePtr& c)override;
-        sIntBasePtr copy()override;
+        void copy(sIntBasePtr& c, u64 lowIdx, u64 highIdx, i64 leftShift)override;
+        void copy(ShGcInt& c, u64 lowIdx, u64 highIdx, i64 leftShift);
+        sIntBasePtr copy(u64 lowIdx, u64 highIdx, i64 leftShift)override;
         u64 bitCount()override;
         Runtime& getRuntime()override;
 
@@ -41,11 +42,12 @@ namespace osuCrypto
         sIntBasePtr bitwiseOr(sIntBasePtr& a, sIntBasePtr& b)override;
 
         sIntBasePtr ifelse(sIntBasePtr& a, sIntBasePtr& ifTrue, sIntBasePtr& ifFalse)override;
-
+        
         void reveal(u64 partyIdx)override;
         void reveal(span<u64> partyIdxs)override;
         ValueType getValue()override;
 
+        //sIntBasePtr getBits(u64 lowIdx, u64 highIdx) override;
 
         ShGc::GarbledMem getMemory(sIntBasePtr& a);
 

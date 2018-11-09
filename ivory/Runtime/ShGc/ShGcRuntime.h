@@ -87,6 +87,7 @@ namespace osuCrypto
 
         void garblerOutput();
         void garblerCircuit();
+        void copyOp(osuCrypto::ShGc::CircuitItem & item);
         void garblerInput();
 
         void evaluatorInput();

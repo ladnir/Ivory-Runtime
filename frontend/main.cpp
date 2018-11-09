@@ -36,31 +36,35 @@ i32 program(std::array<Party, 2> parties, i64 myInput)
 		parties[1].input<sInt>(myInput, bitCount) :
 		parties[1].input<sInt>(bitCount);
 
-
-
-
 	// perform some computation
 	auto add = input1 + input0;
 	auto sub = input1 - input0;
 	auto mul = input1 * input0;
 	auto div = input1 / input0;
+    
+    // multiplies input 1 by 2^4
+    auto shift = input1 << 4;
 
-	//auto pubAdd = add + 22;
-
+    // logical operations
 	auto gteq = input1 >= input0;
 	auto lt = input1 < input0;
 
+    // select a subset of the bits
+    auto signBit = input1.copyBits(bitCount - 1, bitCount);
 
+    // perform if statements
 	auto max = gteq.ifelse(input1, input0);
 
-	input0 = input0 + input1;
+    // assigments
+	input0 = input1;
 
 
 	// reveal this output to party 0.
 	parties[0].reveal(add);
 	parties[0].reveal(sub);
 	parties[0].reveal(mul);
-	parties[0].reveal(div);
+    parties[0].reveal(div);
+    parties[0].reveal(signBit);
 	parties[0].reveal(gteq);
 	parties[0].reveal(lt);
 	parties[0].reveal(max);
@@ -68,13 +72,14 @@ i32 program(std::array<Party, 2> parties, i64 myInput)
 
 	if (parties[0].isLocalParty())
 	{
-		std::cout << "add  " << add.getValue() << std::endl;
-		std::cout << "sub  " << sub.getValue() << std::endl;
-		std::cout << "mul  " << mul.getValue() << std::endl;
-		std::cout << "div  " << div.getValue() << std::endl;
-		std::cout << "gteq " << gteq.getValue() << std::endl;
-		std::cout << "lt   " << lt.getValue() << std::endl;
-		std::cout << "max  " << max.getValue() << std::endl;
+		std::cout << "add       " << add.getValue() << std::endl;
+		std::cout << "sub       " << sub.getValue() << std::endl;
+		std::cout << "mul       " << mul.getValue() << std::endl;
+        std::cout << "div       " << div.getValue() << std::endl;
+        std::cout << "sign(in1) " << signBit.getValue() << std::endl;
+		std::cout << "gteq      " << gteq.getValue() << std::endl;
+		std::cout << "lt        " << lt.getValue() << std::endl;
+		std::cout << "max       " << max.getValue() << std::endl;
 	}
 
 	// operations can get queued up in the background. Eventually this call should not

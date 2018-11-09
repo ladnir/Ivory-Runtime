@@ -16,8 +16,8 @@ namespace osuCrypto
 		PublicInt(sInt::ValueType v, u64 bits) : mValue(v), mBitCount(bits) {}
         ~PublicInt() override {}
 
-        void copy(sIntBasePtr& c)override;
-        sIntBasePtr copy()override;
+        void copy(sIntBasePtr& c, u64 lowIdx, u64 highIdx, i64 shift)override;
+        sIntBasePtr copy(u64 lowIdx, u64 highIdx, i64 shift)override;
         u64 bitCount()override;
         Runtime& getRuntime()override;
 

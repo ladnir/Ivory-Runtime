@@ -13,24 +13,41 @@ namespace osuCrypto
         mRt.freeMem(mLabels);
     }
 
-    void ShGcInt::copy(sIntBasePtr& c)
+    void ShGcInt::copy(sIntBasePtr& c, u64 beginIdx, u64 endIdx, i64 leftShift)
     {
         auto cc = dynamic_cast<ShGcInt*>(c.get());
+        if (!cc)
+            throw std::runtime_error(LOCATION);
+        copy(*cc, beginIdx, endIdx, leftShift);
+    }
+
+
+    void ShGcInt::copy(ShGcInt& src, u64 beginIdx, u64 endIdx, i64 leftShift)
+    {
+        if (leftShift < 0)
+            throw std::runtime_error("not impl " LOCATION);
 
         ShGc::CircuitItem w;
         w.mLabels.resize(2);
-        w.mLabels[0] = cc->mLabels;
+        w.mLabels[0] = src.mLabels;
         w.mLabels[1] = mLabels;
+        w.mCopyBegin = beginIdx;
+        w.mCopyEnd = endIdx;
+        w.mLeftShift = leftShift;
 
-
-        //mLabels = ShGcGarbledMem(new std::vector<block>(*cc->mLabels));
-
-        //return sIntBasePtr(new ShGcInt(*this));
+        mRt.enqueue(std::move(w));
     }
 
-    sIntBasePtr ShGcInt::copy()
+    sIntBasePtr ShGcInt::copy(u64 beginIdx, u64 endIdx, i64 leftShift)
     {
-        return sIntBasePtr();
+        endIdx = std::min(endIdx, mLabels->size());
+        auto size = endIdx - beginIdx;
+
+        auto ret(new ShGcInt(mRt, size));
+
+        ret->copy(*this, beginIdx, endIdx, leftShift);
+
+        return sIntBasePtr(ret);
     }
 
     u64 ShGcInt::bitCount()

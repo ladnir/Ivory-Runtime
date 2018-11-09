@@ -43,8 +43,8 @@ namespace osuCrypto
             IfElse
         };
 
-        virtual void copy(sIntBasePtr& b) = 0;
-        virtual sIntBasePtr copy() = 0;
+        virtual void copy(sIntBasePtr& b, u64 lowIdx, u64 highIdx, i64 leftShift) = 0;
+        virtual sIntBasePtr copy(u64 lowIdx, u64 highIdx, i64 leftShift) = 0;
         virtual u64 bitCount() = 0;
         virtual Runtime& getRuntime() = 0;
 
@@ -64,6 +64,7 @@ namespace osuCrypto
 
         virtual sIntBasePtr ifelse(sIntBasePtr& selectBit, sIntBasePtr& ifTrue, sIntBasePtr& ifFalse) = 0;
 
+
         virtual void reveal(u64 partyIdx) = 0;
         virtual void reveal(span<u64> partyIdxs) = 0;
         virtual ValueType getValue() = 0;
@@ -79,7 +80,7 @@ namespace osuCrypto
         //sInt(Runtime& rt, const BitCount& bitCount);
 
         sInt() = default;
-        sInt(const sInt&) = default;
+        sInt(const sInt&);
         sInt(sInt&&) = default;
         sInt(sIntBasePtr&& data) : mData(std::move(data)) {}
 
@@ -121,7 +122,11 @@ namespace osuCrypto
         sInt operator<=(const sInt&);
         sInt operator<(const sInt&);
 
+        //sInt operator>>(int shift);
+        sInt operator<<(int shift);
 
+        sInt copyBits(u64 lowIdx, u64 highIdx) const;
+        u64 bitCount()const;
         sInt operator&(const sInt&);
 
         sInt ifelse(const sInt&, const sInt&);

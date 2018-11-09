@@ -15,15 +15,21 @@ namespace osuCrypto
             return (v & botMask) | topMask;
         }
     }
-
-    void PublicInt::copy(sIntBasePtr & c)
+     
+    void PublicInt::copy(sIntBasePtr & c, u64 lowIdx, u64 highIdx, i64 shift)
     {
+        if (lowIdx != 0 || highIdx != -1 || shift)
+            throw std::runtime_error("not impl. " LOCATION);
+
         auto& cc = static_cast<PublicInt&>(*c.get());
         mValue = Public::signExtend(cc.mValue, mBitCount);
     }
 
-    sIntBasePtr PublicInt::copy()
+    sIntBasePtr PublicInt::copy(u64 lowIdx, u64 highIdx, i64 shift)
     {
+        if (lowIdx != 0 || highIdx != -1 || shift)
+            throw std::runtime_error("not impl. " LOCATION);
+
         auto ret = new PublicInt(mValue, mBitCount);
         return sIntBasePtr(ret);
     }
@@ -38,7 +44,7 @@ namespace osuCrypto
     }
     sIntBasePtr PublicInt::add(sIntBasePtr & a, sIntBasePtr & b)
     {
-        auto bb = static_cast<PublicInt*>(b.get());
+        auto bb = dynamic_cast<PublicInt*>(b.get());
         if (bb == nullptr)
         {   // b is not public data, let b decide how to add a which is public.
             return b->add(a, b);
@@ -52,7 +58,7 @@ namespace osuCrypto
     }
     sIntBasePtr PublicInt::subtract(sIntBasePtr & a, sIntBasePtr & b)
     {
-        auto bb = static_cast<PublicInt*>(b.get());
+        auto bb = dynamic_cast<PublicInt*>(b.get());
         if (bb == nullptr)
         {   // b is not public data, let b decide how to subtract a which is public.
             return b->subtract(a, b);
@@ -66,7 +72,7 @@ namespace osuCrypto
     }
     sIntBasePtr PublicInt::multiply(sIntBasePtr & a, sIntBasePtr & b)
     {
-        auto bb = static_cast<PublicInt*>(b.get());
+        auto bb = dynamic_cast<PublicInt*>(b.get());
         if (bb == nullptr)
         {   // b is not public data, let b decide how to multiply a which is public.
             return b->multiply(a, b);
@@ -80,7 +86,7 @@ namespace osuCrypto
     }
     sIntBasePtr PublicInt::divide(sIntBasePtr & a, sIntBasePtr & b)
     {
-        auto bb = static_cast<PublicInt*>(b.get());
+        auto bb = dynamic_cast<PublicInt*>(b.get());
         if (bb == nullptr)
         {   // b is not public data, let b decide how to divide a which is public.
             return b->divide(a, b);
@@ -101,7 +107,7 @@ namespace osuCrypto
     }
     sIntBasePtr PublicInt::gteq(sIntBasePtr & a, sIntBasePtr & b)
     {
-        auto bb = static_cast<PublicInt*>(b.get());
+        auto bb = dynamic_cast<PublicInt*>(b.get());
         if (bb == nullptr)
         {   // b is not public data, let b decide how to gteq a which is public.
             return b->gteq(a, b);
@@ -115,7 +121,7 @@ namespace osuCrypto
     }
     sIntBasePtr PublicInt::gt(sIntBasePtr & a, sIntBasePtr & b)
     {
-        auto bb = static_cast<PublicInt*>(b.get());
+        auto bb = dynamic_cast<PublicInt*>(b.get());
         if (bb == nullptr)
         {   // b is not public data, let b decide how to gt a which is public.
             return b->gteq(a, b);
@@ -136,7 +142,7 @@ namespace osuCrypto
     }
     sIntBasePtr PublicInt::bitwiseAnd(sIntBasePtr & a, sIntBasePtr & b)
     {
-        auto bb = static_cast<PublicInt*>(b.get());
+        auto bb = dynamic_cast<PublicInt*>(b.get());
         if (bb == nullptr)
         {   // b is not public data, let b decide how to bitwiseAnd a which is public.
             return b->gteq(a, b);
@@ -150,7 +156,7 @@ namespace osuCrypto
     }
     sIntBasePtr PublicInt::bitwiseOr(sIntBasePtr & a, sIntBasePtr & b)
     {
-        auto bb = static_cast<PublicInt*>(b.get());
+        auto bb = dynamic_cast<PublicInt*>(b.get());
         if (bb == nullptr)
         {   // b is not public data, let b decide how to bitwiseOr a which is public.
             return b->gteq(a, b);
@@ -165,9 +171,9 @@ namespace osuCrypto
     sIntBasePtr PublicInt::ifelse(sIntBasePtr & a, sIntBasePtr & ifTrue, sIntBasePtr & ifFalse)
     {
 
-        return mValue ? ifTrue->copy() : ifFalse->copy();
-        //auto tt = static_cast<PublicInt*>(ifTrue.get());
-        //auto ff = static_cast<PublicInt*>(ifFalse.get());
+        return mValue ? ifTrue->copy(0,-1, 0) : ifFalse->copy(0, -1, 0);
+        //auto tt = dynamic_cast<PublicInt*>(ifTrue.get());
+        //auto ff = dynamic_cast<PublicInt*>(ifFalse.get());
         //if (tt == nullptr)
         //{   // tt is not public data, let tt decide how to ifelse a which is public.
         //    return tt->gteq(a, b);

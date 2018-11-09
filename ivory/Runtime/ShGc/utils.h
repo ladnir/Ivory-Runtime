@@ -22,6 +22,9 @@ namespace osuCrypto
 
             bool mDebugFlag;
             u64 mInputBundleCount;
+            u64 mCopyBegin = 0;
+            u64 mCopyEnd = -1;
+            i64 mLeftShift = 0;
         };
 
         struct InputItem
