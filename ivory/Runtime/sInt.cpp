@@ -89,6 +89,17 @@ namespace osuCrypto
         return mData->copy(0, bc, s);
     }
 
+    sInt sInt::operator>>(int s)
+    {
+        auto bc = bitCount();
+        if (s < 0 || s > bc)
+            throw std::runtime_error("bad shift value " LOCATION);
+
+        // copy the bits. drop the top bc bits.
+        return mData->copy(0, bc, -s);
+    }
+
+
     sInt sInt::copyBits(u64 lowIdx, u64 highIdx) const
     {
         return mData->copy(lowIdx, highIdx, 0);

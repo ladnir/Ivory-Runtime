@@ -519,17 +519,24 @@ namespace osuCrypto
         auto end = item.mLabels[0]->begin() + item.mCopyEnd;
         auto size = end - begin;
             
-        end -= std::max(item.mLeftShift, 0ll);
+
+        auto leftShift = std::max(item.mLeftShift, 0ll);
+        auto rightShift = -std::min(item.mLeftShift, 0ll);
+        begin += rightShift;
+        end -= leftShift; 
 
         item.mLabels[1]->resize(size);
         auto dest = item.mLabels[1]->begin();
 
         // fill the bottom bits with const zero.
-        std::fill(dest, dest + item.mLeftShift, mPublicLabels[0]);
-        dest += item.mLeftShift;
+        std::fill(dest, dest + leftShift, mPublicLabels[0]);
+        dest += leftShift;
         
         // copy the other bits over.
-        std::copy(begin, end, dest);
+        dest = std::copy(begin, end, dest);
+
+        // fill the top bits with const zero.
+        std::fill(dest, dest + rightShift, mPublicLabels[0]);
     }
 
 

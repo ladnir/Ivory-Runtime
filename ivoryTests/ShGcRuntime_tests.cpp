@@ -167,6 +167,7 @@ void ShGcRuntime_basicArith_Test()
 		i32 divResult = 0;
         i32 signResult = 0;
         i32 shiftResult = 0;
+        i32 rShiftResult = 0;
 		i32 gteResult = 0;
 		i32 grtResult = 0;
 		i32 lstResult = 0;
@@ -228,6 +229,7 @@ void ShGcRuntime_basicArith_Test()
 			auto max = gteq.ifelse(input1, input0);
 
             auto shift = input0 << 4;
+            auto rShift = input0 >> 4;
 
 			// reveal this output to party 0 and then party 1.
 			parties[0].reveal(add);
@@ -236,6 +238,7 @@ void ShGcRuntime_basicArith_Test()
 			parties[0].reveal(div);
             parties[0].reveal(sign);
             parties[0].reveal(shift);
+            parties[0].reveal(rShift);
 			parties[1].reveal(gt);
 			parties[1].reveal(gteq);
 			parties[1].reveal(lteq);
@@ -255,6 +258,7 @@ void ShGcRuntime_basicArith_Test()
 				divResult = div.getValue();
                 signResult = sign.getValue();
                 shiftResult = shift.getValue();
+                rShiftResult = rShift.getValue();
 			}
 			else {
 				grtResult = gt.getValue();
@@ -295,6 +299,8 @@ void ShGcRuntime_basicArith_Test()
 		if (maxresult != std::max(inputVal0, inputVal1)) throw UnitTestFail();
         if (signResult != (subResult < 0))throw UnitTestFail();
         if (shiftResult != (inputVal0 << 4))
+            throw UnitTestFail();
+        if (rShiftResult != (u32(inputVal0) >> 4))
             throw UnitTestFail();
 	}
 
@@ -341,7 +347,7 @@ void ShGcRuntime_SequentialOp_Test()
 		auto add = ~input1 + input0;
         auto add2 = add;
         auto add3 = add2;
-
+        auto subRange = input1.copyBits(4, 10);
 		// reveal this output to party 0 and then party 1.
 		parties[0].reveal(add3);
 

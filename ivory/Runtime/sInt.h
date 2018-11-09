@@ -122,7 +122,7 @@ namespace osuCrypto
         sInt operator<=(const sInt&);
         sInt operator<(const sInt&);
 
-        //sInt operator>>(int shift);
+        sInt operator>>(int shift);
         sInt operator<<(int shift);
 
         sInt copyBits(u64 lowIdx, u64 highIdx) const;

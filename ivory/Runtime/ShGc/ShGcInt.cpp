@@ -24,8 +24,8 @@ namespace osuCrypto
 
     void ShGcInt::copy(ShGcInt& src, u64 beginIdx, u64 endIdx, i64 leftShift)
     {
-        if (leftShift < 0)
-            throw std::runtime_error("not impl " LOCATION);
+        //if (leftShift < 0)
+        //    throw std::runtime_error("not impl " LOCATION);
 
         ShGc::CircuitItem w;
         w.mLabels.resize(2);
