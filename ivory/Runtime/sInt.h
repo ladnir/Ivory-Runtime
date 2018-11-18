@@ -55,14 +55,18 @@ namespace osuCrypto
 
         virtual sIntBasePtr negate() = 0;
 
+        virtual sIntBasePtr neq(sIntBasePtr& a, sIntBasePtr& b) = 0;
+        virtual sIntBasePtr eq(sIntBasePtr& a, sIntBasePtr& b) = 0;
         virtual sIntBasePtr gteq(sIntBasePtr& a, sIntBasePtr& b) = 0;
         virtual sIntBasePtr gt(sIntBasePtr& a, sIntBasePtr& b) = 0;
 
         virtual sIntBasePtr bitwiseInvert() = 0;
+        virtual sIntBasePtr bitwiseXor(sIntBasePtr& a, sIntBasePtr& b) = 0;
         virtual sIntBasePtr bitwiseAnd(sIntBasePtr& a, sIntBasePtr& b) = 0;
         virtual sIntBasePtr bitwiseOr(sIntBasePtr& a, sIntBasePtr& b) = 0;
 
         virtual sIntBasePtr ifelse(sIntBasePtr& selectBit, sIntBasePtr& ifTrue, sIntBasePtr& ifFalse) = 0;
+        virtual sIntBasePtr isZero() = 0;
 
 
         virtual void reveal(u64 partyIdx) = 0;
@@ -95,7 +99,10 @@ namespace osuCrypto
         sInt& operator=(sInt&&);
 
 
-        sInt operator~();
+        sInt operator~()const;
+        sInt operator|(const sInt&)const;
+        sInt operator&(const sInt&)const;
+        sInt operator^(const sInt&)const;
 
         sInt operator+(const sInt&) const;
         sInt operator-(const sInt&) const;
@@ -117,6 +124,8 @@ namespace osuCrypto
         //sInt operator*=(const sInt&);
         //sInt operator/=(const sInt&);
 
+        sInt operator!=(const sInt&);
+        sInt operator==(const sInt&);
         sInt operator>=(const sInt&);
         sInt operator>(const sInt&);
         sInt operator<=(const sInt&);
@@ -127,9 +136,10 @@ namespace osuCrypto
 
         sInt copyBits(u64 lowIdx, u64 highIdx) const;
         u64 bitCount()const;
-        sInt operator&(const sInt&);
 
         sInt ifelse(const sInt&, const sInt&);
+
+        sInt isZero() const;
 
 
         ValueType getValue();

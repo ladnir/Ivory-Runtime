@@ -168,7 +168,10 @@ void ShGcRuntime_basicArith_Test()
         i32 signResult = 0;
         i32 shiftResult = 0;
         i32 rShiftResult = 0;
-		i32 gteResult = 0;
+        i32 eqResult = 0;
+        i32 eq2Result = 0;
+        i32 neqResult = 0;
+        i32 gteResult = 0;
 		i32 grtResult = 0;
 		i32 lstResult = 0;
 		i32 lteResult = 0;
@@ -176,7 +179,9 @@ void ShGcRuntime_basicArith_Test()
 		i32 grt2Result = 0;
 		i32 lst2Result = 0;
 		i32 lte2Result = 0;
-		i32 maxresult = 0;
+        i32 maxresult = 0;
+        i32 isZero1result = 0;
+        i32 isZero2result = 0;
 
 		i32 inputVal0 = i ? prng.get<int>() : 254324;
 		i32 inputVal1 = i ? prng.get<int>() : -5323;
@@ -197,13 +202,21 @@ void ShGcRuntime_basicArith_Test()
 			// get the two input variables. If this party is
 			// the local party, then lets use our input value.
 			// Otherwise the remote party will provide the value.
-			auto input0 = parties[0].isLocalParty() ?
-				parties[0].input<sInt>(inputVal0, bitCount0) :
-				parties[0].input<sInt>(bitCount0);
+            auto input0 = parties[0].isLocalParty() ?
+                parties[0].input<sInt>(inputVal0, bitCount0) :
+                parties[0].input<sInt>(bitCount0);
 
-			sInt input1 = parties[1].isLocalParty() ?
-				parties[1].input<sInt>(inputVal1, bitCount1) :
-				parties[1].input<sInt>(bitCount1);
+            auto input00 = parties[0].isLocalParty() ?
+                parties[0].input<sInt>(inputVal0, bitCount0) :
+                parties[0].input<sInt>(bitCount0);
+
+            sInt input1 = parties[1].isLocalParty() ?
+                parties[1].input<sInt>(inputVal1, bitCount1) :
+                parties[1].input<sInt>(bitCount1);
+
+            sInt zero = parties[1].isLocalParty() ?
+                parties[1].input<sInt>(0, bitCount1) :
+                parties[1].input<sInt>(bitCount1);
 
 
 			// perform some computation
@@ -226,6 +239,13 @@ void ShGcRuntime_basicArith_Test()
 			auto lteq2 = input0 <= input1;
 			auto lt2 = input0 < input1;
 
+            auto eq = input0 == input1;
+            auto eq2 = input0 == input00;
+            auto neq = input0 != input00;
+
+            auto z1 = zero.isZero();
+            auto z2 = input0.isZero();
+
 			auto max = gteq.ifelse(input1, input0);
 
             auto shift = input0 << 4;
@@ -246,7 +266,12 @@ void ShGcRuntime_basicArith_Test()
 			parties[1].reveal(gt2);
 			parties[1].reveal(gteq2);
 			parties[1].reveal(lteq2);
-			parties[1].reveal(lt2);
+            parties[1].reveal(lt2);
+            parties[1].reveal(eq);
+            parties[1].reveal(eq2);
+            parties[1].reveal(neq);
+            parties[1].reveal(z1);
+            parties[1].reveal(z2);
 			parties[1].reveal(max);
 
 
@@ -269,7 +294,12 @@ void ShGcRuntime_basicArith_Test()
 				lstResult = lt.getValue();
 				gte2Result = gteq2.getValue();
 				lte2Result = lteq2.getValue();
-				lst2Result = lt2.getValue();
+                lst2Result = lt2.getValue();
+                eqResult = eq.getValue();
+                eq2Result = eq2.getValue();
+                neqResult = neq.getValue();
+                isZero1result = z1.getValue();
+                isZero2result = z2.getValue();
 				maxresult = max.getValue();
 			}
 
@@ -302,7 +332,18 @@ void ShGcRuntime_basicArith_Test()
             throw UnitTestFail();
         if (rShiftResult != (u32(inputVal0) >> 4))
             throw UnitTestFail();
-	}
+        if (eqResult != (inputVal0 == inputVal1))
+            throw UnitTestFail();
+        if (!eq2Result)
+            throw UnitTestFail();
+        if (neqResult)
+            throw UnitTestFail();
+
+        if (!isZero1result)
+            throw UnitTestFail();
+        if (isZero2result)
+            throw UnitTestFail();
+    }
 
 }
 

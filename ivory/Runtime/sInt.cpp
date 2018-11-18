@@ -39,9 +39,22 @@ namespace osuCrypto
         return *this;
     }
 
-    sInt sInt::operator~()
+    sInt sInt::operator~() const
     {
         return mData->bitwiseInvert();
+    }
+    sInt sInt::operator|(const sInt& in2) const
+    {
+        return mData->bitwiseOr((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
+    }
+    sInt sInt::operator&(const sInt& in2) const
+    {
+        return mData->bitwiseAnd((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
+    }
+
+    sInt sInt::operator^(const sInt & in2) const
+    {
+        return mData->bitwiseXor((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
     }
 
     sInt sInt::operator+(const sInt& in2) const
@@ -52,6 +65,16 @@ namespace osuCrypto
     sInt sInt::operator-(const sInt & in2) const
     {
         return mData->subtract((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
+    }
+
+    sInt sInt::operator!=(const sInt & in2)
+    {
+        return mData->neq((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
+    }
+
+    sInt sInt::operator==(const sInt & in2)
+    {
+        return mData->eq((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
     }
 
     sInt sInt::operator>=(const sInt & in2)
@@ -109,15 +132,16 @@ namespace osuCrypto
         return mData->bitCount();
     }
 
-    sInt sInt::operator&(const sInt &in2)
-    {
-        return mData->bitwiseAnd((sIntBasePtr&)mData, (sIntBasePtr&)in2.mData);
-    }
-
     sInt sInt::ifelse(const sInt & ifTrue, const sInt & ifFalse)
     {
         return mData->ifelse((sIntBasePtr&)mData, (sIntBasePtr&)ifTrue.mData, (sIntBasePtr&)ifFalse.mData);
     }
+
+    sInt sInt::isZero() const
+    {
+        return mData->isZero();
+    }
+
 
     sInt& sInt::operator+=(const sInt& in2)
     {

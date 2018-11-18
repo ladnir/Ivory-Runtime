@@ -173,6 +173,57 @@ namespace osuCrypto
         return sIntBasePtr(ret);
     }
 
+
+    sIntBasePtr ShGcInt::eq(sIntBasePtr& a, sIntBasePtr & b)
+    {
+        if (a->bitCount() != b->bitCount())
+            throw std::runtime_error("mixed bit count eq not impl. " LOCATION);
+
+        auto aa = getMemory(a);
+        auto bb = getMemory(b);
+        auto ret(new ShGcInt(mRt, 1));
+
+        ShGc::CircuitItem workItem;
+        workItem.mInputBundleCount = 2;
+        workItem.mLabels.resize(3);
+        workItem.mLabels[0] = aa;
+        workItem.mLabels[1] = bb;
+        workItem.mLabels[2] = ret->mLabels;
+
+        workItem.mCircuit = mRt.mLibrary.int_eq(
+            workItem.mLabels[0]->size());
+
+        mRt.enqueue(std::move(workItem));
+
+        return sIntBasePtr(ret);
+    }
+
+
+    sIntBasePtr ShGcInt::neq(sIntBasePtr& a, sIntBasePtr & b)
+    {
+        if (a->bitCount() != b->bitCount())
+            throw std::runtime_error("mixed bit count eq not impl. " LOCATION);
+
+        auto aa = getMemory(a);
+        auto bb = getMemory(b);
+        auto ret(new ShGcInt(mRt, 1));
+
+        ShGc::CircuitItem workItem;
+        workItem.mInputBundleCount = 2;
+        workItem.mLabels.resize(3);
+        workItem.mLabels[0] = aa;
+        workItem.mLabels[1] = bb;
+        workItem.mLabels[2] = ret->mLabels;
+
+        workItem.mCircuit = mRt.mLibrary.int_neq(
+            workItem.mLabels[0]->size());
+
+        mRt.enqueue(std::move(workItem));
+
+        return sIntBasePtr(ret);
+    }
+
+
     sIntBasePtr ShGcInt::gteq(sIntBasePtr& a, sIntBasePtr & b)
     {
         auto aa = getMemory(a);
@@ -235,6 +286,28 @@ namespace osuCrypto
         return sIntBasePtr(ret);
     }
 
+    sIntBasePtr ShGcInt::bitwiseXor(sIntBasePtr& a, sIntBasePtr & b)
+    {
+        auto aa = getMemory(a);
+        auto bb = getMemory(b);
+        auto ret(new ShGcInt(mRt, 1));
+
+        ShGc::CircuitItem workItem;
+        workItem.mInputBundleCount = 2;
+        workItem.mLabels.resize(3);
+        workItem.mLabels[0] = aa;
+        workItem.mLabels[1] = bb;
+        workItem.mLabels[2] = ret->mLabels;
+
+        workItem.mCircuit = mRt.mLibrary.int_int_bitwiseXor(
+            workItem.mLabels[0]->size(),
+            workItem.mLabels[1]->size(),
+            workItem.mLabels[2]->size());
+
+        mRt.enqueue(std::move(workItem));
+
+        return sIntBasePtr(ret);
+    }
     sIntBasePtr ShGcInt::bitwiseAnd(sIntBasePtr& a, sIntBasePtr & b)
     {
         auto aa = getMemory(a);
@@ -309,6 +382,24 @@ namespace osuCrypto
         mRt.enqueue(std::move(workItem));
 
         return rret;
+    }
+
+    sIntBasePtr ShGcInt::isZero()
+    {
+        auto ret(new ShGcInt(mRt, 1));
+
+        ShGc::CircuitItem workItem;
+        workItem.mInputBundleCount = 1;
+        workItem.mLabels.resize(2);
+        workItem.mLabels[0] = mLabels;
+        workItem.mLabels[1] = ret->mLabels;
+
+        workItem.mCircuit = mRt.mLibrary.int_isZero(
+            workItem.mLabels[0]->size());
+
+        mRt.enqueue(std::move(workItem));
+
+        return sIntBasePtr(ret);
     }
 
     void ShGcInt::reveal(u64 partyIdx)

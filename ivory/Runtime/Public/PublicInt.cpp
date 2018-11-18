@@ -105,6 +105,45 @@ namespace osuCrypto
         ret->mValue = Public::signExtend(-mValue, ret->mBitCount);
         return sIntBasePtr(ret);
     }
+
+    sIntBasePtr PublicInt::isZero()
+    {
+        auto ret = new PublicInt();
+        ret->mBitCount = 1;
+        ret->mValue = (mValue == 0);
+        return sIntBasePtr(ret);
+    }
+
+    sIntBasePtr PublicInt::eq(sIntBasePtr & a, sIntBasePtr & b)
+    {
+        auto bb = dynamic_cast<PublicInt*>(b.get());
+        if (bb == nullptr)
+        {   // b is not public data, let b decide how to eq a which is public.
+            return b->eq(a, b);
+        }
+        else {
+            auto ret = new PublicInt();
+            ret->mBitCount = 1;
+            ret->mValue = Public::signExtend(mValue == bb->mValue, ret->mBitCount);
+            return sIntBasePtr(ret);
+        }
+    }
+
+    sIntBasePtr PublicInt::neq(sIntBasePtr & a, sIntBasePtr & b)
+    {
+        auto bb = dynamic_cast<PublicInt*>(b.get());
+        if (bb == nullptr)
+        {   // b is not public data, let b decide how to eq a which is public.
+            return b->neq(a, b);
+        }
+        else {
+            auto ret = new PublicInt();
+            ret->mBitCount = 1;
+            ret->mValue = Public::signExtend(mValue != bb->mValue, ret->mBitCount);
+            return sIntBasePtr(ret);
+        }
+    }
+
     sIntBasePtr PublicInt::gteq(sIntBasePtr & a, sIntBasePtr & b)
     {
         auto bb = dynamic_cast<PublicInt*>(b.get());
@@ -119,12 +158,13 @@ namespace osuCrypto
             return sIntBasePtr(ret);
         }
     }
+
     sIntBasePtr PublicInt::gt(sIntBasePtr & a, sIntBasePtr & b)
     {
         auto bb = dynamic_cast<PublicInt*>(b.get());
         if (bb == nullptr)
         {   // b is not public data, let b decide how to gt a which is public.
-            return b->gteq(a, b);
+            return b->gt(a, b);
         }
         else {
             auto ret = new PublicInt();
@@ -140,12 +180,28 @@ namespace osuCrypto
         ret->mValue = Public::signExtend(~mValue, ret->mBitCount);
         return sIntBasePtr(ret);
     }
+
+    sIntBasePtr PublicInt::bitwiseXor(sIntBasePtr & a, sIntBasePtr & b)
+    {
+        auto bb = dynamic_cast<PublicInt*>(b.get());
+        if (bb == nullptr)
+        {   // b is not public data, let b decide how to bitwiseAnd a which is public.
+            return b->bitwiseXor(a, b);
+        }
+        else {
+            auto ret = new PublicInt();
+            ret->mBitCount = std::max(mBitCount, bb->mBitCount);;
+            ret->mValue = Public::signExtend(mValue ^ bb->mValue, ret->mBitCount);
+            return sIntBasePtr(ret);
+        }
+    }
+
     sIntBasePtr PublicInt::bitwiseAnd(sIntBasePtr & a, sIntBasePtr & b)
     {
         auto bb = dynamic_cast<PublicInt*>(b.get());
         if (bb == nullptr)
         {   // b is not public data, let b decide how to bitwiseAnd a which is public.
-            return b->gteq(a, b);
+            return b->bitwiseAnd(a, b);
         }
         else {
             auto ret = new PublicInt();
@@ -159,7 +215,7 @@ namespace osuCrypto
         auto bb = dynamic_cast<PublicInt*>(b.get());
         if (bb == nullptr)
         {   // b is not public data, let b decide how to bitwiseOr a which is public.
-            return b->gteq(a, b);
+            return b->bitwiseOr(a, b);
         }
         else {
             auto ret = new PublicInt();

@@ -28,14 +28,18 @@ namespace osuCrypto
 
         sIntBasePtr negate()override;
 
+        sIntBasePtr neq(sIntBasePtr& a, sIntBasePtr& b)override;
+        sIntBasePtr eq(sIntBasePtr& a, sIntBasePtr& b)override;
         sIntBasePtr gteq(sIntBasePtr& a, sIntBasePtr& b)override;
         sIntBasePtr gt(sIntBasePtr& a, sIntBasePtr& b)override;
 
         sIntBasePtr bitwiseInvert()override;
+        sIntBasePtr bitwiseXor(sIntBasePtr& a, sIntBasePtr& b)override;
         sIntBasePtr bitwiseAnd(sIntBasePtr& a, sIntBasePtr& b)override;
         sIntBasePtr bitwiseOr(sIntBasePtr& a, sIntBasePtr& b)override;
 
         sIntBasePtr ifelse(sIntBasePtr& a, sIntBasePtr& ifTrue, sIntBasePtr& ifFalse)override;
+        sIntBasePtr isZero()override;
 
         void reveal(u64 partyIdx)override { throw std::runtime_error(" cant reveal public value" LOCATION); }
         void reveal(span<u64> partyIdxs)override { throw std::runtime_error(" cant reveal public value" LOCATION); }
