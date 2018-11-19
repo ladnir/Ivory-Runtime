@@ -288,9 +288,12 @@ namespace osuCrypto
 
     sIntBasePtr ShGcInt::bitwiseXor(sIntBasePtr& a, sIntBasePtr & b)
     {
+        if (a->bitCount() != b->bitCount())
+            throw RTE_LOC;
+
         auto aa = getMemory(a);
         auto bb = getMemory(b);
-        auto ret(new ShGcInt(mRt, 1));
+        auto ret(new ShGcInt(mRt, a->bitCount()));
 
         ShGc::CircuitItem workItem;
         workItem.mInputBundleCount = 2;
@@ -310,9 +313,12 @@ namespace osuCrypto
     }
     sIntBasePtr ShGcInt::bitwiseAnd(sIntBasePtr& a, sIntBasePtr & b)
     {
+        if (a->bitCount() != b->bitCount())
+            throw RTE_LOC;
+
         auto aa = getMemory(a);
         auto bb = getMemory(b);
-        auto ret(new ShGcInt(mRt, 1));
+        auto ret(new ShGcInt(mRt, a->bitCount()));
 
         ShGc::CircuitItem workItem;
         workItem.mInputBundleCount = 2;
@@ -333,9 +339,12 @@ namespace osuCrypto
 
     sIntBasePtr ShGcInt::bitwiseOr(sIntBasePtr& a, sIntBasePtr & b)
     {
+        if (a->bitCount() != b->bitCount())
+            throw RTE_LOC;
+
         auto aa = getMemory(a);
         auto bb = getMemory(b);
-        auto ret(new ShGcInt(mRt, 1));
+        auto ret(new ShGcInt(mRt, a->bitCount()));
 
         ShGc::CircuitItem workItem;
         workItem.mInputBundleCount = 2;

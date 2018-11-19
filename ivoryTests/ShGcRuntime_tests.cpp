@@ -182,6 +182,8 @@ void ShGcRuntime_basicArith_Test()
         i32 maxresult = 0;
         i32 isZero1result = 0;
         i32 isZero2result = 0;
+        i32 plus10Result = 0;
+        i32 btAndResult, lessThanOneResult;
 
 		i32 inputVal0 = i ? prng.get<int>() : 254324;
 		i32 inputVal1 = i ? prng.get<int>() : -5323;
@@ -218,6 +220,10 @@ void ShGcRuntime_basicArith_Test()
                 parties[1].input<sInt>(0, bitCount1) :
                 parties[1].input<sInt>(bitCount1);
 
+            sInt one = parties[1].isLocalParty() ?
+                parties[1].input<sInt>(1, 10) :
+                parties[1].input<sInt>(10);
+
 
 			// perform some computation
 			auto add = input1 + input0;
@@ -225,6 +231,12 @@ void ShGcRuntime_basicArith_Test()
 			auto mul = input1 * input0;
 			auto div = input1 / input0;
             auto sign = sub.copyBits(sub.bitCount() - 1, sub.bitCount());
+
+
+            auto btAnd = input1 & input0;
+            auto lessThanOne = one > 1;
+
+            auto plus10 = input1 + 10;
 
 			auto gt = input1 > input0;
 			parties[0].getRuntime().processesQueue();
@@ -256,6 +268,8 @@ void ShGcRuntime_basicArith_Test()
 			parties[0].reveal(sub);
 			parties[0].reveal(mul);
 			parties[0].reveal(div);
+            parties[0].reveal(plus10);
+            parties[0].reveal(btAnd);
             parties[0].reveal(sign);
             parties[0].reveal(shift);
             parties[0].reveal(rShift);
@@ -273,6 +287,7 @@ void ShGcRuntime_basicArith_Test()
             parties[1].reveal(z1);
             parties[1].reveal(z2);
 			parties[1].reveal(max);
+            parties[1].reveal(lessThanOne);
 
 
 			if (parties[0].isLocalParty())
@@ -281,9 +296,11 @@ void ShGcRuntime_basicArith_Test()
 				subResult = sub.getValue();
 				mulResult = mul.getValue();
 				divResult = div.getValue();
+                plus10Result = plus10.getValue();
                 signResult = sign.getValue();
                 shiftResult = shift.getValue();
                 rShiftResult = rShift.getValue();
+                btAndResult = btAnd.getValue();
 			}
 			else {
 				grtResult = gt.getValue();
@@ -301,6 +318,7 @@ void ShGcRuntime_basicArith_Test()
                 isZero1result = z1.getValue();
                 isZero2result = z2.getValue();
 				maxresult = max.getValue();
+                lessThanOneResult = lessThanOne.getValue();
 			}
 
 			parties[0].getRuntime().processesQueue();
@@ -308,16 +326,23 @@ void ShGcRuntime_basicArith_Test()
 		runProgram(program);
 
 
-		//if (addResult != inputVal1 + inputVal0) throw UnitTestFail();
-		//if (subResult != inputVal1 - inputVal0) throw UnitTestFail();
-		//if (mulResult != inputVal1 * inputVal0) throw UnitTestFail();
-		//if (divResult != inputVal1 / inputVal0) throw UnitTestFail();
+		if (addResult != inputVal1 + inputVal0) throw UnitTestFail();
+		if (subResult != inputVal1 - inputVal0) throw UnitTestFail();
+		if (mulResult != inputVal1 * inputVal0) throw UnitTestFail();
+        if (divResult != inputVal1 / inputVal0) throw UnitTestFail();
+        if (plus10Result != inputVal1 + 10)
+            throw UnitTestFail();
+
+        if(btAndResult != (inputVal0 & inputVal1))
+            throw UnitTestFail();
+
 		if (grtResult != inputVal1 > inputVal0)
 			throw UnitTestFail();
 		if (grt2Result != inputVal0 > inputVal1)
 			throw UnitTestFail();
 
-
+        if(lessThanOneResult)
+            throw UnitTestFail();
 
 		if (gteResult != inputVal1 >= inputVal0)
 			throw UnitTestFail();

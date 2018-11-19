@@ -7,6 +7,10 @@ namespace osuCrypto
         : mData(std::move(val.copyBits(0,-1).mData))
     { }
 
+    sInt::sInt(const i64 & val, u64 bitCount)
+        : mData(Runtime::getPublicInt(val, bitCount))
+    { }
+
     sInt::sInt(const i64 & val)
         : mData(Runtime::getPublicInt(val, 64))
     { }

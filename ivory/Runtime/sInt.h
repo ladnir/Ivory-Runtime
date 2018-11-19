@@ -88,6 +88,7 @@ namespace osuCrypto
         sInt(sInt&&) = default;
         sInt(sIntBasePtr&& data) : mData(std::move(data)) {}
 
+        sInt(const i64& val, u64 bitCount);
         sInt(const i64& val);
         sInt(const i32& val);
         sInt(const i16& val);
