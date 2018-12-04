@@ -1,6 +1,6 @@
 #include "Circuit_Tests.h"
 
-#include "ivory/Circuit/CircuitLibrary.h"
+#include "cryptoTools/Circuit/BetaLibrary.h"
 
 #include <fstream>
 #include "Common.h"
@@ -8,7 +8,6 @@
 #include "cryptoTools/Common/BitVector.h"
 #include "cryptoTools/Crypto/AES.h"
 #include "cryptoTools/Crypto/PRNG.h"
-#include "DebugCircuits.h"
 
 using namespace osuCrypto;
 
@@ -62,7 +61,7 @@ void Circuit_SequentialOp_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -130,7 +129,7 @@ void Circuit_int_Adder_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -187,7 +186,7 @@ void Circuit_int_Adder_const_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -243,7 +242,7 @@ void Circuit_int_Subtractor_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -298,7 +297,7 @@ void Circuit_int_Subtractor_const_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -351,7 +350,7 @@ void Circuit_uint_Adder_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -405,7 +404,7 @@ void Circuit_uint_Subtractor_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -457,7 +456,7 @@ void Circuit_int_Multiply_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -512,7 +511,7 @@ void Circuit_int_Divide_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -571,7 +570,7 @@ void Circuit_int_LessThan_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -633,7 +632,7 @@ void Circuit_int_GreaterThanEq_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -692,7 +691,7 @@ void Circuit_uint_LessThan_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -756,7 +755,7 @@ void Circuit_uint_GreaterThanEq_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -820,7 +819,7 @@ void Circuit_multiplex_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -875,7 +874,7 @@ void Circuit_bitInvert_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -924,7 +923,7 @@ void Circuit_negate_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -973,7 +972,7 @@ void Circuit_removeSign_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);
@@ -1020,7 +1019,7 @@ void Circuit_addSign_Test()
     setThreadName("CP_Test_Thread");
 
 
-    CircuitLibrary lib;
+    BetaLibrary lib;
 
 
     PRNG prng(ZeroBlock);

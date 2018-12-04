@@ -49,7 +49,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)/../;$(libOTeDir);$(libOTeDir)/cryptoTools;$(ProjectDir)/../thirdparty/win/NTL/include;C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../;$(libOTeDir);$(libOTeDir)/cryptoTools;$(ProjectDir)/../thirdparty/win/NTL/include;C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl;C:\libs\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -61,7 +61,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)/../;$(libOTeDir);$(libOTeDir)/cryptoTools;$(ProjectDir)/../thirdparty/win/NTL/include;C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../;$(libOTeDir);$(libOTeDir)/cryptoTools;$(ProjectDir)/../thirdparty/win/NTL/include;C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl;C:\libs\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -71,9 +71,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Circuit\BetaCircuit.cpp" />
-    <ClCompile Include="Circuit\Circuit.cpp" />
-    <ClCompile Include="Circuit\CircuitLibrary.cpp" />
     <ClCompile Include="Runtime\Party.cpp" />
     <ClCompile Include="Runtime\Public\PublicInt.cpp" />
     <ClCompile Include="Runtime\Runtime.cpp" />
@@ -83,10 +80,6 @@
     <ClCompile Include="Runtime\sInt.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Circuit\BetaCircuit.h" />
-    <ClInclude Include="Circuit\Circuit.h" />
-    <ClInclude Include="Circuit\CircuitLibrary.h" />
-    <ClInclude Include="Circuit\Gate.h" />
     <ClInclude Include="Runtime\Party.h" />
     <ClInclude Include="Runtime\Public\PublicInt.h" />
     <ClInclude Include="Runtime\Runtime.h" />

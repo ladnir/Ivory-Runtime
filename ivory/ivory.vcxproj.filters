@@ -15,15 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Circuit\BetaCircuit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Circuit\Circuit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Circuit\CircuitLibrary.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Runtime\Public\PublicInt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -47,18 +38,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Circuit\BetaCircuit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Circuit\Circuit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Circuit\CircuitLibrary.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Circuit\Gate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime\Public\PublicInt.h">
       <Filter>Header Files</Filter>
     </ClInclude>

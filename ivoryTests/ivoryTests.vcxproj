@@ -49,7 +49,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(libOTeDir);$(libOTeDir)/cryptoTools;$(ProjectDir)/../SPDZ;$(ProjectDir)/../;$(ProjectDir);C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(libOTeDir);$(libOTeDir)/cryptoTools;$(ProjectDir)/../SPDZ;$(ProjectDir)/../;$(ProjectDir);C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl;C:\libs\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SOLUTION_DIR=R"**($(SolutionDir))**";_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -64,7 +64,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(libOTeDir);$(libOTeDir)/cryptoTools;$(ProjectDir)/../SPDZ;$(ProjectDir)/../;$(ProjectDir);C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(libOTeDir);$(libOTeDir)/cryptoTools;$(ProjectDir)/../SPDZ;$(ProjectDir)/../;$(ProjectDir);C:\libs\NTL\include;C:\libs;C:\libs\boost;C:\libs\miracl;C:\libs\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SOLUTION_DIR=R"**($(SolutionDir))**";_WIN32_WINNT=0x0501;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -78,7 +78,6 @@
     <ClInclude Include="Circuit_Tests.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Cope_Tests.h" />
-    <ClInclude Include="DebugCircuits.h" />
     <ClInclude Include="ShGcRuntime_tests.h" />
     <ClInclude Include="ZpNumber_Tests.h" />
   </ItemGroup>
@@ -86,7 +85,6 @@
     <ClCompile Include="Circuit_Tests.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Cope_Tests.cpp" />
-    <ClCompile Include="DebugCircuits.cpp" />
     <ClCompile Include="ShGcRuntime_tests.cpp" />
     <ClCompile Include="ZpNumber_Tests.cpp" />
   </ItemGroup>

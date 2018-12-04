@@ -1,5 +1,7 @@
 #pragma once
-#include <ivory/Circuit/BetaCircuit.h>
+
+
+#include <cryptoTools/Circuit/BetaCircuit.h>
 #include <cryptoTools/Common/BitVector.h>
 
 #include <future>

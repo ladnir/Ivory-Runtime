@@ -1,8 +1,5 @@
 #pragma once
-//#include "Runtime/CrtModulal.h"
-
-#include "ivory/Circuit/Circuit.h"
-
+#include "cryptoTools/Common/Defines.h"
 
 namespace osuCrypto
 {

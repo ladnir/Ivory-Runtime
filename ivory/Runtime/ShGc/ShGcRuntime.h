@@ -1,8 +1,7 @@
 #pragma once
 #include "ivory/Runtime/Runtime.h"
-#include "ivory/Circuit/Circuit.h"
-#include "ivory/Circuit/BetaCircuit.h"
-#include "ivory/Circuit/CircuitLibrary.h"
+#include "cryptoTools/Circuit/BetaCircuit.h"
+#include "cryptoTools/Circuit/BetaLibrary.h"
 
 
 
@@ -53,7 +52,7 @@ namespace osuCrypto
 
         u64 getPartyIdx() override { return mPartyIdx; }
 
-        CircuitLibrary mLibrary;
+        BetaLibrary mLibrary;
 
 
 

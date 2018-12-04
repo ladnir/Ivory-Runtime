@@ -6,7 +6,7 @@
 #include "cryptoTools/Network/IOService.h"
 #include "cryptoTools/Network/Session.h"
 #include "cryptoTools/Common/Log.h"
-
+#include "ivory/Runtime/Public/PublicInt.h"
 #include "Common.h"
 
 using namespace osuCrypto;
@@ -237,6 +237,8 @@ void ShGcRuntime_basicArith_Test()
             auto lessThanOne = one > 1;
 
             auto plus10 = input1 + 10;
+
+            //auto four = one + PublicInt(3, 10);
 
 			auto gt = input1 > input0;
 			parties[0].getRuntime().processesQueue();
@@ -602,7 +604,7 @@ void evaluate(BetaCircuit* cir, PRNG& prng, InputType type)
 
 void ShGcRuntime_CircuitInvert_Test()
 {
-	CircuitLibrary lib;
+	BetaLibrary lib;
 	u64 aSize(10);
 	auto cir = lib.int_bitInvert(aSize);
 	PRNG prng(ZeroBlock);
@@ -649,7 +651,7 @@ i64 get(const std::vector<u8>& src)
 
 void ShGcRuntime_CircuitAdd_Test()
 {
-	CircuitLibrary lib;
+	BetaLibrary lib;
 	u64 size(5);
 	auto cir = lib.int_int_add(size, size, size);
 	auto trials = 100;
@@ -684,7 +686,7 @@ void ShGcRuntime_CircuitAdd_Test()
 
 void ShGcRuntime_CircuitMult_Test()
 {
-	CircuitLibrary lib;
+	BetaLibrary lib;
 	u64 size(5);
 	auto cir = lib.int_int_mult(size, size, size);
 	auto trials = 100;
@@ -723,7 +725,7 @@ void shGcRuntime_CircuitEval_Test()
 	auto trials(10);
 	PRNG prng(ZeroBlock);
 
-	CircuitLibrary lib;
+	BetaLibrary lib;
 	auto sizeA(13), sizeB(10), sizeC(11);
 	std::vector<BetaCircuit*> cirs{
 		lib.int_int_gteq(sizeA, sizeA),
