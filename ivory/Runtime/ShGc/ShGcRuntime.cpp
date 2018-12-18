@@ -4,7 +4,12 @@
 
 #include "cryptoTools/Common/Log.h"
 
-#include "libOTe/Base/naor-pinkas.h"
+#include "libOTe/Base/BaseOT.h"
+
+#ifndef LIBOTE_HAS_BASE_OT
+#error LibOTe must be build with base OTs. See libOTe readme. 
+#endif
+
 namespace osuCrypto
 {
 
@@ -40,17 +45,17 @@ namespace osuCrypto
 
 		if (role == Garbler)
 		{
-			NaorPinkas base;
+			DefaultBaseOT base;
 			BitVector choices(128);
 			std::vector<block> msg(128);
-			base.receive(choices, msg, mPrng, chl, 4);
+			base.receive(choices, msg, mPrng, chl);
 			mOtExtSender.setBaseOts(msg, choices);
 		}
 		else
 		{
-			NaorPinkas base;
+            DefaultBaseOT base;
 			std::vector<std::array<block, 2>> msg(128);
-			base.send(msg, mPrng, chl, 4);
+			base.send(msg, mPrng, chl);
 			mOtExtRecver.setBaseOts(msg);
 		}
 

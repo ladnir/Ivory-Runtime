@@ -3,7 +3,9 @@
 #include "cryptoTools/Circuit/BetaCircuit.h"
 #include "cryptoTools/Circuit/BetaLibrary.h"
 
-
+#ifndef ENABLE_CIRCUITS
+#error Must be build with cryptoTools/libOTe circuits enabled. See libOTe Readme.
+#endif
 
 
 #include "libOTe/TwoChooseOne/IknpOtExtSender.h"
