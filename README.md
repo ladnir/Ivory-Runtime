@@ -74,7 +74,7 @@ void program(std::array<Party, 2> parties, i64 myInput)
 
 ## Building
 
-To build the library, [libOTe](https://github.com/osu-crypto/libOTe) must be built. Follow the instructions on the associated readme. Once build, ensure that Ivory-Runtime and libOTe are contained in the same parent directory.
+To build the library on linux, [libOTe](https://github.com/osu-crypto/libOTe) must be built.  *Important*, build libOTe with (Miracl or Relic) and enable the circuit implementation. Follow the instructions on the associated [readme](https://github.com/osu-crypto/libOTe).  Once build, ensure that Ivory-Runtime and libOTe are contained in the same parent directory.
 ```
 [libOTe setup]
 git clone https://github.com/ladnir/Ivory-Runtime.git
