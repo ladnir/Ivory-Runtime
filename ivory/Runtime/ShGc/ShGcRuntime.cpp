@@ -310,7 +310,6 @@ namespace osuCrypto
 		}
 	}
 
-
 	void ShGcRuntime::garblerInput()
 	{
 		std::vector<std::array<block, 2>> messages(mOtCount);
@@ -404,6 +403,7 @@ namespace osuCrypto
 		}
 	}
 
+	// 
 	void ShGcRuntime::garblerCircuit()
 	{
 
@@ -620,7 +620,7 @@ namespace osuCrypto
 		{
 			auto& item = mOutputQueue.front();
 
-
+			// 
 			if (item.mOutPartyIdxs[0] == mPartyIdx || item.mOutPartyIdxs.size() == 2)
 			{
 				if (sharedMem.size() < item.mLabels->size())
@@ -659,6 +659,7 @@ namespace osuCrypto
 				item.mOutputProm->set_value(std::move(val));
 			}
 
+			// Evaluator
 			if (item.mOutPartyIdxs[0] != mPartyIdx || item.mOutPartyIdxs.size() == 2)
 			{
 				std::unique_ptr<BitVector> sendBuff(new BitVector(item.mLabels->size()));
