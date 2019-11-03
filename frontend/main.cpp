@@ -91,7 +91,7 @@ i32 program(std::array<Party, 2> parties, i64 myInput)
 	return 0;
 }
 
-void party1(std::string ip)
+void party1(std::string ip, OfflineSocket& shared_channel)
 {
 
 
@@ -126,7 +126,7 @@ void party1(std::string ip)
 	// the local party index. 
 	ShGcRuntime rt1;
 	rt1.mDebugFlag = debug;
-	rt1.init(chl1, prng.get<block>(), ShGcRuntime::Evaluator, 1);
+	rt1.init(chl1, shared_channel, prng.get<block>(), ShGcRuntime::Evaluator, 1);
 
 	// We can then instantiate the parties that will be running the protocol.
 	std::array<Party, 2> parties{
@@ -143,7 +143,7 @@ void party1(std::string ip)
 	}
 }
 
-void party0(std::string ip)
+void party0(std::string ip, OfflineSocket& shared_channel)
 {
 
 	u64 tries(2);
@@ -160,7 +160,7 @@ void party0(std::string ip)
 	// set up the runtime, see above for details
 	ShGcRuntime rt0;
 	rt0.mDebugFlag = debug;
-	rt0.init(chl0, prng.get<block>(), ShGcRuntime::Garbler, 0);
+	rt0.init(chl0, shared_channel, prng.get<block>(), ShGcRuntime::Garbler, 0);
 
 	// instantiate the parties
 	std::array<Party, 2> parties{
@@ -181,6 +181,9 @@ int main(int argc, char**argv)
 	// parse command line options
 	CLP cmd(argc, argv);
 
+	// Mock socket
+	OfflineSocket shared_channel;
+
 	if (cmd.isSet("r"))
 	{
 		// this is the control flow in the event that we want to run the protocol between two programs.
@@ -190,11 +193,11 @@ int main(int argc, char**argv)
 
 		if (r == 0)
 		{
-			party0(ip);
+			party0(ip, shared_channel);
 		}
 		else if (r == 1)
 		{
-			party1(ip);
+			party1(ip, shared_channel);
 		}
 		else
 		{
@@ -206,9 +209,10 @@ int main(int argc, char**argv)
 		// here we run both parties in a single program.
 
 		// We need a second thread to run the other party.
-		std::thread thrd(party0, "127.0.0.1:1212");
+		std::thread thrd(party0, "127.0.0.1:1212", std::ref(shared_channel));
 
-		party1("127.0.0.1:1212");
+		// std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+		party1("127.0.0.1:1212", shared_channel);
 
 		thrd.join();
 	}

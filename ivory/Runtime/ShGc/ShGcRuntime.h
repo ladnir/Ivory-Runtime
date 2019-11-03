@@ -1,4 +1,5 @@
 #pragma once
+#include "ivory/Runtime/ShGc/OfflineSocket.h"
 #include "ivory/Runtime/Runtime.h"
 #include "cryptoTools/Circuit/BetaCircuit.h"
 #include "cryptoTools/Circuit/BetaLibrary.h"
@@ -41,7 +42,7 @@ namespace osuCrypto
         ShGcRuntime();
         ~ShGcRuntime();
 
-        void init(Channel& chl, block seed, Role role, u64 partyIdx);
+        void init(Channel& chl, OfflineSocket& sharedChannel, block seed, Role role, u64 partyIdx);
 
         ShGc::GarbledMem getNewMem(u64 size);
         void freeMem(const ShGc::GarbledMem& mem);
@@ -68,13 +69,14 @@ namespace osuCrypto
         AES mAes;
         PRNG mPrng;
         u64 mInputIdx;
-        Channel* mChannel;
+        OfflineSocket* mChannel;
+        Channel* trueChannel;
 
         IknpOtExtReceiver mOtExtRecver;
         IknpOtExtSender mOtExtSender;
 
         std::vector<block> sharedMem;
-        //std::vector<GarbledGate<2>> sharedGates;
+        std::vector<GarbledGate<2>> sharedGates;
 		std::vector<u8> shareAuxBits;
         std::vector<block> sharedBuff;
         std::array<block, 2>mTweaks;

@@ -40,7 +40,7 @@ namespace osuCrypto
 
     sIntBasePtr ShGcInt::copy(u64 beginIdx, u64 endIdx, i64 leftShift)
     {
-        endIdx = std::min(endIdx, mLabels->size());
+        endIdx = std::min<size_t>(endIdx, mLabels->size());
         auto size = endIdx - beginIdx;
 
         auto ret(new ShGcInt(mRt, size));
