@@ -44,6 +44,8 @@ namespace osuCrypto
 
         void init(Channel& chl, OfflineSocket& sharedChannel, block seed, Role role, u64 partyIdx);
 
+        void init(Channel& chl, OfflineSocket& sharedChannel, block seed, Role role, u64 partyIdx, std::vector<block>& evalLabels);
+
         ShGc::GarbledMem getNewMem(u64 size);
         void freeMem(const ShGc::GarbledMem& mem);
 
@@ -72,6 +74,8 @@ namespace osuCrypto
         OfflineSocket* mChannel;
         Channel* trueChannel;
 
+        std::vector<block> mEvalLabels;
+
         IknpOtExtReceiver mOtExtRecver;
         IknpOtExtSender mOtExtSender;
 
@@ -87,11 +91,13 @@ namespace osuCrypto
         void enqueue(ShGc::CircuitItem&& item);
         void enqueue(ShGc::OutputItem&& item);
         void processesQueue() override;
+        std::vector<u8> processesQueueGarbler();
+        void processesQueueEvaluator();
 
         void garblerOutput();
         void garblerCircuit();
         void copyOp(osuCrypto::ShGc::CircuitItem & item);
-        void garblerInput();
+        std::vector<u8> garblerInput();
 
         void evaluatorInput();
         void evaluatorCircuit();

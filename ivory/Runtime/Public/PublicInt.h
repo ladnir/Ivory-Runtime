@@ -1,5 +1,8 @@
 #pragma once
 #include "ivory/Runtime/sInt.h"
+#include <cryptoTools/Common/Defines.h>
+#include <vector>
+
 
 
 namespace osuCrypto
@@ -44,6 +47,9 @@ namespace osuCrypto
         void reveal(u64 partyIdx)override { throw std::runtime_error(" cant reveal public value" LOCATION); }
         void reveal(span<u64> partyIdxs)override { throw std::runtime_error(" cant reveal public value" LOCATION); }
         ValueType getValue()override { return mValue; }
+        ValueType getValueOffline()override { return mValue; }
+        std::vector<u8> genLabelsCircuit()override { throw std::runtime_error(" cant gen labels" LOCATION); }
+
     };
 
 }

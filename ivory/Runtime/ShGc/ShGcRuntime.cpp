@@ -43,22 +43,36 @@ namespace osuCrypto
 		mPartyIdx = partyIdx;
 
 
-		if (role == Garbler)
-		{
-			DefaultBaseOT base;
-			BitVector choices(128);
-			std::vector<block> msg(128);
-			base.receive(choices, msg, mPrng, chl);
-			mOtExtSender.setBaseOts(msg, choices);
-		}
-		else
-		{
-            DefaultBaseOT base;
-			std::vector<std::array<block, 2>> msg(128);
-			base.send(msg, mPrng, chl);
-			mOtExtRecver.setBaseOts(msg);
-		}
+		// if (role == Garbler)
+		// {
+		// 	DefaultBaseOT base;
+		// 	BitVector choices(128);
+		// 	std::vector<block> msg(128);
+		// 	base.receive(choices, msg, mPrng, chl);
+		// 	mOtExtSender.setBaseOts(msg, choices);
+		// }
+		// else
+		// {
+        //     DefaultBaseOT base;
+		// 	std::vector<std::array<block, 2>> msg(128);
+		// 	base.send(msg, mPrng, chl);
+		// 	mOtExtRecver.setBaseOts(msg);
+		// }
 
+	}
+
+	void ShGcRuntime::init(Channel & chl, OfflineSocket& sharedChannel, block seed, Role role, u64 partyIdx, std::vector<block>& evalLabels)
+	{
+		mPrng.SetSeed(seed);
+		mAes.setKey(mPrng.get<block>());
+		mChannel = &sharedChannel;
+		trueChannel = &chl;
+		mGlobalOffset = mPrng.get<block>() | OneBlock;
+		mZeroAndGlobalOffset[0] = ZeroBlock;
+		mZeroAndGlobalOffset[1] = mGlobalOffset;
+		mRole = role;
+		mPartyIdx = partyIdx;
+		mEvalLabels = evalLabels;
 	}
 
 	ShGc::GarbledMem ShGcRuntime::getNewMem(u64 size)
@@ -76,7 +90,7 @@ namespace osuCrypto
 		ShGc::InputItem ii;
 		ii.mLabels = ret->mLabels;
 
-		if (mRole == Garbler) mOtCount += bc.mBitCount;
+		// if (mRole == Garbler) mOtCount += bc.mBitCount;
 
 		enqueue(std::move(ii));
 		return sIntBasePtr(ret);
@@ -89,11 +103,11 @@ namespace osuCrypto
 		ii.mLabels = ret->mLabels;
 		ii.mInputVal.append((u8*)&v, bc.mBitCount);
 
-		if (mRole == Evaluator)
-		{
-			mOtCount += bc.mBitCount;
-			mOtChoices.append(ii.mInputVal);
-		}
+		// if (mRole == Evaluator)
+		// {
+		// 	mOtCount += bc.mBitCount;
+		// 	mOtChoices.append(ii.mInputVal);
+		// }
 		enqueue(std::move(ii));
 
 		return sIntBasePtr(ret);
@@ -310,20 +324,35 @@ namespace osuCrypto
 		}
 	}
 
-	void ShGcRuntime::garblerInput()
+	std::vector<u8> ShGcRuntime::processesQueueGarbler() {
+		std::vector<u8> evalLabels = garblerInput();
+		garblerCircuit();
+		return evalLabels;
+	}
+
+	void ShGcRuntime::processesQueueEvaluator() {
+		evaluatorInput();
+		evaluatorCircuit();
+		evaluatorOutput();
+		garblerOutput();
+	}
+
+	std::vector<u8> ShGcRuntime::garblerInput()
 	{
-		std::vector<std::array<block, 2>> messages(mOtCount);
-		if (mOtCount)
-		{
+		// std::vector<std::array<block, 2>> messages(mOtCount);
+		// if (mOtCount)
+		// {
 
-			mOtCount = 0;
+		// 	mOtCount = 0;
 
-			mOtExtSender.send(messages, mPrng, *trueChannel);
+		// 	mOtExtSender.send(messages, mPrng, *trueChannel);
 
 
-		}
+		// }
 
-		auto iter = messages.begin();
+		// auto iter = messages.begin();
+
+		std::vector<u8> eval_labels_q;
 
 		while (mInputQueue.size())
 		{
@@ -351,45 +380,60 @@ namespace osuCrypto
 				std::cout << view.size() << std::endl;
 				mChannel->asyncSend(std::move(view));
 				std::cout << "VIEW SENT" << std::endl;
-			}
-			else
-			{
-				std::vector<block>view(item.mLabels->size());
-				for (u64 i = 0; i < item.mLabels->size(); ++i, ++iter)
+
+				// Generate all potential evaluator labels
+				// (this assumes that evaluator input size same as garbler input size)
+				std::vector<block> viewEvalZero(item.mLabels->size());
+				mAes.ecbEncCounterMode(mInputIdx, viewEvalZero.size(), viewEvalZero.data());
+				std::vector<block> viewEvalOne(viewEvalZero.size());
+				for (u64 i = 0; i < viewEvalZero.size(); ++i)
 				{
-					(*item.mLabels)[i] = (*iter)[0];
-					view[i] = (*iter)[1] ^ (*iter)[0] ^ mGlobalOffset;
+					viewEvalOne[i] = viewEvalZero[i] ^ mGlobalOffset;
+					// (*item.mLabels)[i] = (*iter)[0];
+					// view[i] = (*iter)[1] ^ (*iter)[0] ^ mGlobalOffset;
 				}
-				std::cout << "SEND 362" << std::endl;
-				std::cout << "SEND 362 SIZE: ";
-				std::cout << view.size() << std::endl;
-				mChannel->asyncSend(std::move(view));
-				std::cout << "END SEND 362" << std::endl;
+
+				// Ordering is all zero labels and then all 1 labels
+				auto zeros = ((u8*) viewEvalZero.data());
+				auto ones = ((u8*) viewEvalOne.data());
+				for (u64 i = 0; i < viewEvalZero.size() * sizeof(block); i++) {
+					eval_labels_q.push_back(zeros[i]);
+				}
+				for (u64 i = 0; i < viewEvalOne.size() * sizeof(block); i++) {
+					eval_labels_q.push_back(ones[i]);
+				}
+
+				// std::cout << "SEND 362" << std::endl;
+				// std::cout << "SEND 362 SIZE: ";
+				// std::cout << view.size() << std::endl;
+				// mChannel->asyncSend(std::move(view));
+				// std::cout << "END SEND 362" << std::endl;
 			}
 
 			mInputQueue.pop();
 		}
+		return eval_labels_q;
 	}
 
 	void ShGcRuntime::evaluatorInput()
 	{
 		static const std::array<block, 2> zeroAndAllOnesBlk{ ZeroBlock, AllOneBlock };
 
-		if (mOtChoices.size())
-		{
+		// if (mOtChoices.size())
+		// {
 
-			if (sharedMem.size() < mOtCount)
-				sharedMem.resize(mOtCount);
+		// 	if (sharedMem.size() < mOtCount)
+		// 		sharedMem.resize(mOtCount);
 
-			//sharedMem.resize(mOtCount);
-			span<block> view(sharedMem.begin(), sharedMem.begin() + mOtCount);
+		// 	//sharedMem.resize(mOtCount);
+		// 	span<block> view(sharedMem.begin(), sharedMem.begin() + mOtCount);
 
-			mOtExtRecver.receive(mOtChoices, sharedMem, mPrng, *trueChannel);
+		// 	mOtExtRecver.receive(mOtChoices, sharedMem, mPrng, *trueChannel);
 
-			mOtChoices.resize(0);
-			mOtCount = 0;
+		// 	mOtChoices.resize(0);
+		// 	mOtCount = 0;
 
-		}
+		// }
 		std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 		auto iter = sharedMem.begin();
 
@@ -400,18 +444,23 @@ namespace osuCrypto
 
 			if (item.mInputVal.size())
 			{
-				std::cout << "EVAL LABELS START RECEIVE 399" << std::endl;
-				mChannel->recv(sharedBuff);
-				std::cout << "EVAL LABELS END RECEIVE 399" << std::endl;
-				std::cout << "RECEIVED LABELS" << std::endl;
-				for (int i = 0; i <sharedBuff.size(); i++) {
-					std::cout << sharedBuff[i] << std::endl;
-				}
+				// std::cout << "EVAL LABELS START RECEIVE 399" << std::endl;
+				// mChannel->recv(sharedBuff);
+				// std::cout << "EVAL LABELS END RECEIVE 399" << std::endl;
+				// std::cout << "RECEIVED LABELS" << std::endl;
+				// for (int i = 0; i <sharedBuff.size(); i++) {
+				// 	std::cout << sharedBuff[i] << std::endl;
+				// }
 
+
+				// for (u64 i = 0; i < item.mLabels->size(); ++i)
+				// {
+				// 	(*item.mLabels)[i] = *iter++ ^ (zeroAndAllOnesBlk[item.mInputVal[i]] & sharedBuff[i]);
+				// }
 
 				for (u64 i = 0; i < item.mLabels->size(); ++i)
 				{
-					(*item.mLabels)[i] = *iter++ ^ (zeroAndAllOnesBlk[item.mInputVal[i]] & sharedBuff[i]);
+					(*item.mLabels)[i] = mEvalLabels[i];
 				}
 			}
 			else
@@ -540,6 +589,7 @@ namespace osuCrypto
 			else
 			{
                 copyOp(item);
+				std::cout << "END SEND 455" << std::endl;
 			}
 
 			mCrtQueue.pop();

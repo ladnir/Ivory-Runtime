@@ -16,7 +16,7 @@
 
 using namespace osuCrypto;
 
-i32 program(std::array<Party, 2> parties, i64 myInput)
+std::vector<u8> program(std::array<Party, 2> parties, i64 myInput)
 {
 	// choose how large the arithmetic should be.
 	u64 bitCount = 16;
@@ -36,62 +36,67 @@ i32 program(std::array<Party, 2> parties, i64 myInput)
 		parties[1].input<sInt>(myInput, bitCount) :
 		parties[1].input<sInt>(bitCount);
 
-	// perform some computation
-	auto add = input1 + input0;
-	auto sub = input1 - input0;
-	auto mul = input1 * input0;
-	auto div = input1 / input0;
+	// // perform some computation
+	// auto add = input1 + input0;
+	// auto sub = input1 - input0;
+	// auto mul = input1 * input0;
+	// auto div = input1 / input0;
     
-    // multiplies input 1 by 2^4
-    auto shift = input1 << 4;
+    // // multiplies input 1 by 2^4
+    // auto shift = input1 << 4;
 
     // logical operations
 	auto gteq = input1 >= input0;
-	auto lt = input1 < input0;
+	// auto lt = input1 < input0;
 
-    // select a subset of the bits
-    auto signBit = input1.copyBits(bitCount - 1, bitCount);
+    // // select a subset of the bits
+    // auto signBit = input1.copyBits(bitCount - 1, bitCount);
 
-    // perform if statements
-	auto max = gteq.ifelse(input1, input0);
+    // // perform if statements
+	// auto max = gteq.ifelse(input1, input0);
 
     // assigments
 	input0 = input1;
 
 
 	// reveal this output to party 0.
-	parties[0].reveal(add);
-	parties[0].reveal(sub);
-	parties[0].reveal(mul);
-    parties[0].reveal(div);
-    parties[0].reveal(signBit);
+	// parties[0].reveal(add);
+	// parties[0].reveal(sub);
+	// parties[0].reveal(mul);
+    // parties[0].reveal(div);
+    // parties[0].reveal(signBit);
 	parties[0].reveal(gteq);
-	parties[0].reveal(lt);
-	parties[0].reveal(max);
+	// parties[0].reveal(lt);
+	// parties[0].reveal(max);
 
 
+	// The garbler
 	if (parties[0].isLocalParty())
 	{
-		std::cout << "add       " << add.getValue() << std::endl;
-		std::cout << "sub       " << sub.getValue() << std::endl;
-		std::cout << "mul       " << mul.getValue() << std::endl;
-        std::cout << "div       " << div.getValue() << std::endl;
-        std::cout << "sign(in1) " << signBit.getValue() << std::endl;
-		std::cout << "gteq      " << gteq.getValue() << std::endl;
-		std::cout << "lt        " << lt.getValue() << std::endl;
-		std::cout << "max       " << max.getValue() << std::endl;
+		// return eval labels
+		return gteq.genLabelsCircuit();
+	}
+
+	if (parties[1].isLocalParty())
+	{
+		// std::cout << "add       " << add.getValue() << std::endl;
+		// std::cout << "sub       " << sub.getValue() << std::endl;
+		// std::cout << "mul       " << mul.getValue() << std::endl;
+        // std::cout << "div       " << div.getValue() << std::endl;
+        // std::cout << "sign(in1) " << signBit.getValue() << std::endl;
+		std::cout << "gteq      " << gteq.getValueOffline() << std::endl;
+		// std::cout << "lt        " << lt.getValue() << std::endl;
+		// std::cout << "max       " << max.getValue() << std::endl;
 	}
 
 	// operations can get queued up in the background. Eventually this call should not
 	// be required but in the mean time, if one party does not call getValue(), then
 	// processesQueue() should be called.
-	parties[1].getRuntime().processesQueue();
+	// parties[1].getRuntime().processesQueue();
 
-
-	return 0;
 }
 
-void party1(std::string ip, OfflineSocket& shared_channel)
+void party1(std::string ip, OfflineSocket& shared_channel, std::vector<u8> evalLabels)
 {
 
 
@@ -126,7 +131,12 @@ void party1(std::string ip, OfflineSocket& shared_channel)
 	// the local party index. 
 	ShGcRuntime rt1;
 	rt1.mDebugFlag = debug;
-	rt1.init(chl1, shared_channel, prng.get<block>(), ShGcRuntime::Evaluator, 1);
+	auto zeros = ((block*) evalLabels.data());
+	std::vector<block> zeroEvalLabels(evalLabels.size() / (sizeof(block)*2));
+	for (int i = 0; i < evalLabels.size()/(2 * sizeof(block)); i++) {
+		zeroEvalLabels[i] = zeros[i]; 
+	}
+	rt1.init(chl1, shared_channel, prng.get<block>(), ShGcRuntime::Evaluator, 1, zeroEvalLabels);
 
 	// We can then instantiate the parties that will be running the protocol.
 	std::array<Party, 2> parties{
@@ -139,11 +149,11 @@ void party1(std::string ip, OfflineSocket& shared_channel)
 	{
 		// the prgram take the parties that are participating and the input
 		// of the local party, in this case its 44.
-		program(parties, 44);
+		program(parties, 0);
 	}
 }
 
-void party0(std::string ip, OfflineSocket& shared_channel)
+std::vector<u8> party0(std::string ip, OfflineSocket& shared_channel)
 {
 
 	u64 tries(1);
@@ -171,7 +181,8 @@ void party0(std::string ip, OfflineSocket& shared_channel)
 	// run the program serveral time, with time with 23 as the input value
 	for (u64 i = 0; i < tries; ++i)
 	{
-		program(parties, 23);
+		auto evalLabels = program(parties, 23);
+		return evalLabels;
 	}
 }
 
@@ -183,6 +194,7 @@ int main(int argc, char**argv)
 
 	// Mock socket
 	OfflineSocket shared_channel;
+	std::vector<u8> hold;
 
 	if (cmd.isSet("r"))
 	{
@@ -197,7 +209,7 @@ int main(int argc, char**argv)
 		}
 		else if (r == 1)
 		{
-			party1(ip, shared_channel);
+			party1(ip, shared_channel, hold);
 		}
 		else
 		{
@@ -209,12 +221,10 @@ int main(int argc, char**argv)
 		// here we run both parties in a single program.
 
 		// We need a second thread to run the other party.
-		std::thread thrd(party0, "127.0.0.1:1212", std::ref(shared_channel));
+		auto evalLabels = party0("127.0.0.1:1212", shared_channel);
 
 		// std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-		party1("127.0.0.1:1212", shared_channel);
-
-		thrd.join();
+		party1("127.0.0.1:1212", shared_channel, evalLabels);
 	}
 	return 0;
 }

@@ -49,6 +49,8 @@ namespace osuCrypto
 
         void reveal(u64 partyIdx)override;
         void reveal(span<u64> partyIdxs)override;
+        std::vector<u8> genLabelsCircuit()override;
+        ValueType getValueOffline()override;
         ValueType getValue()override;
 
         //sIntBasePtr getBits(u64 lowIdx, u64 highIdx) override;
