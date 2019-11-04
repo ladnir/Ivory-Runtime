@@ -34,7 +34,7 @@ namespace osuCrypto {
 
         void recv(std::vector<block>& data);
 
-        void recv(std::vector<GarbledGate<2>> &gates, u64 size);
+        void recv(std::vector<block>& gates, u64 size);
 
         void recv(BitVector& data);
 

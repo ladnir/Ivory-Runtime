@@ -605,18 +605,18 @@ namespace osuCrypto
 				if (item.mCircuit->mNonlinearGateCount)
 				{
 					std::cout << "START EVAL CIRCUIT RECV" << std::endl;
-					mChannel->recv(sharedGates, item.mCircuit->mNonlinearGateCount * 2);
+					mChannel->recv(sharedBuff, item.mCircuit->mNonlinearGateCount);
 					std::cout << "RECV 610 SIZE: ";
-					std::cout << sharedGates.size() << std::endl;
+					std::cout << sharedBuff.size() << std::endl;
 					std::cout << "END EVAL CIRCUIT RECV" << std::endl;
 					std::cout << "RECEIVED LABELS" << std::endl;
-					for (int i = 0; i <sharedGates.size(); i++) {
-						std::cout << ((block *)&sharedGates[i]) << std::endl;
-					}
-					Expects(sharedGates.size() == item.mCircuit->mNonlinearGateCount * 2);
+					// for (int i = 0; i <sharedBuff.size(); i++) {
+					// 	std::cout << sharedBuff[i] << std::endl;
+					// }
+					Expects(sharedBuff.size() == item.mCircuit->mNonlinearGateCount * 2);
 				}
 				auto gates = span<GarbledGate<2>>(
-					(GarbledGate<2>*) sharedGates.data(), 
+					(GarbledGate<2>*) sharedBuff.data(), 
 					item.mCircuit->mNonlinearGateCount);
 
 				evaluate(*item.mCircuit, sharedMem, mTweaks, gates, mRecvBit);
@@ -729,7 +729,7 @@ namespace osuCrypto
 
 	void ShGcRuntime::evaluatorOutput()
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(4000));
+		//std::this_thread::sleep_for(std::chrono::milliseconds(4500));
 		while (mOutputQueue.size())
 		{
 			auto& item = mOutputQueue.front();
@@ -738,7 +738,9 @@ namespace osuCrypto
 			{
 				BitVector val(item.mLabels->size());
 
+				std::cout << "START RECV 742" << std::endl;
 				mChannel->recv(val);
+				std::cout << "END RECV 742" << std::endl;
 
 				for (u64 i = 0; i < item.mLabels->size(); ++i)
 				{

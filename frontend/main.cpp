@@ -95,7 +95,7 @@ void party1(std::string ip, OfflineSocket& shared_channel)
 {
 
 
-	u64 tries(2);
+	u64 tries(1);
 	bool debug = false;
 
 	// IOSerive will perform the networking operations in the background
@@ -146,7 +146,7 @@ void party1(std::string ip, OfflineSocket& shared_channel)
 void party0(std::string ip, OfflineSocket& shared_channel)
 {
 
-	u64 tries(2);
+	u64 tries(1);
 	PRNG prng(OneBlock);
 	bool debug = false;
 

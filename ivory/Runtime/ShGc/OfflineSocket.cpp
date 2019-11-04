@@ -95,13 +95,15 @@ namespace osuCrypto {
     //     recv((u8*) data.data(), size * sizeof(block));
     // }
 
-    void OfflineSocket::recv(std::vector<GarbledGate<2>> &gates, u64 size) {
-        gates.resize(size);
+    void OfflineSocket::recv(std::vector<block>& gates, u64 size) {
+        gates.resize(size*2);
         std::cout << "GATE VALUES" << std::endl;
         std::cout << q_gate.size() << std::endl;
         std::cout << size << std::endl;
-        for (u64 i = 0; i < size; i++) {
-            gates[i] = q_gate.front();
+        for (u64 i = 0; i < size*2; i+=2) {
+            GarbledGate<2> gate_pair = q_gate.front();
+            gates[i] = gate_pair.mGarbledTable[0];
+            gates[i+1] = gate_pair.mGarbledTable[1];
             q_gate.pop_front();
         }
     }

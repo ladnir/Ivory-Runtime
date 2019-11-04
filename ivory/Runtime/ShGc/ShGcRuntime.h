@@ -76,7 +76,7 @@ namespace osuCrypto
         IknpOtExtSender mOtExtSender;
 
         std::vector<block> sharedMem;
-        std::vector<GarbledGate<2>> sharedGates;
+        //std::vector<GarbledGate<2>> sharedGates;
 		std::vector<u8> shareAuxBits;
         std::vector<block> sharedBuff;
         std::array<block, 2>mTweaks;
