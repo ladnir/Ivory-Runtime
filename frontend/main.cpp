@@ -147,9 +147,9 @@ void party1(std::string ip, OfflineSocket& shared_channel, std::vector<u8>& eval
 	for (int i = 0; i < evalLabels.size()/(sizeof(block)); i++) {
 		std::cout << zeros[i] << std::endl;
 	}
-	std::vector<block> zeroEvalLabels(evalLabels.size() / (sizeof(block)*2));
+	std::vector<block> zeroEvalLabels;
 	for (int i = evalLabels.size()/(2 * sizeof(block)); i < evalLabels.size()/(sizeof(block)); i++) {
-		zeroEvalLabels[i] = zeros[i];
+		zeroEvalLabels.push_back(zeros[i]);
 		// std::cout << zeros[i] << std::endl;
 	}
 	rt1.init(shared_channel, prng.get<block>(), ShGcRuntime::Evaluator, 1, zeroEvalLabels);
@@ -164,7 +164,7 @@ void party1(std::string ip, OfflineSocket& shared_channel, std::vector<u8>& eval
 	{
 		// the prgram take the parties that are participating and the input
 		// of the local party, in this case its 44.
-		program(parties, 47);
+		program(parties, -8);
 	}
 }
 
