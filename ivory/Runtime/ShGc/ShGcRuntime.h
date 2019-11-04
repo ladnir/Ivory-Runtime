@@ -42,9 +42,9 @@ namespace osuCrypto
         ShGcRuntime();
         ~ShGcRuntime();
 
-        void init(Channel& chl, OfflineSocket& sharedChannel, block seed, Role role, u64 partyIdx);
+        void init(OfflineSocket& sharedChannel, block seed, Role role, u64 partyIdx);
 
-        void init(Channel& chl, OfflineSocket& sharedChannel, block seed, Role role, u64 partyIdx, std::vector<block>& evalLabels);
+        void init(OfflineSocket& sharedChannel, block seed, Role role, u64 partyIdx, std::vector<block>& evalLabels);
 
         ShGc::GarbledMem getNewMem(u64 size);
         void freeMem(const ShGc::GarbledMem& mem);
@@ -72,7 +72,6 @@ namespace osuCrypto
         PRNG mPrng;
         u64 mInputIdx;
         OfflineSocket* mChannel;
-        Channel* trueChannel;
 
         std::vector<block> mEvalLabels;
 

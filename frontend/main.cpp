@@ -21,6 +21,8 @@ std::vector<u8> program(std::array<Party, 2> parties, i64 myInput)
 	// choose how large the arithmetic should be.
 	u64 bitCount = 16;
 
+	std::vector<u8> labels;
+
 	// get the two input variables. If this party is the local party, then 
 	// lets use our input value. Otherwise the remote party will provide the value.
 	// In addition, the bitCount parameter means a value with that many bits
@@ -36,6 +38,7 @@ std::vector<u8> program(std::array<Party, 2> parties, i64 myInput)
 		parties[1].input<sInt>(myInput, bitCount) :
 		parties[1].input<sInt>(bitCount);
 
+	std::cout << myInput << std::endl;
 	// // perform some computation
 	// auto add = input1 + input0;
 	// auto sub = input1 - input0;
@@ -65,7 +68,13 @@ std::vector<u8> program(std::array<Party, 2> parties, i64 myInput)
 	// parties[0].reveal(mul);
     // parties[0].reveal(div);
     // parties[0].reveal(signBit);
-	parties[0].reveal(gteq);
+	if (parties[0].isLocalParty()) {
+		parties[0].reveal(gteq);
+	}
+	else {
+		parties[1].reveal(gteq);
+	}
+	
 	// parties[0].reveal(lt);
 	// parties[0].reveal(max);
 
@@ -74,11 +83,12 @@ std::vector<u8> program(std::array<Party, 2> parties, i64 myInput)
 	if (parties[0].isLocalParty())
 	{
 		// return eval labels
-		return gteq.genLabelsCircuit();
+		labels = gteq.genLabelsCircuit();
 	}
 
 	if (parties[1].isLocalParty())
 	{
+		std::cout << "HERE" << std::endl;
 		// std::cout << "add       " << add.getValue() << std::endl;
 		// std::cout << "sub       " << sub.getValue() << std::endl;
 		// std::cout << "mul       " << mul.getValue() << std::endl;
@@ -94,36 +104,37 @@ std::vector<u8> program(std::array<Party, 2> parties, i64 myInput)
 	// processesQueue() should be called.
 	// parties[1].getRuntime().processesQueue();
 
+	return labels;
+
 }
 
-void party1(std::string ip, OfflineSocket& shared_channel, std::vector<u8> evalLabels)
+void party1(std::string ip, OfflineSocket& shared_channel, std::vector<u8>& evalLabels)
 {
 
 
 	u64 tries(1);
 	bool debug = false;
 
-	// IOSerive will perform the networking operations in the background
-	IOService ios;
+	// // IOSerive will perform the networking operations in the background
+	// IOService ios;
 
-	// Session represents one end of a connection. It facilitates the
-	// creation of sockets that all bind to this port. First we pass it the 
-	// IOSerive and then the server's IP:port number. Next we state that 
-	// this Session should act as a server (listens to the provided port).
-	Session ep1(ios, ip, SessionMode::Server);
+	// // Session represents one end of a connection. It facilitates the
+	// // creation of sockets that all bind to this port. First we pass it the 
+	// // IOSerive and then the server's IP:port number. Next we state that 
+	// // this Session should act as a server (listens to the provided port).
+	// Session ep1(ios, ip, SessionMode::Server);
 
-	// We can now create a socket. This is done with addChannel. This operation 
-	// is asynchronous. If additional connections are needed between the 
-	// two parties, call addChannel again.
-	Channel chl1 = ep1.addChannel();
+	// // We can now create a socket. This is done with addChannel. This operation 
+	// // is asynchronous. If additional connections are needed between the 
+	// // two parties, call addChannel again.
+	// Channel chl1 = ep1.addChannel();
 
-	// this is an optional call that blocks until the socket has successfully 
-	// been set up.
-	chl1.waitForConnection();
+	// // this is an optional call that blocks until the socket has successfully 
+	// // been set up.
+	// chl1.waitForConnection();
 
 	// We will need a random number generator. Should pass it a real seed.
 	PRNG prng(ZeroBlock);
-
 	// In this example, we will use the semi-honest Garbled Circuit
 	// runtime. Once constructed, init should be called. We need to
 	// provide the runtime the channel that it will use to communicate 
@@ -132,24 +143,28 @@ void party1(std::string ip, OfflineSocket& shared_channel, std::vector<u8> evalL
 	ShGcRuntime rt1;
 	rt1.mDebugFlag = debug;
 	auto zeros = ((block*) evalLabels.data());
-	std::vector<block> zeroEvalLabels(evalLabels.size() / (sizeof(block)*2));
-	for (int i = 0; i < evalLabels.size()/(2 * sizeof(block)); i++) {
-		zeroEvalLabels[i] = zeros[i]; 
+	std::cout << "POTENTIAL EVAL LABEL VALS" << std::endl;
+	for (int i = 0; i < evalLabels.size()/(sizeof(block)); i++) {
+		std::cout << zeros[i] << std::endl;
 	}
-	rt1.init(chl1, shared_channel, prng.get<block>(), ShGcRuntime::Evaluator, 1, zeroEvalLabels);
+	std::vector<block> zeroEvalLabels(evalLabels.size() / (sizeof(block)*2));
+	for (int i = evalLabels.size()/(2 * sizeof(block)); i < evalLabels.size()/(sizeof(block)); i++) {
+		zeroEvalLabels[i] = zeros[i];
+		// std::cout << zeros[i] << std::endl;
+	}
+	rt1.init(shared_channel, prng.get<block>(), ShGcRuntime::Evaluator, 1, zeroEvalLabels);
 
 	// We can then instantiate the parties that will be running the protocol.
 	std::array<Party, 2> parties{
 		Party(rt1, 0),
 		Party(rt1, 1)
 	};
-
 	// Next, lets call the main "program" several times.
 	for (u64 i = 0; i < tries; ++i)
 	{
 		// the prgram take the parties that are participating and the input
 		// of the local party, in this case its 44.
-		program(parties, 0);
+		program(parties, 47);
 	}
 }
 
@@ -160,17 +175,17 @@ std::vector<u8> party0(std::string ip, OfflineSocket& shared_channel)
 	PRNG prng(OneBlock);
 	bool debug = false;
 
-	// IOSerive will perform the networking operations in the background
-	IOService ios;
+	// // IOSerive will perform the networking operations in the background
+	// IOService ios;
 
-	// set up networking. See above for details
-	Session ep0(ios, ip, SessionMode::Client);
-	Channel chl0 = ep0.addChannel();
+	// // set up networking. See above for details
+	// Session ep0(ios, ip, SessionMode::Client);
+	// Channel chl0 = ep0.addChannel();
 
 	// set up the runtime, see above for details
 	ShGcRuntime rt0;
 	rt0.mDebugFlag = debug;
-	rt0.init(chl0, shared_channel, prng.get<block>(), ShGcRuntime::Garbler, 0);
+	rt0.init(shared_channel, prng.get<block>(), ShGcRuntime::Garbler, 0);
 
 	// instantiate the parties
 	std::array<Party, 2> parties{
@@ -178,12 +193,13 @@ std::vector<u8> party0(std::string ip, OfflineSocket& shared_channel)
 		Party(rt0, 1)
 	};
 
+	std::vector<u8> evalLabels;
 	// run the program serveral time, with time with 23 as the input value
 	for (u64 i = 0; i < tries; ++i)
 	{
-		auto evalLabels = program(parties, 23);
-		return evalLabels;
+		evalLabels = program(parties, 23);
 	}
+	return evalLabels;
 }
 
 int main(int argc, char**argv)

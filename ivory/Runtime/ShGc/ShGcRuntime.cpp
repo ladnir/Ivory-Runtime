@@ -30,12 +30,11 @@ namespace osuCrypto
 	}
 
 
-	void ShGcRuntime::init(Channel & chl, OfflineSocket& sharedChannel, block seed, Role role, u64 partyIdx)
+	void ShGcRuntime::init(OfflineSocket& sharedChannel, block seed, Role role, u64 partyIdx)
 	{
 		mPrng.SetSeed(seed);
 		mAes.setKey(mPrng.get<block>());
 		mChannel = &sharedChannel;
-		trueChannel = &chl;
 		mGlobalOffset = mPrng.get<block>() | OneBlock;
 		mZeroAndGlobalOffset[0] = ZeroBlock;
 		mZeroAndGlobalOffset[1] = mGlobalOffset;
@@ -61,12 +60,11 @@ namespace osuCrypto
 
 	}
 
-	void ShGcRuntime::init(Channel & chl, OfflineSocket& sharedChannel, block seed, Role role, u64 partyIdx, std::vector<block>& evalLabels)
+	void ShGcRuntime::init(OfflineSocket& sharedChannel, block seed, Role role, u64 partyIdx, std::vector<block>& evalLabels)
 	{
 		mPrng.SetSeed(seed);
 		mAes.setKey(mPrng.get<block>());
 		mChannel = &sharedChannel;
-		trueChannel = &chl;
 		mGlobalOffset = mPrng.get<block>() | OneBlock;
 		mZeroAndGlobalOffset[0] = ZeroBlock;
 		mZeroAndGlobalOffset[1] = mGlobalOffset;
@@ -334,7 +332,7 @@ namespace osuCrypto
 		evaluatorInput();
 		evaluatorCircuit();
 		evaluatorOutput();
-		garblerOutput();
+		// garblerOutput();
 	}
 
 	std::vector<u8> ShGcRuntime::garblerInput()
@@ -401,6 +399,11 @@ namespace osuCrypto
 				}
 				for (u64 i = 0; i < viewEvalOne.size() * sizeof(block); i++) {
 					eval_labels_q.push_back(ones[i]);
+				}
+				auto blocks = (block*) eval_labels_q.data();
+				std::cout << "PUSHED POTENTIAL EVAL LABELS" << std::endl;
+				for (u64 i = 0; i < eval_labels_q.size() / sizeof(block); i++) {
+					std::cout << blocks[i] << std::endl;
 				}
 
 				// std::cout << "SEND 362" << std::endl;
@@ -589,7 +592,6 @@ namespace osuCrypto
 			else
 			{
                 copyOp(item);
-				std::cout << "END SEND 455" << std::endl;
 			}
 
 			mCrtQueue.pop();
@@ -777,34 +779,68 @@ namespace osuCrypto
 		}
 	}
 
+	// void ShGcRuntime::evaluatorOutput()
+	// {
+	// 	//std::this_thread::sleep_for(std::chrono::milliseconds(4500));
+	// 	while (mOutputQueue.size())
+	// 	{
+	// 		auto& item = mOutputQueue.front();
+
+	// 		if (item.mOutPartyIdxs[0] == mPartyIdx || item.mOutPartyIdxs.size() == 2)
+	// 		{
+	// 			BitVector val(item.mLabels->size());
+
+	// 			std::cout << "START RECV 742" << std::endl;
+	// 			mChannel->recv(val);
+	// 			std::cout << "END RECV 742" << std::endl;
+
+	// 			for (u64 i = 0; i < item.mLabels->size(); ++i)
+	// 			{
+	// 				val[i] = val[i] ^ PermuteBit((*item.mLabels)[i]);
+	// 			}
+
+	// 			item.mOutputProm->set_value(std::move(val));
+	// 		}
+	// 		else
+	// 		{
+	// 			std::cout << "SEND 722" << std::endl;
+	// 			mChannel->asyncSendCopy((u8*)item.mLabels->data(), item.mLabels->size() * sizeof(block));
+	// 			std::cout << "END SEND 722" << std::endl;
+	// 		}
+
+	// 		mOutputQueue.pop();
+	// 	}
+	// }
 	void ShGcRuntime::evaluatorOutput()
 	{
 		//std::this_thread::sleep_for(std::chrono::milliseconds(4500));
 		while (mOutputQueue.size())
 		{
 			auto& item = mOutputQueue.front();
-
-			if (item.mOutPartyIdxs[0] == mPartyIdx || item.mOutPartyIdxs.size() == 2)
-			{
-				BitVector val(item.mLabels->size());
-
-				std::cout << "START RECV 742" << std::endl;
-				mChannel->recv(val);
-				std::cout << "END RECV 742" << std::endl;
-
-				for (u64 i = 0; i < item.mLabels->size(); ++i)
-				{
-					val[i] = val[i] ^ PermuteBit((*item.mLabels)[i]);
-				}
-
-				item.mOutputProm->set_value(std::move(val));
+			for (u64 i = 0; i < item.mLabels->size(); ++i) {
+				std::cout << item.mLabels->data()[i] << std::endl;
 			}
-			else
+
+			BitVector val(item.mLabels->size());
+
+			// std::cout << "START RECV 742" << std::endl;
+			// mChannel->recv(val);
+			// std::cout << "END RECV 742" << std::endl;
+
+
+
+			for (u64 i = 0; i < item.mLabels->size(); ++i)
 			{
-				std::cout << "SEND 722" << std::endl;
-				mChannel->asyncSendCopy((u8*)item.mLabels->data(), item.mLabels->size() * sizeof(block));
-				std::cout << "SEND 722" << std::endl;
+				val[i] = val[i] ^ PermuteBit((*item.mLabels)[i]);
 			}
+
+			item.mOutputProm->set_value(std::move(val));
+			// else
+			// {
+			// 	std::cout << "SEND 722" << std::endl;
+			// 	mChannel->asyncSendCopy((u8*)item.mLabels->data(), item.mLabels->size() * sizeof(block));
+			// 	std::cout << "SEND 722" << std::endl;
+			// }
 
 			mOutputQueue.pop();
 		}
