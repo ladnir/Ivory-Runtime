@@ -38,6 +38,18 @@ namespace osuCrypto {
 
         void recv(BitVector& data);
 
+        std::deque<GarbledGate<2>> getQGate();
+
+        std::deque<u8> getQu8();
+
+        std::deque<BitReference> getQBit();
+
+        void setQGate(std::deque<GarbledGate<2>> q);
+
+        void setQu8(std::deque<u8> q);
+
+        void setQBit(std::deque<BitReference> q);
+
         // std::deque<block>& get_q() {
         //     return q;
         // }

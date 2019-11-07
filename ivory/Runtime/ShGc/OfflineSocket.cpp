@@ -116,4 +116,28 @@ namespace osuCrypto {
         }
     }
 
+    std::deque<GarbledGate<2>> OfflineSocket::getQGate() {
+        return q_gate;
+    }
+
+    std::deque<u8> OfflineSocket::getQu8() {
+        return q_u8;
+    }
+
+    std::deque<BitReference> OfflineSocket::getQBit() {
+        return q_bit;
+    }
+
+    void OfflineSocket::setQGate(std::deque<GarbledGate<2>> q) [
+        q_gate = q;
+    ]
+
+    void OfflineSocket::setQu8(std::deque<u8> q) [
+        q_u8 = q;
+    ]
+
+    void OfflineSocket::setQBit(std::deque<BitReference> q) [
+        q_bit = q;
+    ]
+
 };
