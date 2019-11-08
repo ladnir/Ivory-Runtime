@@ -1,6 +1,8 @@
 #pragma once
 #include "cryptoTools/Common/Defines.h"
 #include <vector>
+#include <tuple>
+#include <deque>
 
 namespace osuCrypto
 {
@@ -70,7 +72,7 @@ namespace osuCrypto
         virtual void reveal(u64 partyIdx) = 0;
         virtual void reveal(span<u64> partyIdxs) = 0;
         virtual ValueType getValue() = 0;
-        virtual std::vector<u8> genLabelsCircuit() = 0;
+        virtual std::tuple<std::vector<u8>, std::deque<u8>, std::deque<block>> genLabelsCircuit() = 0;
         virtual ValueType getValueOffline() = 0;
     };
 
@@ -145,7 +147,7 @@ namespace osuCrypto
 
         ValueType getValue();
 
-        std::vector<u8> genLabelsCircuit();
+        std::tuple<std::vector<u8>, std::deque<u8>, std::deque<block>> genLabelsCircuit();
         ValueType getValueOffline();
 
 

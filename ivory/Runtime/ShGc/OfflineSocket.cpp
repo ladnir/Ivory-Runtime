@@ -2,15 +2,6 @@
 
 
 namespace osuCrypto {
-    // Sending a vector of blocks to queue
-    // void OfflineSocket::send(const std::vector<block> data, u64 size)
-    // {
-    //     auto size_block = size / sizeof(block);
-    //     for (u64 i = 0; i < size_block; i++) {
-    //         q_block.push_back(data[i]);
-    //         std::cout << data[i];
-    //     }
-    // }
 
     // Sending data given by u8* by copying into a vector of blocks and then adding to queue
     void OfflineSocket::send(const u8* data, u64 size)
@@ -59,33 +50,16 @@ namespace osuCrypto {
 
     // Receive for vector of blocks but given u8* instead
     void OfflineSocket::recv(u8* data, u64 size) {
-        // int count = 0;
-        // while (q_u8.empty()) {
-        //     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-        //     count++;
-        //     std::cerr << "WAITING" << std::endl;
-        //     if (count > 1) {
-        //         std::cout << "WAITING TOO LONG" << std::endl;
-        //     }
-        // }
-        // std::cout << q_u8.size() << std::endl;
         for (u64 i = 0; i < size; i++) {
             data[i] = q_u8.front();
             q_u8.pop_front();
         }
-
-        // std::cout << "START REC VALUES" << std::endl;
-
-        // for (int i = 0; i < size/sizeof(block); i++) {
-        //     std::cout << ((block*) data)[i] << std::endl;
-        // }
-        // std::cout << "END REC VALUES" << std::endl;
     }
 
     // Receive for vector of blocks
     void OfflineSocket::recv(std::vector<block>& data) {
+        // 16 comes from the bitcount variable in the main program
         data.resize(16);
-        std::cout << q_u8.size() << std::endl;
         recv((u8*) data.data(), 16 * sizeof(block));
     }
 
@@ -97,9 +71,6 @@ namespace osuCrypto {
 
     void OfflineSocket::recv(std::vector<block>& gates, u64 size) {
         gates.resize(size*2);
-        std::cout << "GATE VALUES" << std::endl;
-        std::cout << q_gate.size() << std::endl;
-        std::cout << size << std::endl;
         for (u64 i = 0; i < size*2; i+=2) {
             GarbledGate<2> gate_pair = q_gate.front();
             gates[i] = gate_pair.mGarbledTable[0];
@@ -116,8 +87,16 @@ namespace osuCrypto {
         }
     }
 
-    std::deque<GarbledGate<2>> OfflineSocket::getQGate() {
-        return q_gate;
+    std::deque<block> OfflineSocket::getQGate() {
+        // Serialize by just sequentially storing the 2 garbled tables
+        std::deque<block> serialized_q_gate;
+        while (q_gate.size()) {
+            GarbledGate<2> gate_pair = q_gate.front();
+            serialized_q_gate.push_back(gate_pair.mGarbledTable[0]);
+            serialized_q_gate.push_back(gate_pair.mGarbledTable[1]);
+            q_gate.pop_front();
+        }
+        return serialized_q_gate;
     }
 
     std::deque<u8> OfflineSocket::getQu8() {
@@ -128,16 +107,23 @@ namespace osuCrypto {
         return q_bit;
     }
 
-    void OfflineSocket::setQGate(std::deque<GarbledGate<2>> q) [
-        q_gate = q;
-    ]
+    void OfflineSocket::setQGate(std::deque<block> q) {
+        while (q.size()) {
+            block garbleTable_1 = q.front();
+            q.pop_front();
+            block garbleTable_2 = q.front();
+            GarbledGate<2> gate_pair = {garbleTable_1, garbleTable_2};
+            q_gate.push_back(gate_pair);
+            q.pop_front();
+        }
+    }
 
-    void OfflineSocket::setQu8(std::deque<u8> q) [
+    void OfflineSocket::setQu8(std::deque<u8> q) {
         q_u8 = q;
-    ]
+    }
 
-    void OfflineSocket::setQBit(std::deque<BitReference> q) [
+    void OfflineSocket::setQBit(std::deque<BitReference> q) {
         q_bit = q;
-    ]
+    }
 
 };

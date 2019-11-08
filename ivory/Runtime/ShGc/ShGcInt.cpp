@@ -442,11 +442,11 @@ namespace osuCrypto
         mRt.enqueue(std::move(cc));
     }
 
-    std::vector<u8> ShGcInt::genLabelsCircuit() {
+    std::tuple<std::vector<u8>, std::deque<u8>, std::deque<block>> ShGcInt::genLabelsCircuit() {
         std::vector<u8> evalLabels = mRt.processesQueueGarbler();
-        std::deque<GarbledGate<2>> q_gate = mRt.mChannel->q_gate;
-        std::deque<u8> q_u8 = mRt.mChannel->q_u8;
-        return evalLabels;
+        std::deque<u8> q_u8 = mRt.mChannel->getQu8();
+        std::deque<block> q_gate = mRt.mChannel->getQGate();
+        return std::make_tuple(evalLabels, q_u8, q_gate);
     }
 
     ShGcInt::ValueType ShGcInt::getValueOffline()

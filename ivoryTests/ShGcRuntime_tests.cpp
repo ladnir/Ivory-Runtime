@@ -127,7 +127,7 @@ void runProgram(std::function<void(Runtime&)>  program)
 		PRNG prng(ZeroBlock);
 
 		ShGcRuntime rt1;
-		rt1.init(chl1, sharedChannel, prng.get<block>(), ShGcRuntime::Evaluator, 1);
+		rt1.init(sharedChannel, prng.get<block>(), ShGcRuntime::Evaluator, 1);
 
 
 		program(rt1);
@@ -142,7 +142,7 @@ void runProgram(std::function<void(Runtime&)>  program)
 	Session ep0(ios, "127.0.0.1:1212", SessionMode::Server, "n");
 	Channel chl0 = ep0.addChannel("n");
 	ShGcRuntime rt0;
-	rt0.init(chl0, sharedChannel, prng.get<block>(), ShGcRuntime::Garbler, 0);
+	rt0.init(sharedChannel, prng.get<block>(), ShGcRuntime::Garbler, 0);
 
 	program(rt0);
 

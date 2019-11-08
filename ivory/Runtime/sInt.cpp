@@ -178,7 +178,7 @@ namespace osuCrypto
         return mData->getValueOffline();
     }
 
-    std::vector<u8> sInt::genLabelsCircuit()
+    std::tuple<std::vector<u8>, std::deque<u8>, std::deque<block>> sInt::genLabelsCircuit()
     {
         return mData->genLabelsCircuit();
     }

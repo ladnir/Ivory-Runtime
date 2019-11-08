@@ -2,6 +2,8 @@
 #include "ivory/Runtime/sInt.h"
 #include <cryptoTools/Common/Defines.h>
 #include <vector>
+#include <tuple>
+#include <deque>
 
 
 
@@ -48,7 +50,7 @@ namespace osuCrypto
         void reveal(span<u64> partyIdxs)override { throw std::runtime_error(" cant reveal public value" LOCATION); }
         ValueType getValue()override { return mValue; }
         ValueType getValueOffline()override { return mValue; }
-        std::vector<u8> genLabelsCircuit()override { throw std::runtime_error(" cant gen labels" LOCATION); }
+        std::tuple<std::vector<u8>, std::deque<u8>, std::deque<block>> genLabelsCircuit()override { throw std::runtime_error(" cant gen labels" LOCATION); }
 
     };
 
