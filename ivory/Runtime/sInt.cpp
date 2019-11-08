@@ -173,4 +173,14 @@ namespace osuCrypto
         mData->reveal(partyIdxs);
     }
 
+    sInt::ValueType sInt::getValueOffline()
+    {
+        return mData->getValueOffline();
+    }
+
+    std::tuple<std::vector<u8>, std::deque<u8>, std::deque<block>> sInt::genLabelsCircuit()
+    {
+        return mData->genLabelsCircuit();
+    }
+
 }

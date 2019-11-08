@@ -1,4 +1,5 @@
 #pragma once
+#include "ivory/Runtime/ShGc/OfflineSocket.h"
 #include "ivory/Runtime/Runtime.h"
 #include "cryptoTools/Circuit/BetaCircuit.h"
 #include "cryptoTools/Circuit/BetaLibrary.h"
@@ -41,7 +42,9 @@ namespace osuCrypto
         ShGcRuntime();
         ~ShGcRuntime();
 
-        void init(Channel& chl, block seed, Role role, u64 partyIdx);
+        void init(OfflineSocket& sharedChannel, block seed, Role role, u64 partyIdx);
+
+        void init(OfflineSocket& sharedChannel, block seed, Role role, u64 partyIdx, std::vector<block>& evalLabels);
 
         ShGc::GarbledMem getNewMem(u64 size);
         void freeMem(const ShGc::GarbledMem& mem);
@@ -68,7 +71,9 @@ namespace osuCrypto
         AES mAes;
         PRNG mPrng;
         u64 mInputIdx;
-        Channel* mChannel;
+        OfflineSocket* mChannel;
+
+        std::vector<block> mEvalLabels;
 
         IknpOtExtReceiver mOtExtRecver;
         IknpOtExtSender mOtExtSender;
@@ -85,11 +90,13 @@ namespace osuCrypto
         void enqueue(ShGc::CircuitItem&& item);
         void enqueue(ShGc::OutputItem&& item);
         void processesQueue() override;
+        std::vector<u8> processesQueueGarbler();
+        void processesQueueEvaluator();
 
         void garblerOutput();
         void garblerCircuit();
         void copyOp(osuCrypto::ShGc::CircuitItem & item);
-        void garblerInput();
+        std::vector<u8> garblerInput();
 
         void evaluatorInput();
         void evaluatorCircuit();

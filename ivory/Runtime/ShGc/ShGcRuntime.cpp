@@ -1,7 +1,6 @@
 #include "ShGcRuntime.h"
 #include "ivory/Runtime/ShGc/ShGcInt.h"
 
-
 #include "cryptoTools/Common/Log.h"
 
 #include "libOTe/Base/BaseOT.h"
@@ -31,11 +30,11 @@ namespace osuCrypto
 	}
 
 
-	void ShGcRuntime::init(Channel & chl, block seed, Role role, u64 partyIdx)
+	void ShGcRuntime::init(OfflineSocket& sharedChannel, block seed, Role role, u64 partyIdx)
 	{
 		mPrng.SetSeed(seed);
 		mAes.setKey(mPrng.get<block>());
-		mChannel = &chl;
+		mChannel = &sharedChannel;
 		mGlobalOffset = mPrng.get<block>() | OneBlock;
 		mZeroAndGlobalOffset[0] = ZeroBlock;
 		mZeroAndGlobalOffset[1] = mGlobalOffset;
@@ -43,22 +42,35 @@ namespace osuCrypto
 		mPartyIdx = partyIdx;
 
 
-		if (role == Garbler)
-		{
-			DefaultBaseOT base;
-			BitVector choices(128);
-			std::vector<block> msg(128);
-			base.receive(choices, msg, mPrng, chl);
-			mOtExtSender.setBaseOts(msg, choices);
-		}
-		else
-		{
-            DefaultBaseOT base;
-			std::vector<std::array<block, 2>> msg(128);
-			base.send(msg, mPrng, chl);
-			mOtExtRecver.setBaseOts(msg);
-		}
+		// if (role == Garbler)
+		// {
+		// 	DefaultBaseOT base;
+		// 	BitVector choices(128);
+		// 	std::vector<block> msg(128);
+		// 	base.receive(choices, msg, mPrng, chl);
+		// 	mOtExtSender.setBaseOts(msg, choices);
+		// }
+		// else
+		// {
+        //     DefaultBaseOT base;
+		// 	std::vector<std::array<block, 2>> msg(128);
+		// 	base.send(msg, mPrng, chl);
+		// 	mOtExtRecver.setBaseOts(msg);
+		// }
 
+	}
+
+	void ShGcRuntime::init(OfflineSocket& sharedChannel, block seed, Role role, u64 partyIdx, std::vector<block>& evalLabels)
+	{
+		mPrng.SetSeed(seed);
+		mAes.setKey(mPrng.get<block>());
+		mChannel = &sharedChannel;
+		mGlobalOffset = mPrng.get<block>() | OneBlock;
+		mZeroAndGlobalOffset[0] = ZeroBlock;
+		mZeroAndGlobalOffset[1] = mGlobalOffset;
+		mRole = role;
+		mPartyIdx = partyIdx;
+		mEvalLabels = evalLabels;
 	}
 
 	ShGc::GarbledMem ShGcRuntime::getNewMem(u64 size)
@@ -76,7 +88,7 @@ namespace osuCrypto
 		ShGc::InputItem ii;
 		ii.mLabels = ret->mLabels;
 
-		if (mRole == Garbler) mOtCount += bc.mBitCount;
+		// if (mRole == Garbler) mOtCount += bc.mBitCount;
 
 		enqueue(std::move(ii));
 		return sIntBasePtr(ret);
@@ -89,11 +101,11 @@ namespace osuCrypto
 		ii.mLabels = ret->mLabels;
 		ii.mInputVal.append((u8*)&v, bc.mBitCount);
 
-		if (mRole == Evaluator)
-		{
-			mOtCount += bc.mBitCount;
-			mOtChoices.append(ii.mInputVal);
-		}
+		// if (mRole == Evaluator)
+		// {
+		// 	mOtCount += bc.mBitCount;
+		// 	mOtChoices.append(ii.mInputVal);
+		// }
 		enqueue(std::move(ii));
 
 		return sIntBasePtr(ret);
@@ -310,20 +322,35 @@ namespace osuCrypto
 		}
 	}
 
-	void ShGcRuntime::garblerInput()
+	std::vector<u8> ShGcRuntime::processesQueueGarbler() {
+		std::vector<u8> evalLabels = garblerInput();
+		garblerCircuit();
+		return evalLabels;
+	}
+
+	void ShGcRuntime::processesQueueEvaluator() {
+		evaluatorInput();
+		evaluatorCircuit();
+		evaluatorOutput();
+		// garblerOutput();
+	}
+
+	std::vector<u8> ShGcRuntime::garblerInput()
 	{
-		std::vector<std::array<block, 2>> messages(mOtCount);
-		if (mOtCount)
-		{
+		// std::vector<std::array<block, 2>> messages(mOtCount);
+		// if (mOtCount)
+		// {
 
-			mOtCount = 0;
+		// 	mOtCount = 0;
 
-			mOtExtSender.send(messages, mPrng, *mChannel);
+		// 	mOtExtSender.send(messages, mPrng, *trueChannel);
 
 
-		}
+		// }
 
-		auto iter = messages.begin();
+		// auto iter = messages.begin();
+
+		std::vector<u8> eval_labels_q;
 
 		while (mInputQueue.size())
 		{
@@ -344,43 +371,44 @@ namespace osuCrypto
 				}
 				mChannel->asyncSend(std::move(view));
 			}
-			else
+
+			// Necessary for proper translation table construction for eval labels
+			else 
 			{
-				std::vector<block>view(item.mLabels->size());
-				for (u64 i = 0; i < item.mLabels->size(); ++i, ++iter)
+				// Generate all potential evaluator labels
+				// (this assumes that evaluator input size same as garbler input size)
+				std::vector<block> viewEvalZero(item.mLabels->size());
+				mAes.ecbEncCounterMode(mInputIdx, viewEvalZero.size(), viewEvalZero.data());
+				std::vector<block> viewEvalOne(viewEvalZero.size());
+				for (u64 i = 0; i < viewEvalZero.size(); ++i)
 				{
-					(*item.mLabels)[i] = (*iter)[0];
-					view[i] = (*iter)[1] ^ (*iter)[0] ^ mGlobalOffset;
+					viewEvalOne[i] = viewEvalZero[i] ^ mGlobalOffset;
+					// (*item.mLabels)[i] = (*iter)[0];
+					// view[i] = (*iter)[1] ^ (*iter)[0] ^ mGlobalOffset;
 				}
-				mChannel->asyncSend(std::move(view));
+
+				// Ordering is all zero labels and then all 1 labels
+				auto zeros = ((u8*) viewEvalZero.data());
+				auto ones = ((u8*) viewEvalOne.data());
+				for (u64 i = 0; i < viewEvalZero.size() * sizeof(block); i++) {
+					eval_labels_q.push_back(zeros[i]);
+				}
+				for (u64 i = 0; i < viewEvalOne.size() * sizeof(block); i++) {
+					eval_labels_q.push_back(ones[i]);
+				}
+				for (u64 i = 0; i < item.mLabels->size(); ++i)
+				{
+					(*item.mLabels)[i] = viewEvalZero[i];
+				}
 			}
 
 			mInputQueue.pop();
 		}
+		return eval_labels_q;
 	}
 
 	void ShGcRuntime::evaluatorInput()
 	{
-		static const std::array<block, 2> zeroAndAllOnesBlk{ ZeroBlock, AllOneBlock };
-
-		if (mOtChoices.size())
-		{
-
-			if (sharedMem.size() < mOtCount)
-				sharedMem.resize(mOtCount);
-
-			//sharedMem.resize(mOtCount);
-			span<block> view(sharedMem.begin(), sharedMem.begin() + mOtCount);
-
-			mOtExtRecver.receive(mOtChoices, sharedMem, mPrng, *mChannel);
-
-			mOtChoices.resize(0);
-			mOtCount = 0;
-
-		}
-
-		auto iter = sharedMem.begin();
-
 		while (mInputQueue.size())
 		{
 
@@ -388,16 +416,17 @@ namespace osuCrypto
 
 			if (item.mInputVal.size())
 			{
-				mChannel->recv(sharedBuff);
 
 				for (u64 i = 0; i < item.mLabels->size(); ++i)
 				{
-					(*item.mLabels)[i] = *iter++ ^ (zeroAndAllOnesBlk[item.mInputVal[i]] & sharedBuff[i]);
+					(*item.mLabels)[i] = mEvalLabels[i];
 				}
 			}
 			else
 			{
 				mChannel->recv((u8*)item.mLabels->data(), item.mLabels->size() * sizeof(block));
+				for (int i = 0; i <item.mLabels->size(); i++) {
+				}
 			}
 			mInputQueue.pop();
 		}
@@ -406,7 +435,6 @@ namespace osuCrypto
 	// 
 	void ShGcRuntime::garblerCircuit()
 	{
-
 		while (mCrtQueue.size())
 		{
 			auto& item = mCrtQueue.front();
@@ -434,9 +462,11 @@ namespace osuCrypto
 
 				auto gates = std::vector<GarbledGate<2>>(item.mCircuit->mNonlinearGateCount);
 				garble(*item.mCircuit, sharedMem, mTweaks, gates, mZeroAndGlobalOffset, shareAuxBits);
+
 				if (item.mCircuit->mNonlinearGateCount) mChannel->asyncSend(std::move(gates));
-				for (auto bit : shareAuxBits)
+				for (auto bit : shareAuxBits) {
 					mChannel->asyncSendCopy(&bit,1);
+				}
 				shareAuxBits.clear();
 
 				for (u64 i = item.mInputBundleCount; i < item.mLabels.size(); ++i) {
@@ -569,7 +599,7 @@ namespace osuCrypto
 
 				if (item.mCircuit->mNonlinearGateCount)
 				{
-					mChannel->recv(sharedBuff);
+					mChannel->recv(sharedBuff, item.mCircuit->mNonlinearGateCount);
 					Expects(sharedBuff.size() == item.mCircuit->mNonlinearGateCount * 2);
 				}
 				auto gates = span<GarbledGate<2>>(
@@ -615,7 +645,6 @@ namespace osuCrypto
 
 	void ShGcRuntime::garblerOutput()
 	{
-
 		while (mOutputQueue.size())
 		{
 			auto& item = mOutputQueue.front();
@@ -668,7 +697,6 @@ namespace osuCrypto
 				{
 					(*sendBuff)[i] = PermuteBit((*item.mLabels)[i]);
 				}
-
 				mChannel->asyncSend(std::move(sendBuff));
 			}
 
@@ -682,23 +710,14 @@ namespace osuCrypto
 		{
 			auto& item = mOutputQueue.front();
 
-			if (item.mOutPartyIdxs[0] == mPartyIdx || item.mOutPartyIdxs.size() == 2)
+			BitVector val(item.mLabels->size());
+
+			for (u64 i = 0; i < item.mLabels->size(); ++i)
 			{
-				BitVector val(item.mLabels->size());
-
-				mChannel->recv(val);
-
-				for (u64 i = 0; i < item.mLabels->size(); ++i)
-				{
-					val[i] = val[i] ^ PermuteBit((*item.mLabels)[i]);
-				}
-
-				item.mOutputProm->set_value(std::move(val));
+				val[i] = val[i] ^ PermuteBit((*item.mLabels)[i]);
 			}
-			else
-			{
-				mChannel->asyncSendCopy((u8*)item.mLabels->data(), item.mLabels->size() * sizeof(block));
-			}
+
+			item.mOutputProm->set_value(std::move(val));
 
 			mOutputQueue.pop();
 		}
