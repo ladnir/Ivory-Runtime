@@ -13,7 +13,7 @@
 #include <string>
 #include "cryptoTools/Crypto/PRNG.h"
 #include "cryptoTools/Common/CLP.h"
-#include "GcInterface.h"
+#include "ivory/Runtime/GcInterface.h"
 
 using namespace osuCrypto;
 
