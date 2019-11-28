@@ -8,7 +8,7 @@
 </div>
 
 
-The Ivory Runtime is a C++ library that aims to make secure computation easier to use. At a high level, Ivory acheives this by bringing together the protocol and the binary/arithmetic circuit compiler into a single integrated system. 
+The Ivory Runtime is a C++ library that aims to make secure computation easier to use. At a high level, Ivory achieves this by bringing together the protocol and the binary/arithmetic circuit compiler into a single integrated system. 
 
 Instead of requiring the user provide the circuit to be computed, the runtime pre-compiles many of the most useful opertions into mini-circuits/operations, e.g. addition, subtraction, multiplication, etc. The runtime then provides easy to use abstrations for declaring input variables, and computing with them. 
 
