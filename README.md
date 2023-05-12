@@ -74,21 +74,26 @@ void program(std::array<Party, 2> parties, i64 myInput)
 
 ## Building
 
-To build the library on linux, [libOTe](https://github.com/osu-crypto/libOTe) must be built.  *Important*, build libOTe with (Miracl or Relic) and enable the circuit implementation. Follow the instructions on the associated [readme](https://github.com/osu-crypto/libOTe).  Once build, ensure that Ivory-Runtime and libOTe are contained in the same parent directory.
+To build the library on linux, [libOTe v1.6.0](https://github.com/osu-crypto/libOTe) must be built.  *Important*, build libOTe with (Miracl or Relic) and enable the circuit implementation. Checkout version 1.6 and follow the instructions on the associated [readme](https://github.com/osu-crypto/libOTe).  Once build, ensure that Ivory-Runtime and libOTe are contained in the same parent directory.
 ```
-[libOTe setup]
+git clone https://github.com/osu-crypto/libOTe.git --recursive
+cd libOTe
+git pull origin v1.6.0
+git checkout v1.6.0
+python3 build.py -DENABLE_CIRCUITS=true -DENABLE_ALL_OT=true
+cd ..
 git clone https://github.com/ladnir/Ivory-Runtime.git
 cd Ivory-Runtime/thirdparty/linux
 bash ./ntl.get
 cd ../..
-cmake -G"Unix Makefiles"
-make
+cmake -S . -B out/build/linux
+cmake --build out/build/linux
 ```
 
 
-This will produce produce several libraries which will need to be linked. In the libOTe directory, the `bin` folder will contain `liblibOTe.a` and `libcryptoTools.a`. In addition to these libraries, the other third party libraries need to be linked. Namely miracl located at `/libOTe/cryptoTools/thirdparty/linux/miracl/miracl/source/libmiracl.a` and boost libraries folder at `libOTe/cryptoTools/thirdparty/linux/boost/stage/lib/`. Finally, the ivory library at `Ivory-Runtime/bin` should also be linked. 
+This will produce produce several libraries which will need to be linked. libOTe can be linked via cmake. See the libOTe repo for instructions. The ivory library at `Ivory-Runtime/bin` should also be linked. 
 
-With regards to includes folders, the boost and miracl folders should be included. The  top level of `libOTe` and `libOTe/cryptoTools` must be included and finally `Ivory-Runtime/ivory` should also be included.
+With regards to includes folders, `libOTe` must be included via cmake and `Ivory-Runtime/ivory` should also be included.
 
 
 Similar instruction on windows can be followed with the exception that visual studio solutions are provided in lue of cmake.
