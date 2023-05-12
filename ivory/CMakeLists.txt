@@ -30,68 +30,7 @@ if(NOT IS_DIRECTORY ${libOTe_Dirs})
 endif()
 
 
-find_library(
-	libOTe_LIB
-	NAMES libOTe
-	HINTS "${libOTe_Dirs}/lib/")
-	
-
-find_library(
-	cryptoTools_LIB
-	NAMES cryptoTools
-	HINTS "${libOTe_Dirs}/lib/")
-
-if(NOT EXISTS "${libOTe_LIB}")
-  message(FATAL_ERROR "Failed to find libOTe at ${libOTe_LIB}" )
-else()
-  target_include_directories(ivory PUBLIC ${libOTe_Dirs}) 
-  target_include_directories(ivory PUBLIC ${libOTe_Dirs}/cryptoTools) 
-endif()
-
-
-
-## Miracl
-###########################################################################
-
-set(Miracl_Dirs "${libOTe_Dirs}/cryptoTools/thirdparty/linux/miracl/")
-
-set(Miracl_Lib_Dirs "${Miracl_Dirs}/miracl/source/")
-find_library(MIRACL_LIB NAMES miracl  HINTS "${Miracl_Lib_Dirs}")
-
-# if we cant fint it, throw an error
-if(NOT MIRACL_LIB)
-    message(FATAL_ERROR "Failed to find miracl at " ${Miracl_Lib_Dirs})
-endif()
-message(STATUS "MIRACL_LIB:  ${MIRACL_LIB}")
-
-#include_directories("${Miracl_Dirs}") 
-
-target_include_directories(ivory PUBLIC "${Miracl_Dirs}") 
-#target_link_libraries(ivory ${MIRACL_LIB})
-
-
-## Boost
-###########################################################################
-
-set(BOOST_ROOT "${libOTe_Dirs}/cryptoTools/thirdparty/linux/boost/")
-
-set(Boost_USE_STATIC_LIBS        ON) # only find static libs
-set(Boost_USE_MULTITHREADED      ON)
-set(Boost_USE_STATIC_RUNTIME     ON)
-
-find_package(Boost COMPONENTS system thread)
-
-if(NOT Boost_FOUND)
-    message(FATAL_ERROR "Failed to find boost at " ${Boost_Lib_Dirs} " Need system thread")
-endif() 
-
-#include_directories(${Boost_INCLUDE_DIR}) 
-
-target_include_directories(ivory PUBLIC ${Boost_INCLUDE_DIR}) 
-#target_link_libraries(ivory ${Boost_LIBRARIES})
-
-message(STATUS "Boost_LIBS ${Boost_LIBRARIES}" )
-
+find_package(libOTe REQUIRED HINTS ${libOTe_Dirs})
 
 #                 Link NTL                  
 ###########################################################################
@@ -125,6 +64,7 @@ endif()
 
 
 
-target_link_libraries(ivory ${libOTe_LIB}  ${cryptoTools_LIB} ${NTL_LIB}  ${Boost_LIBRARIES}  ${MIRACL_LIB})
+target_link_libraries(ivory oc::libOTe)
+
 
 

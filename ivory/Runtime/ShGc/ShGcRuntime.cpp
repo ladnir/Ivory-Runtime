@@ -424,7 +424,7 @@ namespace osuCrypto
 				auto iter = sharedMem.begin();
 				for (u64 i = 0; i < item.mInputBundleCount; ++i) {
 
-					Expects(item.mLabels[i]->size() == item.mCircuit->mInputs[i].mWires.size());
+					assert(item.mLabels[i]->size() == item.mCircuit->mInputs[i].mWires.size());
 
 					std::copy(item.mLabels[i]->begin(), item.mLabels[i]->end(), iter);
 					iter += item.mLabels[i]->size();
@@ -516,7 +516,7 @@ namespace osuCrypto
 
     void ShGcRuntime::copyOp(osuCrypto::ShGc::CircuitItem & item)
     {
-        Expects(item.mLabels.size() == 2); // copy operation
+        assert(item.mLabels.size() == 2); // copy operation
 
         item.mCopyEnd = std::min<u64>(item.mCopyEnd, item.mLabels[0]->size());
 
@@ -525,8 +525,8 @@ namespace osuCrypto
         auto size = end - begin;
             
 
-        auto leftShift = std::max(item.mLeftShift, 0ll);
-        auto rightShift = -std::min(item.mLeftShift, 0ll);
+        auto leftShift = std::max<i64>(item.mLeftShift, 0ll);
+        auto rightShift = -std::min<i64>(item.mLeftShift, 0ll);
         begin += rightShift;
         end -= leftShift; 
 
@@ -570,7 +570,7 @@ namespace osuCrypto
 				if (item.mCircuit->mNonlinearGateCount)
 				{
 					mChannel->recv(sharedBuff);
-					Expects(sharedBuff.size() == item.mCircuit->mNonlinearGateCount * 2);
+					assert(sharedBuff.size() == item.mCircuit->mNonlinearGateCount * 2);
 				}
 				auto gates = span<GarbledGate<2>>(
 					(GarbledGate<2>*) sharedBuff.data(), 
@@ -763,7 +763,9 @@ namespace osuCrypto
 		}
 		else {
 			auto v = subGate(constB, aa, bb, gt);
-			return _mm_or_si128(ShGcRuntime::mPublicLabels[v / 3], (in[constA] & zeroAndAllOne[v > 0])) ^ (zeroAndAllOne[v == 1] & xorOffset);
+			return ( ShGcRuntime::mPublicLabels[v / 3] | 
+				(in[constA] & zeroAndAllOne[v > 0])) ^
+			       	(zeroAndAllOne[v == 1] & xorOffset);
 		}
 	}
 
@@ -809,9 +811,9 @@ namespace osuCrypto
 			auto& gt = gate.mType;
 
 
+			#define GSL_LIKELY(X) X
 
-
-			if (GSL_LIKELY(gt != GateType::a))
+			if (gt != GateType::a)
 			{
 				auto a = wires[gate.mInput[0]];
 				auto b = wires[gate.mInput[1]];
@@ -841,9 +843,9 @@ namespace osuCrypto
 					else
 					{
 						// compute the hashs
-						hashs[0] = _mm_slli_epi64(a, 1) ^ tweaks[0];
-						hashs[1] = _mm_slli_epi64(b, 1) ^ tweaks[1];
-						mAesFixedKey.ecbEncTwoBlocks(hashs, temp);
+						hashs[0] = (a << 1) ^ tweaks[0];
+						hashs[1] = (b << 1) ^ tweaks[1];
+						mAesFixedKey.ecbEncBlocks<2>(hashs, temp);
 						hashs[0] = temp[0] ^ hashs[0];
 						hashs[1] = temp[1] ^ hashs[1];
 
@@ -982,7 +984,7 @@ namespace osuCrypto
 					else
 					{
 #ifndef  NDEBUG
-						Expects(!(gt == GateType::a ||
+						assert(!(gt == GateType::a ||
 							gt == GateType::b ||
 							gt == GateType::na ||
 							gt == GateType::nb ||
@@ -1002,11 +1004,11 @@ namespace osuCrypto
 						cPermuteBit = ((aPermuteBit ^ aAlpha) && (bAlphaBPermute)) ^ cAlpha;
 
 						// compute the hashs of the wires as H(x) = AES_f( x * 2 ^ tweak) ^ (x * 2 ^ tweak)
-						hash[0] = _mm_slli_epi64(a, 1) ^ tweaks[0];
-						hash[1] = _mm_slli_epi64((a ^ mGlobalOffset), 1) ^ tweaks[0];
-						hash[2] = _mm_slli_epi64(b, 1) ^ tweaks[1];
-						hash[3] = _mm_slli_epi64((bNot), 1) ^ tweaks[1];
-						mAesFixedKey.ecbEncFourBlocks(hash, temp);
+						hash[0] = (a << 1) ^ tweaks[0];
+						hash[1] = ((a ^ mGlobalOffset) << 1) ^ tweaks[0];
+						hash[2] = (b << 1) ^ tweaks[1];
+						hash[3] = ((bNot)<< 1) ^ tweaks[1];
+						mAesFixedKey.ecbEncBlocks<4>(hash, temp);
 						hash[0] = hash[0] ^ temp[0]; // H( a0 )
 						hash[1] = hash[1] ^ temp[1]; // H( a1 )
 						hash[2] = hash[2] ^ temp[2]; // H( b0 )
